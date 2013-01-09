@@ -9,15 +9,39 @@ $def with (form)
     <meta name="author" content="">
 
     <!-- Le styles -->
-    <link href="/static/css/bootstrap.css" rel="stylesheet">
     <link href="http://wrongwaycn.github.com/bootstrap/docs/assets/css/bootstrap.css" rel="stylesheet">
     <link href="http://wrongwaycn.github.com/bootstrap/docs/assets/css/bootstrap-responsive.css" rel="stylesheet">
-    <style>
+    <style type="text/css">
       body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+      }
+      .form-signin {
+        max-width: 400px;
+        padding: 19px 29px 29px;
+        margin: 0 auto 20px;
+        background-color: #fff;
+        border: 1px solid #e5e5e5;
+        -webkit-border-radius: 5px;
+           -moz-border-radius: 5px;
+                border-radius: 5px;
+        -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+           -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+                box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      }
+      .form-signin .form-signin-heading,
+      .form-signin .checkbox {
+        margin-bottom: 10px;
+      }
+      .form-signin input[type="text"],
+      .form-signin input[type="password"] {
+        font-size: 16px;
+        height: auto;
+        margin-bottom: 15px;
+        padding: 7px 9px;
       }
     </style>
-    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -53,36 +77,28 @@ $def with (form)
       </div>
     </div>
 
-    <div id="container" class= "container">
+    <div id="container" class= "container"><br>
     <center><h1>正方教务系统查询工具</h1></center>
     <hr>
-    <div id="info" class= "form-actions span7 offset2" align="center">
-
-
-        <form name="main" method="post" accept-charset="utf-8" class="form-horizontal">
-
-
-        $if not form.valid: 
-          <p class="alert alert-danger">Try again, AmeriCAN:</p>
-        $:form.render()
-        <br>
-          <button type="reset" class="btn">重置</button>&nbsp;
-          <button type="submit" class="btn btn-primary">查询</button>
-        </form>
-
-
-      </div>
-
-
-  </div> <!-- /container -->
-    <hr>
-    <center>
-      Power by <a href="http://webpy.org/" target="_blank">web.py</a>&nbsp;
-      <a href="http://python.org/" target="_blank">python</a>&nbsp;
-      <a href="http://sdutlinux.org" target="_blank">SLUG</a>&nbsp;
-      Author:<a href="http://zhwei.42qu.com" target="_blank">zhwei</a>&nbsp;
-      Version:beta 1.0
-    </center>
+    <form name="main" method="post" accept-charset="utf-8" class="form-signin">
+      $if not form.valid: 
+        <p class="alert alert-danger">Try again, AmeriCAN:</p>
+      $:form.render()
+      <br>
+      <label align="center">
+        <button type="submit" class="btn btn-primary">查询</button>&nbsp;
+        <button type="reset" class="btn">重置</button>
+      </label>
+    </form>
+      <hr>
+      <center>
+        Power by <a href="http://webpy.org/" target="_blank">web.py</a>&nbsp;
+        <a href="http://python.org/" target="_blank">python</a>&nbsp;
+        <a href="http://sdutlinux.org" target="_blank">SLUG</a>&nbsp;
+        Author:<a href="http://zhwei.42qu.com" target="_blank">zhwei</a>&nbsp;
+        Version:beta 1.0
+      </center>
+    </div> <!-- /container -->
 
 <!-- baidu sitecenter   -->
     <div style="display: none;">
