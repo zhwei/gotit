@@ -1,0 +1,1 @@
+kill `pgrep -f "python code.py 7070"`

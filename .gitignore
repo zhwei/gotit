@@ -1,4 +1,8 @@
-*.py[cod]
+*.pyc[cod]
+*.out
+log/*
+tools.py
+ 
 
 # C extensions
 *.so

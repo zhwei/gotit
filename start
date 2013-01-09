@@ -1,0 +1,1 @@
+nohup python code.py 7070& > log/print.log
