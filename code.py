@@ -15,6 +15,7 @@ import gpa
 urls = (
         '/', 'index',
         '/contact.html','contact',
+        '/notice.html','notice'
         )
 
 
@@ -145,6 +146,11 @@ class contact:
     def GET(self):
         return render.contact()
         
+#notice 
+class notice:
+    def GET(self):
+        return render.notice()
+
 
 if __name__  == "__main__":
     app = web.application(urls, globals())

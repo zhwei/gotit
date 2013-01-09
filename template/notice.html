@@ -3,7 +3,7 @@ $def with(table, error)
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>查询结果</title>
+    <title>公告</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -40,7 +40,7 @@ $def with(table, error)
           <div class="nav-collapse">
             <ul class="nav">
               <li><a href="/">首页</a></li>
-              <li class="active"><a href="#">查询结果</a></li>
+              <li class="active"><a href="#">公告</a></li>
               <li><a href="contact.html" target="_blank">联系我们</a></li>
             </ul>
           </div><!--/.nav-collapse -->
@@ -49,11 +49,15 @@ $def with(table, error)
     </div>
 
     <div id="container" class= "container">
-    	<table border="1" class= "table table-striped table-bordered table-condensed">
-			$for i in table:
-				$:i
-		</table>
-		<h2 id="error">$error</h2>
+      
+      <h2>网站公告</h2>
+      <ul>
+
+        <div class="alert alert-info">
+          <li>当出现<strong>System is Busy!!!</strong>时是因为正方教务系未为正常运行,非本网站原因</li>
+        </div>
+        
+      </ul>
   	</div> <!-- /container -->
     <hr>
     <center>
@@ -63,11 +67,11 @@ $def with(table, error)
       Author:<a href="http://zhwei.42qu.com" target="_blank">zhwei</a>&nbsp;
       Version:beta 1.0
     </center>
-<!-- baidu sitecenter   -->
+    <!-- baidu sitecenter   -->
     <script type="text/javascript">
       var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
       document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F8798cad9d47e876ea6c4f4ce5ff5fe5b' type='text/javascript'%3E%3C/script%3E"));
     </script>
-<!-- baidu sitecenter   -->
+    <!-- baidu sitecenter   -->
   </body>
 </html>
