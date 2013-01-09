@@ -20,9 +20,6 @@ urls = (
 
 render = web.template.render('template/') # your templates
 
-#info
-##_xh = '1111051046'
-#_pw = 'zhejiushimima@JW'
 #urls
 login_url = 'http://210.44.176.132/default3.aspx'
 
@@ -103,7 +100,6 @@ class index:
         else:
             _xh = form.d.number
             _pw = form.d.password
-            print _xh + "+++" + _pw
             t = form.d.Type
 
             if login(login_url,_xh,_pw):
