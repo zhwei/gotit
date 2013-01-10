@@ -27,8 +27,11 @@ def get_first():
     u1 = urllib2.urlopen(url1)
     url2 = u1.get_url()
     url3 = url2[:-13]
-    login = url3 + "default3.aspx"
-    return login
+    return first
+def get_login():
+    aaa = get_first()
+    bbb = aaa + "Default3.aspx"
+    return bbb
 
 #get url
 def get_url(_xh,funl):
@@ -109,7 +112,7 @@ class index:
             _xh = form.d.number
             _pw = form.d.password
             t = form.d.Type
-
+            login_url = get_login()    
             if login(login_url,_xh,_pw):
                 opener = login(login_url, _xh,_pw)
                 if t == "1":
