@@ -22,14 +22,17 @@ urls = (
 render = web.template.render('template/') # your templates
 
 #urls
-url1 = "http://210.44.176.133/"
-u1 = urllib2.urlopen(url1)
-url2 = u1.get_url()
-url3 = url2[:-13]
-login_url = url3 + 'default3.aspx'
+def get_first():
+    url1 = "http://210.44.176.133"
+    u1 = urllib2.urlopen(url1)
+    url2 = u1.get_url()
+    url3 = url2[:-13]
+    login = url3 + "default3.aspx"
+    return login
 
 #get url
 def get_url(_xh,funl):
+    url3 = get_first()
     url= url3 + funl +'.aspx?xh=' + _xh 
     print url
     return url
