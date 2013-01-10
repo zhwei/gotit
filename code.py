@@ -28,14 +28,14 @@ def get_first():
     url2 = u1.geturl()
     url3 = url2[:-13]
     return url3
-def get_login():
-    aaa = get_first()
-    bbb = aaa + "Default3.aspx"
+
+
+def get_login(url3):
+    bbb = url3 + "Default3.aspx"
     return bbb
 
 #get url
-def get_url(_xh,funl):
-    url3 = get_first()
+def get_url(_xh,funl,url3):
     url= url3 + funl +'.aspx?xh=' + _xh 
     print url
     return url
@@ -100,6 +100,8 @@ info_form = form.Form(
 
 #成绩查询
 class index:
+    url3 = get_first()
+
     def GET(self):
         form = info_form()
         return render.index(form)
@@ -112,7 +114,7 @@ class index:
             _xh = form.d.number
             _pw = form.d.password
             t = form.d.Type
-            login_url = get_login()    
+            login_url = get_login(url3)    
             if login(login_url,_xh,_pw):
                 opener = login(login_url, _xh,_pw)
                 if t == "1":
@@ -139,7 +141,7 @@ class index:
                 else:
                     return '<script type="text/javascript">alert("输入不合理!");top.location="/"</script>'
 
-                score_url = get_url(_xh,funl)
+                score_url = get_url(_xh,funl,url3)
                 table = get_score(score_url, opener,tname)
 
                 if table:
