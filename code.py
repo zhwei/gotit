@@ -27,7 +27,7 @@ def get_first():
     u1 = urllib2.urlopen(url1)
     url2 = u1.geturl()
     url3 = url2[:-13]
-    return first
+    return url3
 def get_login():
     aaa = get_first()
     bbb = aaa + "Default3.aspx"
