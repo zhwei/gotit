@@ -25,7 +25,7 @@ render = web.template.render('template/') # your templates
 def get_first():
     url1 = "http://210.44.176.133"
     u1 = urllib2.urlopen(url1)
-    url2 = u1.get_url()
+    url2 = u1.geturl()
     url3 = url2[:-13]
     return first
 def get_login():
