@@ -10,7 +10,7 @@ import urllib
 import urllib2
 import cookielib
 from BeautifulSoup import BeautifulSoup
-import gpa
+from calc_GPA import GPA
 
 urls = (
         '/', 'index',
@@ -126,7 +126,8 @@ class index:
                     tname = "Table1"
                     funl = "xskbcx"
                 elif t == "4":
-                    a = gpa.calc_score(_xh)
+                    gpa = GPA(_xh)
+                    a = gpa.get_gpa()
                     table = [
                         # "<tr><td><strong>姓名</strong></td><td><strong>" + str(a["name"])+"</strong></td></tr>",
                         # "<tr><td><strong>班级</strong></td><td><strong>" + str(a["class"])+"</strong></td></tr>",
