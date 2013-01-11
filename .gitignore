@@ -2,6 +2,7 @@
 *.out
 log/*
 tools.py
+dong.py
  
 
 # C extensions
