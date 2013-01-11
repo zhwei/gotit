@@ -22,11 +22,21 @@ urls = (
 render = web.template.render('template/') # your templates
 
 #urls
-login_url = 'http://210.44.176.132/default3.aspx'
+def get_first():
+    url1 = "http://210.44.176.133"
+    u1 = urllib2.urlopen(url1)
+    url2 = u1.geturl()
+    url3 = url2[:-13]
+    return url3
+
+
+def get_login(url3):
+    bbb = url3 + "Default3.aspx"
+    return bbb
 
 #get url
-def get_url(_xh,funl):
-    url='http://210.44.176.132/' + funl +'.aspx?xh=' + _xh 
+def get_url(_xh,funl,url3):
+    url= url3 + funl +'.aspx?xh=' + _xh 
     print url
     return url
 
@@ -51,33 +61,33 @@ def login(login_url,_xh,_pw):
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(student_cookie))
     data = '__VIEWSTATE='+VIEWSTATE+'&TextBox1='+_xh+'&TextBox2='+_pw+'&ddl_js=%D1%A7%C9%FA&Button1=+%B5%C7+%C2%BC+'
     try:
-    	login_request = urllib2.Request(login_url, data)
-    	opener.open(login_request, data)
-    	# print opener
-    	return opener
+        login_request = urllib2.Request(login_url, data)
+        opener.open(login_request, data)
+        # print opener
+        return opener
     except:
-    	# out = ["<div class='alert alert-error'><h4><center><strong>Login ERROR!!!</strong><center></h4></div>",]
-    	return "error"
+        # out = ["<div class='alert alert-error'><h4><center><strong>Login ERROR!!!</strong><center></h4></div>",]
+        return "error"
 
 
 def get_score(score_url, opener,tname):
     #get result page
     if opener == "error":
-    	out = ["<div class='alert alert-error'><h4><center><strong>Login ERROR!!!</strong><center></h4></div>",]
-    	return out
+        out = ["<div class='alert alert-error'><h4><center><strong>Login ERROR!!!</strong><center></h4></div>",]
+        return out
     else:
-	    score_html = opener.open(score_url).read()
-	    if score_html:
-	        #print score_html
-	        print('html is ok')
-	    #get table
-	    soup = BeautifulSoup(score_html, fromEncoding='gbk')
-	    table = soup.find("table", {"id": tname}) #table is class
-	    if table:
-	        out = table.contents
-	    else:
-	        out = ["<div class='alert alert-error'><h4><center><strong>System is Busy!!!</strong><center></h4></div>",]
-	    return out
+        score_html = opener.open(score_url).read()
+        if score_html:
+            #print score_html
+            print('html is ok')
+        #get table
+        soup = BeautifulSoup(score_html, fromEncoding='gbk')
+        table = soup.find("table", {"id": tname}) #table is class
+        if table:
+            out = table.contents
+        else:
+            out = ["<div class='alert alert-error'><h4><center><strong>System is Busy!!!</strong><center></h4></div>",]
+        return out
 
 
 info_form = form.Form(
@@ -102,7 +112,8 @@ class index:
             _xh = form.d.number
             _pw = form.d.password
             t = form.d.Type
-
+            url3 = get_first()
+            login_url = get_login(url3)    
             if login(login_url,_xh,_pw):
                 opener = login(login_url, _xh,_pw)
                 if t == "1":
@@ -115,21 +126,21 @@ class index:
                     tname = "Table1"
                     funl = "xskbcx"
                 elif t == "4":
-                	a = gpa.calc_score(_xh)
-                	table = [
-                		# "<tr><td><strong>姓名</strong></td><td><strong>" + str(a["name"])+"</strong></td></tr>",
-                		# "<tr><td><strong>班级</strong></td><td><strong>" + str(a["class"])+"</strong></td></tr>",
-                		"<tr><td><strong>平均学分绩点</strong></td><td><strong>" + str(a["ave_score"])+"</strong></td></tr>",
-                		# "<tr><td><strong>总基点</strong></td><td><strong>" + str(a["total_score"])+"</strong></td></tr>",
-                		# "<tr><td><strong>总学分</strong></td><td><strong>" + str(a["totle_credits"])+"</strong></td></tr>",
-                		# "<tr><td><strong>至今未通过科目</strong></td><td><strong>" + str(len(a['not_accept']))+"</strong></td></tr>",
-                	]
-                	error = None
-                	return render.result(table,error)
+                    a = gpa.calc_score(_xh)
+                    table = [
+                        # "<tr><td><strong>姓名</strong></td><td><strong>" + str(a["name"])+"</strong></td></tr>",
+                        # "<tr><td><strong>班级</strong></td><td><strong>" + str(a["class"])+"</strong></td></tr>",
+                        "<tr><td><strong>平均学分绩点</strong></td><td><strong>" + str(a["ave_score"])+"</strong></td></tr>",
+                        # "<tr><td><strong>总基点</strong></td><td><strong>" + str(a["total_score"])+"</strong></td></tr>",
+                        # "<tr><td><strong>总学分</strong></td><td><strong>" + str(a["totle_credits"])+"</strong></td></tr>",
+                        # "<tr><td><strong>至今未通过科目</strong></td><td><strong>" + str(len(a['not_accept']))+"</strong></td></tr>",
+                    ]
+                    error = None
+                    return render.result(table,error)
                 else:
                     return '<script type="text/javascript">alert("输入不合理!");top.location="/"</script>'
 
-                score_url = get_url(_xh,funl)
+                score_url = get_url(_xh,funl,url3)
                 table = get_score(score_url, opener,tname)
 
                 if table:

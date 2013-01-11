@@ -3,7 +3,7 @@ $def with(table, error)
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>查询结果</title>
+    <title>查询结果--Got it</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -36,10 +36,10 @@ $def with(table, error)
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="/">正方教务查询系统</a>
+          <a class="brand" href="/">Got it</a>
           <div class="nav-collapse">
             <ul class="nav">
-              <li><a href="/">首页</a></li>
+              <li><a href="http://gotit.asia/">首页</a></li>
               <li><a href="/notice.html" >公告</a></li>
               <li class="active"><a href="#">查询结果</a></li>
               <li><a href="/contact.html" >联系我们</a></li>
@@ -49,15 +49,13 @@ $def with(table, error)
       </div>
     </div>
 
-    <div class="jumbotron">
-      <div id="container" class= "container">
-        <table border="1" class= "table table-striped table-bordered table-condensed">
-            $for i in table:
-              $:i
-          </table>
-          <h2 id="error">$error</h2>
-          </div> <!-- /container -->
-    </div>
+    <div id="container" class= "container">
+    	<table border="1" class= "table table-striped table-bordered table-condensed">
+			$for i in table:
+				$:i
+		</table>
+		<h2 id="error">$error</h2>
+  	</div> <!-- /container -->
     <hr>
     <center>
       Power by <a href="http://webpy.org/" target="_blank">web.py</a>&nbsp;

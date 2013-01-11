@@ -3,10 +3,10 @@ $def with (form)
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>正方教务系统查询工具</title>
+    <title>Got it--正方教务系统查询工具</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="Got it,正方教务系统查询工具">
+    <meta name="author" content="zhwei">
 
     <!-- Le styles -->
     <link href="http://wrongwaycn.github.com/bootstrap/docs/assets/css/bootstrap.css" rel="stylesheet">
@@ -65,7 +65,7 @@ $def with (form)
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="/">正方教务查询系统</a>
+          <a class="brand" href="http://gotit.asia/">Got it</a>
           <div class="nav-collapse">
             <ul class="nav">
               <li class="active"><a href="/">首页</a></li>
@@ -81,14 +81,17 @@ $def with (form)
     <center><h1>正方教务系统查询工具</h1></center>
     <hr>
     <form name="main" method="post" accept-charset="utf-8" class="form-signin">
+      <div class="alert alert-success">
+        由于正方系统验证方式改变, 昨晚本系统服务异常, 现已更新,详情见<a href="http://gotit.asia/notice.html">公告</a>
+      </div>
       $if not form.valid: 
-        <p class="alert alert-danger">Try again, AmeriCAN:</p>
+        <p class="alert alert-danger">输入错误:</p>
       $:form.render()
       <br>
-      <label align="center">
+      <center>
         <button type="submit" class="btn btn-primary">查询</button>&nbsp;
         <button type="reset" class="btn">重置</button>
-      </label>
+      </center>
     </form>
       <hr>
       <center>
