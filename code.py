@@ -3,7 +3,7 @@
 
 import web
 from web import form
-web.config.debug = True
+web.config.debug = False
 
 import random
 import re
