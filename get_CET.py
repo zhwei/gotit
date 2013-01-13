@@ -4,8 +4,28 @@ import re
 import urllib
 import urllib2
 import logging
+
 class CET:
     '''Get CET score'''
+    def get_last_cet_score(self,num,name):
+        '''从官方网站获取最新四六级成绩'''
+        header = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6','Referer':'http://www.chsi.com.cn/cet/'}
+        url = 'http://www.chsi.com.cn/cet/query'
+        params = urllib.urlencode({'zkzh':num,'xm':name})
+        req = urllib2.Request(url,data=params,headers= header)
+        page = urllib2.urlopen(req).read()
+        #解析
+        ret = {}
+        try:
+            ret['name'], ret['school'], ret['type'], ret['num'], ret['time'] = re.findall("<td>(.*)</td>",page)[0:5]
+            ret['total'] = re.findall('<span style="color: #F00;">  (\d*)  </span>',page)[0]
+            ret['listen'],ret['read'],ret['mix'] =re.findall('(\d*) &nbsp;&nbsp;<span class="color01">',page)[1:4]
+            ret['write'] = re.findall('(\d*)   </strong></td>',page)[0]
+            return ret
+        except:
+            return -1
+
+
     def get_cet_table(self,num):
         '''获取四六级成绩（直接返回一个表格）'''
         param = urllib.urlencode({'post_xuehao':num})
@@ -58,10 +78,16 @@ class CET:
         return ret
 
 if __name__=='__main__':
-	num = raw_input("please input your number: ")
-	cet = CET()
-	info =  cet.get_cet_dict(num)
-	for i in  range(info['total']):
-		print info['num'],info['name'],
-		print info['cet_num'][i],info['cet_time'][i],
-		print info['cet_type'][i],info['cet_score'][i]
+    cet_num = raw_input("请输入你最近一次四六级的考号: ")
+    name = raw_input("请输入您的姓名: ")
+    cet = CET()
+    ret =  cet.get_last_cet_score(cet_num,name)
+    for key in ret.keys():
+        print key,ret[key]
+    num = raw_input("请输入你的学号: ")
+    cet = CET()
+    info =  cet.get_cet_dict(num)
+    for i in  range(info['total']):
+        print info['num'],info['name'],
+        print info['cet_num'][i],info['cet_time'][i],
+        print info['cet_type'][i],info['cet_score'][i]
