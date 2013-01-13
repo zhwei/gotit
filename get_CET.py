@@ -21,9 +21,11 @@ class CET:
             ret['total'] = re.findall('<span style="color: #F00;">  (\d*)  </span>',page)[0]
             ret['listen'],ret['read'],ret['mix'] =re.findall('(\d*) &nbsp;&nbsp;<span class="color01">',page)[1:4]
             ret['write'] = re.findall('(\d*)   </strong></td>',page)[0]
+            print ret
             return ret
         except:
-            return -1
+            ret["error"] = u"尚无成绩!"
+            return ret
 
 
     def get_cet_table(self,num):
@@ -78,16 +80,24 @@ class CET:
         return ret
 
 if __name__=='__main__':
-    cet_num = raw_input("请输入你最近一次四六级的考号: ")
-    name = raw_input("请输入您的姓名: ")
+    cet_num = "371012122112608"
+    # cet_num = "371012121210906"
+    # name = "马伟伟"
+    name = "张卫"
     cet = CET()
-    ret =  cet.get_last_cet_score(cet_num,name)
-    for key in ret.keys():
-        print key,ret[key]
-    num = raw_input("请输入你的学号: ")
-    cet = CET()
-    info =  cet.get_cet_dict(num)
-    for i in  range(info['total']):
-        print info['num'],info['name'],
-        print info['cet_num'][i],info['cet_time'][i],
-        print info['cet_type'][i],info['cet_score'][i]
+    ret = cet.get_last_cet_score(cet_num, name)
+
+    if type(ret) == dict:
+        for key in ret.keys():
+            print key,ret[key]
+    else:
+        print "aaaa"
+
+
+    # num = raw_input("请输入你的学号: ")
+    # cet = CET()
+    # info =  cet.get_cet_dict(num)
+    # for i in  range(info['total']):
+    #     print info['num'],info['name'],
+    #     print info['cet_num'][i],info['cet_time'][i],
+    #     print info['cet_type'][i],info['cet_score'][i]
