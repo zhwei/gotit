@@ -80,24 +80,10 @@ class CET:
         return ret
 
 if __name__=='__main__':
-    cet_num = "371012122112608"
-    # cet_num = "371012121210906"
-    # name = "马伟伟"
-    name = "张卫"
-    cet = CET()
-    ret = cet.get_last_cet_score(cet_num, name)
-
-    if type(ret) == dict:
-        for key in ret.keys():
-            print key,ret[key]
-    else:
-        print "aaaa"
-
-
-    # num = raw_input("请输入你的学号: ")
-    # cet = CET()
-    # info =  cet.get_cet_dict(num)
-    # for i in  range(info['total']):
-    #     print info['num'],info['name'],
-    #     print info['cet_num'][i],info['cet_time'][i],
-    #     print info['cet_type'][i],info['cet_score'][i]
+     num = raw_input("请输入你的学号: ")
+     cet = CET()
+     info =  cet.get_cet_dict(num)
+     for i in  range(info['total']):
+         print info['num'],info['name'],
+         print info['cet_num'][i],info['cet_time'][i],
+         print info['cet_type'][i],info['cet_score'][i]
