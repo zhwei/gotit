@@ -21,7 +21,8 @@ urls = (
         '/', 'index',
         '/cet', 'cet',
         '/contact.html','contact',
-        '/notice.html','notice'
+        '/notice.html','notice', 
+        '/orca.txt', 'orca', 
         )
 
 
@@ -193,6 +194,10 @@ class notice:
     def GET(self):
         return render.notice()
 
+#orca accelerating
+class orca:
+    def GET(self):
+        return render.orca()
 
 if __name__  == "__main__":
     app = web.application(urls, globals())
