@@ -150,7 +150,7 @@ class index:
                         # "<tr><td><strong>至今未通过科目</strong></td><td><strong>" + str(len(a['not_accept']))+"</strong></td></tr>",
                     ]
                     error = None
-                    return render.result_dic(table,error)
+                    return render.result(table,error)
                 else:
                     return '<script type="text/javascript">alert("输入不合理!");top.location="/"</script>'
 
