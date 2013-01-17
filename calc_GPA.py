@@ -122,6 +122,9 @@ class GPA:
         credits=GPA.__ret['credits']      #学分
         score=GPA.__ret['score']          #成绩
         score2=GPA.__ret['score2']        #补考成绩
+        set_course = []
+        set_score = []
+        set_credit = []
         i = 0
         all = len(type)
         while(i<all):
@@ -134,7 +137,26 @@ class GPA:
 
             s = self.__score2number(score[i])   #将成绩五级成绩等转换成百分成绩
             s2 = self.__score2number(score2[i]) #将成绩五级成绩等转换成百分成绩
-
+            if s > s2:
+                max = s
+            else:
+                max = s2
+            if course[i] in set_course:    #重修则只计算两次成绩的最大值
+                position = set_course.index(course[i]) #获取这门课程在列表中的位置
+                if max < 60: #重修成绩不足60分直接忽略
+                    i += 1
+                    continue
+                if max >float(set_score[position]): #重修成绩比原来成绩高的话删除原来成绩，计算重修成绩
+                    totle_credits -= float(set_credit[position])
+                    totle_score -= float(set_score[position])*float(set_credit[position])
+                    set_score[position] = max
+                else:
+                    i += 1
+                    continue
+            else:
+                set_course.append(course[i])
+                set_score.append(max)
+                set_credit.append(credits[i])
             totle_credits+=float(credits[i])  #总学分
             if s<60:          #成绩小于60
                 if s2 >= 60:
