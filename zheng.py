@@ -26,18 +26,17 @@ class ZHENG:
         base_url = with_random_url[:-13]
         return base_url
 
-    def __get_login_url(self):
-        base_url = self.__get_base_url()
+    def __get_login_url(self,base_url):
         login_url = base_url + "Default3.aspx"
         return login_url
 
-    def __get_url(self):
-        base_url = self.__get_base_url()
+    def __get_url(self,base_url):
         func_url = base_url + self.func + ".aspx?xh=" + self._xh
         return func_url
     
-    def login(self):
-        login_url = self.__get_login_url()
+    def login(self,base_url):
+        login_url = self.__get_login_url(base_url)
+        print login_url
         html1 = urllib.urlopen(login_url).read()
         a = re.compile('<input type="hidden" name="__VIEWSTATE" value="(.*)" />')
         VIEWSTATE = a.findall(html1)[0]
@@ -58,9 +57,10 @@ class ZHENG:
 
 
     def get_table(self):
-        opener = self.login()
+        base_url = self.__get_base_url()
+        opener = self.login(base_url)
         if opener:
-            target_url = self.__get_url()
+            target_url = self.__get_url(base_url)
             print target_url
             target_html = opener.open(target_url).read()
             soup = BeautifulSoup(target_html, fromEncoding='gbk')
@@ -72,7 +72,6 @@ class ZHENG:
             table = soup.find("table", {"id": table_name}) #table is class
             result = table.contents
             return result
-
         else:
             result = [u"<div class='alert alert-error'><h4><center><strong>用户名或密码错误!</strong><center></h4></div>",]
             return result
