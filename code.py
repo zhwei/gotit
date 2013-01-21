@@ -23,6 +23,7 @@ urls = (
         '/contact.html','contact',
         '/notice.html','notice', 
         '/orca.txt', 'orca', 
+        '/root.txt', 'ttest', 
         )
 
 
@@ -124,6 +125,10 @@ class notice:
 class orca:
     def GET(self):
         return render.orca()
+#taobao accelerating
+class ttest:
+    def GET(self):
+        return render.root()
 
 if __name__  == "__main__":
     app = web.application(urls, globals())
