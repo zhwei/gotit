@@ -7,6 +7,8 @@ import urllib2
 import cookielib
 from BeautifulSoup import BeautifulSoup
 
+from cache import Cache
+
 global URL
 URL = "http://210.44.176.133"
 
@@ -25,6 +27,18 @@ class ZHENG:
         with_random_url = target.geturl()
         base_url = with_random_url[:-13]
         return base_url
+
+    def cache_url(self):
+        ''''''
+        cache = Cache()
+        url = self.__get_base_url()
+        cache.set('url',url,500)
+        while True:
+            result = cache.get('url')
+            if result is None:
+                result = __get_base_url()
+                cache.set('url',result,500)
+            return result
 
     def __get_login_url(self,base_url):
         login_url = base_url + "Default3.aspx"
@@ -57,7 +71,7 @@ class ZHENG:
 
 
     def get_table(self):
-        base_url = self.__get_base_url()
+        base_url = self.cache_url()
         opener = self.login(base_url)
         if opener:
             target_url = self.__get_url(base_url)
