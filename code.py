@@ -11,10 +11,10 @@ import urllib2
 import cookielib
 from BeautifulSoup import BeautifulSoup
 
-#self
-from calc_GPA import GPA
-from get_CET import CET
-from zheng import ZHENG
+#addons
+from addons.calc_GPA import GPA
+from addons.get_CET import CET
+from addons.zheng import ZHENG
 
 
 urls = (

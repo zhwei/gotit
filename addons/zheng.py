@@ -5,10 +5,9 @@ import re
 import urllib
 import urllib2
 import cookielib
+from BeautifulSoup import BeautifulSoup
 
-from addons.BeautifulSoup import BeautifulSoup
-
-from addons.cache import Cache
+from cache import Cache
 
 global URL
 URL = "http://210.44.176.133"
