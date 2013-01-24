@@ -1,6 +1,5 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
-import random
 import re
 import urllib
 import urllib2

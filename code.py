@@ -4,13 +4,6 @@ import web
 from web import form
 web.config.debug = False
 
-import random
-import re
-import urllib
-import urllib2
-import cookielib
-from BeautifulSoup import BeautifulSoup
-
 #addons
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
@@ -25,7 +18,6 @@ urls = (
         '/orca.txt', 'orca', 
         '/root.txt', 'ttest', 
         )
-
 
 render = web.template.render('template/') # your templates
 
