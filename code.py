@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import web
 from web import form
-web.config.debug = False
+web.config.debug = True
 
 #addons
 from addons.calc_GPA import GPA
@@ -16,7 +16,8 @@ urls = (
         '/contact.html','contact',
         '/notice.html','notice', 
         '/root.txt', 'ttest', 
-        '/json/(\d{11}|\d{10})/(.*)','json',
+        '/api/score','api_score',
+        '/api/cet','api_cet',
         )
 
 render = web.template.render('template/') # your templates
@@ -102,12 +103,22 @@ class cet:
             result = cet.get_last_cet_score(zkzh,name)
             return render.result_dic(items,result)
 
-#json
-class json:
-    def GET(self,xh,pw):
-        zheng = ZHENG(xh,pw,'xscjcx_dq')
+#api
+class api_score:
+    def GET(self):
+        return 'Hello World!'
+    def POST(self):
+        data=web.input()
+        _xh=data.xh
+        _pw=data.pw
+        zheng = ZHENG(_xh,_pw,'xscjcx_dq')
         json = zheng.get_json()
         return json
+class api_cet:
+    def GET(self):
+        return 'cet'
+    def POST(self):
+        data=web.input()
 
 #contact us
 class contact:

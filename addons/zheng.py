@@ -112,47 +112,8 @@ class ZHENG:
         dic = {}
         for i in result:
             (key,value) = i
-        dic[key] = value
+            dic[key] = value
         return dic
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
