@@ -70,8 +70,8 @@ class ZHENG:
     def login(self,base_url):
         login_url = self.__get_login_url(base_url)
 
-        logger = initlog("log/zheng.log")
-        logger.info(login_url)                  #loging the login url
+        #logger = initlog("log/zheng.log")
+        #logger.info(login_url)                  #loging the login url
 
         html1 = urllib.urlopen(login_url).read()
         a = re.compile('<input type="hidden" name="__VIEWSTATE" value="(.*)" />')
@@ -88,6 +88,7 @@ class ZHENG:
         t = status.find(key)
         if t != -1:
             logger.error(self._xh+"    login error")    #when it can not login , log it's number
+            print(self._xh+"    login error")    #when it can not login , log it's number
             return None
         else:
             return opener
@@ -98,8 +99,8 @@ class ZHENG:
         opener = self.login(base_url)
         if opener:
             target_url = self.__get_url(base_url)
-            logger = initlog("log/zheng.log")
-            logger.info(target_url)
+            #logger = initlog("log/zheng.log")
+            #logger.info(target_url)
             target_html = opener.open(target_url).read()
             soup = BeautifulSoup(target_html, fromEncoding='gbk')
             if self.func == "xskbcx":
