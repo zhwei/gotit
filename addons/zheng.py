@@ -114,46 +114,15 @@ class ZHENG:
             result = [u"<div class='alert alert-error'><h4><center><strong>用户名或密码错误!</strong><center></h4></div>",]
             return result
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def get_json(self):
+        table = self.get_table()
+        score_re = re.compile('<td>.*</td><td>.</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td>')
+        result = score_re.findall(str(table))
+        dic = {}
+        for i in result:
+            (key,value) = i
+            dic[key] = value
+        return dic
 
 
 

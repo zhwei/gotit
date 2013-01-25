@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import web
 from web import form
-web.config.debug = False
+web.config.debug = True
 
 #addons
 from addons.calc_GPA import GPA
@@ -15,8 +15,10 @@ urls = (
         '/cet', 'cet',
         '/contact.html','contact',
         '/notice.html','notice', 
-        '/orca.txt', 'orca', 
         '/root.txt', 'ttest', 
+        '/api/score','api_score',
+        '/api/cet','api_cet',
+        '/api/gpa','api_gpa',
         )
 
 render = web.template.render('template/') # your templates
@@ -102,6 +104,37 @@ class cet:
             result = cet.get_last_cet_score(zkzh,name)
             return render.result_dic(items,result)
 
+#api
+class api_score:
+    def GET(self):
+        return 'Hello World!'
+    def POST(self):
+        data=web.input()
+        _xh=data.xh
+        _pw=data.pw
+        zheng = ZHENG(_xh,_pw,'xscjcx_dq')
+        json = zheng.get_json()
+        return json
+class api_cet:
+    def GET(self):
+        return 'cet'
+    def POST(self):
+        data=web.input()
+        nu = data.nu
+        name=data.name.encode('utf-8')
+        cet = CET()
+        result = cet.get_last_cet_score(nu,name)
+        return result
+class api_gpa:
+    def GET(self):
+        return 'gpa'
+    def POST(self):
+        data = web.input()
+        xh = data.xh
+        gpa = GPA(xh)
+        result = gpa.get_gpa()
+        return result
+
 #contact us
 class contact:
     """contact us page"""
@@ -113,10 +146,6 @@ class notice:
     def GET(self):
         return render.notice()
 
-#orca accelerating
-class orca:
-    def GET(self):
-        return render.orca()
 #taobao accelerating
 class ttest:
     def GET(self):
