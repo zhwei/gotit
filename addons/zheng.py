@@ -13,6 +13,15 @@ URL = "http://210.44.176.133"
 
 def initlog(logfile):
     import logging
+    import os
+    if os.path.exists('log'):
+        pass
+    else:
+        os.mkdir('log')
+    if os.path.isfile(logfile):
+        pass
+    else:
+        os.mknod(logfile)
     logger    = logging.getLogger()
     hdlr      = logging.FileHandler(logfile)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
