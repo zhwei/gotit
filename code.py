@@ -1,6 +1,7 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 import web
+import json
 from web import form
 web.config.debug = True
 
@@ -124,6 +125,7 @@ class api_cet:
         name=data.name.encode('utf-8')
         cet = CET()
         result = cet.get_last_cet_score(nu,name)
+        result = json.dumps(result)
         return result
 class api_gpa:
     def GET(self):
@@ -133,6 +135,7 @@ class api_gpa:
         xh = data.xh
         gpa = GPA(xh)
         result = gpa.get_gpa()
+        result = json.dumps(result)
         return result
 
 #contact us
