@@ -15,8 +15,8 @@ urls = (
         '/cet', 'cet',
         '/contact.html','contact',
         '/notice.html','notice', 
-        '/orca.txt', 'orca', 
         '/root.txt', 'ttest', 
+        '/json/(\d{11}|\d{10})/(.*)','json',
         )
 
 render = web.template.render('template/') # your templates
@@ -102,6 +102,13 @@ class cet:
             result = cet.get_last_cet_score(zkzh,name)
             return render.result_dic(items,result)
 
+#json
+class json:
+    def GET(self,xh,pw):
+        zheng = ZHENG(xh,pw,'xscjcx_dq')
+        json = zheng.get_json()
+        return json
+
 #contact us
 class contact:
     """contact us page"""
@@ -113,10 +120,6 @@ class notice:
     def GET(self):
         return render.notice()
 
-#orca accelerating
-class orca:
-    def GET(self):
-        return render.orca()
 #taobao accelerating
 class ttest:
     def GET(self):
