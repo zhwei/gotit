@@ -1,12 +1,14 @@
 # apis
 * * *
 ## 成绩查询系统
-+ ###url: http://gotit.asia/api/score
++ ### url: http://gotit.asia/api/score
 + ### 支持的方法:
         POST
+        
 + ### 参数
         xh        #学号
         pw        #密码
+        
 + ### 返回值
         {"科目1":"成绩1",...,...}
     
