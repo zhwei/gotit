@@ -116,6 +116,7 @@ class ZHENG:
             return result
 
     def get_json(self):
+        import json
         table = self.get_table()
         score_re = re.compile('<td>.*</td><td>.</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td>')
         result = score_re.findall(str(table).decode('utf-8'))
@@ -123,7 +124,8 @@ class ZHENG:
         for i in result:
             (key,value) = i
             dic[key] = value
-        return dic
+        json = json.dumps(dic)
+        return json
 
 
 
