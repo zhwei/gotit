@@ -18,6 +18,7 @@ urls = (
         '/root.txt', 'ttest', 
         '/api/score','api_score',
         '/api/cet','api_cet',
+        '/api/gpa','api_gpa',
         )
 
 render = web.template.render('template/') # your templates
@@ -119,6 +120,20 @@ class api_cet:
         return 'cet'
     def POST(self):
         data=web.input()
+        nu = data.nu
+        name=data.name.encode('utf-8')
+        cet = CET()
+        result = cet.get_last_cet_score(nu,name)
+        return result
+class api_gpa:
+    def GET(self):
+        return 'gpa'
+    def POST(self):
+        data = web.input()
+        xh = data.xh
+        gpa = GPA(xh)
+        result = gpa.get_gpa()
+        return result
 
 #contact us
 class contact:
