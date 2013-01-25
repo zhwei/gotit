@@ -55,7 +55,7 @@ class ZHENG:
         while True:
             result = cache.get('url')
             if result is None:
-                result = __get_base_url()
+                result = self.__get_base_url()
                 cache.set('url',result,500)
             return result
 
