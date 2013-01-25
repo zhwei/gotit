@@ -87,7 +87,7 @@ class ZHENG:
         key = string.decode('utf-8').encode('gb2312')
         t = status.find(key)
         if t != -1:
-            logger.error(self._xh+"    login error")    #when it can not login , log it's number
+            #logger.error(self._xh+"    login error")    #when it can not login , log it's number
             print(self._xh+"    login error")    #when it can not login , log it's number
             return None
         else:
