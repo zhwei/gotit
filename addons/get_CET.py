@@ -13,7 +13,7 @@ class CET:
         url = 'http://www.chsi.com.cn/cet/query'
         params = urllib.urlencode({'zkzh':num,'xm':name})
         req = urllib2.Request(url,data=params,headers= header)
-        page = urllib2.urlopen(req).read()
+        page = urllib2.urlopen(req).read().decode('utf-8')
         #解析
         ret = {}
         try:
