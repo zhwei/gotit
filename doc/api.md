@@ -1,4 +1,4 @@
-# apis
+# api
 * * *
 ## 成绩查询系统
 + ### url: http://gotit.asia/api/score
