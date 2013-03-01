@@ -20,7 +20,7 @@ class CET:
             ret['name'], ret['school'], ret['type'], ret['num'], ret['time'] = re.findall("<td>(.*)</td>",page)[0:5]
             ret['total'] = re.findall('<span style="color: #F00;">(\d*)</span>',page)[0]
             ret['listen'],ret['read'],ret['mix'] =re.findall('</span>(\d*)&nbsp;&nbsp;<',page)[1:4]
-            ret['write'] = re.findall('(\d*)   </strong></td>',page)[0]
+            ret['write'] = re.findall('</span>(\d*)</strong></td>',page)[0]
             return ret
         except:
             ret["error"] = u"尚无成绩!"

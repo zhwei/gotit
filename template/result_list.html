@@ -1,4 +1,4 @@
-$def with(items,result)
+$def with(items,lis)
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -55,8 +55,8 @@ $def with(items,result)
     $for i in items:<td><strong>$i</strong></td>
     </tr>
     <tr>
-    $for key in result.keys():
-        <td><strong>$result[key]</strong></td>
+    $for key in lis:
+        <td><strong>$key</strong></td>
     </tr>
 		</table>
   	</div> <!-- /container -->
