@@ -1,6 +1,7 @@
 *.pyc
 *.out
 log/*
+addons/*.pyc
 tools.py
 dong.py
  

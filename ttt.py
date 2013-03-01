@@ -103,7 +103,9 @@ class cet:
             items = ["学校","姓名","阅读","写作","综合", "准考证号", "考试时间", "总分", "考试类别", "听力"]
             cet = CET()
             result = cet.get_last_cet_score(zkzh,name)
-            return render.result_dic(items,result)
+            lis = [result["school"],result["name"],result["read"],result["write"],result["mix"],result["num"],result["time"],result["total"],result["type"],result["listen"]]
+
+            return render.result_dic(items,lis)
 
 #api
 class api_score:
