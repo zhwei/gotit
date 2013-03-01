@@ -55,8 +55,8 @@ $def with(items,lis)
     $for i in items:<td><strong>$i</strong></td>
     </tr>
     <tr>
-    $for key in lis:
-        <td><strong>$key</strong></td>
+    $for key in lis.keys():
+        <td><strong>$lis[key]</strong></td>
     </tr>
 		</table>
   	</div> <!-- /container -->

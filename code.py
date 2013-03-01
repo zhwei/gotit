@@ -100,12 +100,14 @@ class cet:
             zkzh = form.d.zkzh
             name = form.d.name
             name = name.encode('utf-8')
-            items = ["学校","姓名","准考证号", "考试类别", "听力","阅读","写作","综合", "总分","考试时间"]
+            items = ["学校","姓名","阅读","写作","综合", "准考证号", "考试时间","总分","考试类别","听力" ]
             cet = CET()
             res = cet.get_last_cet_score(zkzh,name)
-            lis = [res["school"],res["name"],res["num"],res["type"],res["listen"],res["read"],res["write"],res["mix"],res["total"],res["time"]]
-
-            return render.result_list(items,lis)
+            #s = ""
+            #for i in res.keys():
+            #    s = "%s%s\n%s\n"%(s,i,res[i])
+            #return s
+            return render.result_list(items,res)
 
 #api
 class api_score:
