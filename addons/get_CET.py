@@ -4,6 +4,16 @@ import re
 import urllib
 import urllib2
 import logging
+from time import ctime
+
+
+def get_proxy():
+    proxy_file = file("addons/proxy.txt")
+    line = proxy_file.readlines()
+    second = int(str(ctime())[-7:-5])
+    proxy = line[second].strip()
+    return proxy
+
 
 class CET:
     '''Get CET score'''
@@ -11,9 +21,15 @@ class CET:
         '''从官方网站获取最新四六级成绩'''
         header = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6','Referer':'http://www.chsi.com.cn/cet/'}
         url = 'http://www.chsi.com.cn/cet/query'
+        ####################################
+        proxy = get_proxy()
+        proxy_support = urllib2.ProxyHandler({'http':proxy})
+        opener = urllib2.build_opener(proxy_support,urllib2.HTTPHandler)
+        ####################################
         params = urllib.urlencode({'zkzh':num,'xm':name})
         req = urllib2.Request(url,data=params,headers= header)
-        page = urllib2.urlopen(req).read().decode('utf-8')
+        page = opener.open(req).read().decode('utf-8')
+        #page = urllib2.urlopen(req).read().decode('utf-8')
         #解析
         ret = {}
         try:
@@ -23,7 +39,7 @@ class CET:
             ret['write'] = re.findall('</span>(\d*)</strong></td>',page)[0]
             return ret
         except:
-            ret["error"] = u"尚无成绩!"
+            ret["error"] = u"请刷新!"
             return ret
 
 
@@ -77,6 +93,8 @@ class CET:
         ret['cet_type']=cet_type
         ret['cet_score']=cet_score
         return ret
+
+    
 
 if __name__=='__main__':
      num = raw_input("请输入你的学号: ")

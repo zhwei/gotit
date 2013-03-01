@@ -4,6 +4,7 @@ log/*
 addons/*.pyc
 tools.py
 dong.py
+test/*
  
 
 # C extensions
