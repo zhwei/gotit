@@ -90,8 +90,9 @@ class index:
 #cet
 class cet:
     def GET(self):
-        form = cet_form()
-        return render.cet(form)
+        #form = cet_form()
+        #return render.cet(form)
+        return render.cet_raise()
     def POST(self):
         form = cet_form()
         if not form.validates():
