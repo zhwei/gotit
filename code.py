@@ -1,6 +1,7 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 import web
+import os
 import json
 from web import form
 web.config.debug = True
@@ -22,7 +23,8 @@ urls = (
         '/api/gpa','api_gpa',
         )
 
-render = web.template.render('template/') # your templates
+#render = web.template.render('./template/') # your templates
+render = web.template.render(os.path.abspath(os.path.dirname(__file__)) + '/template/')
 
 #forms
 info_form = form.Form(
@@ -119,8 +121,8 @@ class api_score:
         _xh=data.xh
         _pw=data.pw
         zheng = ZHENG(_xh,_pw,'xscjcx_dq')
-        json = zheng.get_json()
-        return json
+        json_object = zheng.get_json()
+        return json_object
 class api_cet:
     def GET(self):
         return 'cet'
@@ -159,6 +161,6 @@ class ttest:
     def GET(self):
         return render.root()
 
-if __name__  == "__main__":
-    app = web.application(urls, globals())
-    app.run()
+#if __name__  == "__main__":
+application = web.application(urls, globals()).wsgifunc()
+#    app.run()
