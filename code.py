@@ -1,15 +1,21 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
-import web
 import os
+import sys
+
+abspath = os.path.dirname(__file__)
+sys.path.append(abspath)
+os.chdir(abspath)
+
+import web
 import json
 from web import form
 web.config.debug = True
 
 #addons
-from addons.calc_GPA import GPA
-from addons.get_CET import CET
-from addons.zheng import ZHENG
+from calc_GPA import GPA
+from get_CET import CET
+from zheng import ZHENG
 
 
 urls = (
@@ -162,5 +168,5 @@ class ttest:
         return render.root()
 
 #if __name__  == "__main__":
-application = web.application(urls, globals()).wsgifunc()
+application = web.application(urls, globals(),autoreload=False).wsgifunc()
 #    app.run()

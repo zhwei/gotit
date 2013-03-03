@@ -5,10 +5,12 @@ import urllib
 import urllib2
 import logging
 from time import ctime
+import os
+DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def get_proxy():
-    proxy_file = file("addons/proxy.txt")
+    proxy_file = file(DIR + "/proxy.txt")
     line = proxy_file.readlines()
     second = int(str(ctime())[-7:-5])
     proxy = line[second].strip()
