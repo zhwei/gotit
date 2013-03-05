@@ -16,6 +16,7 @@ web.config.debug = True
 from calc_GPA import GPA
 from get_CET import CET
 from zheng import ZHENG
+from get_all_score import ALL_SCORE
 
 
 urls = (
@@ -171,6 +172,7 @@ class ttest:
     def GET(self):
         return render.root()
 
+#get all score
 class store:
     def GET(self):
         return render.socre()
@@ -180,6 +182,15 @@ class store:
             return render.score(form)
         else:
             xh = form.d.xh
+            table = ALL_SCORE(xh).get_all_score()
+
+            if table:
+                error = None
+                return render.result(table,error)
+            else:
+                table = None
+                error = "can not get your score"
+                return render.result(table,error)
         
 
 #if __name__  == "__main__":
