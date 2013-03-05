@@ -38,7 +38,7 @@ render = web.template.render(os.path.abspath(os.path.dirname(__file__)) + '/temp
 info_form = form.Form(
         form.Textbox("number", description="学号:",class_="span3",pre="&nbsp;&nbsp;"),
         form.Password("password", description="密码:",class_="span3",pre="&nbsp;&nbsp;"),
-        form.Dropdown('Type',[('1', '本学期成绩查询'), ('2', '考试时间查询'), ('3', '课表查询'),('4', '平均学分绩点查询')],description="查询类型:",pre="&nbsp;&nbsp;"),
+        form.Dropdown('Type',[('1', '本学期成绩查询'), ('2', '考试时间查询'), ('3', '本学期课表查询'),('4', '平均学分绩点查询')],description="查询类型:",pre="&nbsp;&nbsp;"),
         validators = [
             form.Validator('输入不合理!', lambda i:int(i.number) > 9)]
         )
@@ -173,16 +173,19 @@ class ttest:
         return render.root()
 
 #get all score
-class store:
+class score:
     def GET(self):
-        return render.socre()
+        form = xh_form()
+        return render.score(form)
+
     def POST(self):
         form = xh_form()
         if not form.validates():
             return render.score(form)
         else:
             xh = form.d.xh
-            table = ALL_SCORE(xh).get_all_score()
+            a = ALL_SCORE(xh)
+            table = a.get_all_score()
 
             if table:
                 error = None
