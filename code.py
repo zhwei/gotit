@@ -20,6 +20,7 @@ from zheng import ZHENG
 
 urls = (
         '/', 'index',
+        '/score', 'score',
         '/cet', 'cet',
         '/contact.html','contact',
         '/notice.html','notice', 
@@ -36,7 +37,7 @@ render = web.template.render(os.path.abspath(os.path.dirname(__file__)) + '/temp
 info_form = form.Form(
         form.Textbox("number", description="学号:",class_="span3",pre="&nbsp;&nbsp;"),
         form.Password("password", description="密码:",class_="span3",pre="&nbsp;&nbsp;"),
-        form.Dropdown('Type',[('1', '成绩查询'), ('2', '考试时间查询'), ('3', '课表查询'),('4', '平均学分绩点查询')],description="查询类型:",pre="&nbsp;&nbsp;"),
+        form.Dropdown('Type',[('1', '本学期成绩查询'), ('2', '考试时间查询'), ('3', '课表查询'),('4', '平均学分绩点查询')],description="查询类型:",pre="&nbsp;&nbsp;"),
         validators = [
             form.Validator('输入不合理!', lambda i:int(i.number) > 9)]
         )
@@ -45,6 +46,9 @@ cet_form = form.Form(
         form.Textbox("name", description="姓名:",class_="span3",pre="&nbsp;&nbsp;"),
         validators = [
             form.Validator('输入不合理!', lambda i:int(i.zkzh) != 15)]
+        )
+xh_form = form.Form(
+        form.Textbox("xh",description="学号:",class_="span3",pre="&nbsp;&nbsp;")
         )
 
 #成绩查询
@@ -166,6 +170,17 @@ class notice:
 class ttest:
     def GET(self):
         return render.root()
+
+class store:
+    def GET(self):
+        return render.socre()
+    def POST(self):
+        form = xh_form()
+        if not form.validates():
+            return render.score(form)
+        else:
+            xh = form.d.xh
+        
 
 #if __name__  == "__main__":
 application = web.application(urls, globals(),autoreload=False).wsgifunc()
