@@ -184,8 +184,8 @@ class score:
             return render.score(form)
         else:
             xh = form.d.xh
-            a = ALL_SCORE(xh)
-            table = a.get_all_score()
+            a = ALL_SCORE()
+            table = a.get_all_score(xh)
 
             if table:
                 error = None
