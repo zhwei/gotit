@@ -1,5 +1,12 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
+import os
+#import sys
+
+#abspath = os.path.dirname(__file__)
+#sys.path.append(abspath)
+#os.chdir(abspath)
+
 import web
 import json
 from web import form
@@ -9,10 +16,12 @@ web.config.debug = True
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
 from addons.zheng import ZHENG
+from addons.get_all_score import ALL_SCORE
 
 
 urls = (
         '/', 'index',
+        '/score', 'score',
         '/cet', 'cet',
         '/contact.html','contact',
         '/notice.html','notice', 
@@ -22,13 +31,14 @@ urls = (
         '/api/gpa','api_gpa',
         )
 
-render = web.template.render('template/') # your templates
+#render = web.template.render('./template/') # your templates
+render = web.template.render(os.path.abspath(os.path.dirname(__file__)) + '/template/')
 
 #forms
 info_form = form.Form(
         form.Textbox("number", description="学号:",class_="span3",pre="&nbsp;&nbsp;"),
         form.Password("password", description="密码:",class_="span3",pre="&nbsp;&nbsp;"),
-        form.Dropdown('Type',[('1', '成绩查询'), ('2', '考试时间查询'), ('3', '课表查询'),('4', '平均学分绩点查询')],description="查询类型:",pre="&nbsp;&nbsp;"),
+        form.Dropdown('Type',[('1', '本学期成绩查询'), ('2', '考试时间查询'), ('3', '本学期课表查询'),('4', '平均学分绩点查询')],description="查询类型:",pre="&nbsp;&nbsp;"),
         validators = [
             form.Validator('输入不合理!', lambda i:int(i.number) > 9)]
         )
@@ -37,6 +47,9 @@ cet_form = form.Form(
         form.Textbox("name", description="姓名:",class_="span3",pre="&nbsp;&nbsp;"),
         validators = [
             form.Validator('输入不合理!', lambda i:int(i.zkzh) != 15)]
+        )
+xh_form = form.Form(
+        form.Textbox("xh",description="学号:",class_="span3",pre="&nbsp;&nbsp;")
         )
 
 #成绩查询
@@ -119,8 +132,8 @@ class api_score:
         _xh=data.xh
         _pw=data.pw
         zheng = ZHENG(_xh,_pw,'xscjcx_dq')
-        json = zheng.get_json()
-        return json
+        json_object = zheng.get_json()
+        return json_object
 class api_cet:
     def GET(self):
         return 'cet'
@@ -158,6 +171,30 @@ class notice:
 class ttest:
     def GET(self):
         return render.root()
+
+#get all score
+class score:
+    def GET(self):
+        form = xh_form()
+        return render.score(form)
+
+    def POST(self):
+        form = xh_form()
+        if not form.validates():
+            return render.score(form)
+        else:
+            xh = form.d.xh
+            a = ALL_SCORE()
+            table = a.get_all_score(xh)
+
+            if table:
+                error = None
+                return render.result(table,error)
+            else:
+                table = None
+                error = "can not get your score"
+                return render.result(table,error)
+        
 
 if __name__  == "__main__":
     app = web.application(urls, globals())
