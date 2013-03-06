@@ -12,7 +12,7 @@ class ALL_SCORE():
             data = param,
             timeout=10
             ).read()
-        patten = re.compile("</caption>(.*?)</table>",re.M|re.S)  
+        patten = re.compile('<span class="style3">成绩信息</span>(.*?)</table>',re.M|re.S)  
         #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为 
         return patten.findall(page)
 
