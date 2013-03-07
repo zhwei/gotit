@@ -1,11 +1,11 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 import os
-import sys
+#import sys
 
-abspath = os.path.dirname(__file__)
-sys.path.append(abspath)
-os.chdir(abspath)
+#abspath = os.path.dirname(__file__)
+#sys.path.append(abspath)
+#os.chdir(abspath)
 
 import web
 import json
@@ -13,10 +13,10 @@ from web import form
 web.config.debug = True
 
 #addons
-from calc_GPA import GPA
-from get_CET import CET
-from zheng import ZHENG
-from get_all_score import ALL_SCORE
+from addons.calc_GPA import GPA
+from addons.get_CET import CET
+from addons.zheng import ZHENG
+from addons.get_all_score import ALL_SCORE
 
 
 urls = (
@@ -31,8 +31,8 @@ urls = (
         '/api/gpa','api_gpa',
         )
 
-#render = web.template.render('./template/') # your templates
-render = web.template.render(os.path.abspath(os.path.dirname(__file__)) + '/template/')
+render = web.template.render('./template/') # your templates
+#render = web.template.render(os.path.abspath(os.path.dirname(__file__)) + '/template/')
 
 #forms
 info_form = form.Form(
