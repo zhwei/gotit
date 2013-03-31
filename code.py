@@ -1,6 +1,6 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
-import os
+#import os
 #import sys
 
 #abspath = os.path.dirname(__file__)
@@ -15,7 +15,7 @@ web.config.debug = True
 #addons
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
-from addons.zheng import ZHENG
+from addons.zf import ZF
 from addons.get_all_score import ALL_SCORE
 
 
@@ -26,7 +26,7 @@ urls = (
         '/contact.html','contact',
         '/notice.html','notice', 
         '/root.txt', 'ttest', 
-        '/api/score','api_score',
+#        '/api/score','api_score',
         '/api/cet','api_cet',
         '/api/gpa','api_gpa',
         )
@@ -89,7 +89,8 @@ class index:
             else:
                 return '<script type="text/javascript">alert("输入不合理!");top.location="/"</script>'
 
-            zheng = ZHENG(_xh,_pw,func)
+            zheng = ZF(_xh,_pw,func)
+            zheng.main()
             table = zheng.get_table()
 
             if table:
@@ -131,7 +132,7 @@ class api_score:
         data=web.input()
         _xh=data.xh
         _pw=data.pw
-        zheng = ZHENG(_xh,_pw,'xscjcx_dq')
+        zheng = ZF(_xh,_pw,'xscjcx_dq')
         json_object = zheng.get_json()
         return json_object
 class api_cet:
@@ -196,6 +197,7 @@ class score:
                 return render.result(table,error)
         
 
-#if __name__  == "__main__":
 application = web.application(urls, globals(),autoreload=False).wsgifunc()
+#if __name__  == "__main__":
+#    app = web.application(urls, globals(),autoreload=False)
 #    app.run()
