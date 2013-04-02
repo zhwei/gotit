@@ -3,14 +3,12 @@
 #import os
 #import sys
 
-#abspath = os.path.dirname(__file__)
-#sys.path.append(abspath)
-#os.chdir(abspath)
 
 import web
 import json
 from web import form
 web.config.debug = True
+from web.contrib.template import render_jinja
 
 #addons
 from addons.calc_GPA import GPA
@@ -31,8 +29,8 @@ urls = (
         '/api/gpa','api_gpa',
         )
 
-render = web.template.render('./template/') # your templates
-#render = web.template.render(os.path.abspath(os.path.dirname(__file__)) + '/template/')
+#render = web.template.render('./template/') # your templates
+render = render_jinja('templates', encoding='utf-8')
 
 #forms
 info_form = form.Form(
@@ -56,12 +54,12 @@ xh_form = form.Form(
 class index:
     def GET(self):
         form = info_form()
-        return render.index(form)
+        return render.index(form=form)
 
     def POST(self):
         form = info_form()
         if not form.validates():
-            return render.index(form)
+            return render.index(form=form)
         else:
             _xh = form.d.number
             _pw = form.d.password
@@ -85,7 +83,7 @@ class index:
                     # "<tr><td><strong>至今未通过科目</strong></td><td><strong>" + str(len(a['not_accept']))+"</strong></td></tr>",
                 ]
                 error = None
-                return render.result(table,error)
+                return render.result(table=table,error=error)
             else:
                 return '<script type="text/javascript">alert("输入不合理!");top.location="/"</script>'
 
@@ -105,7 +103,7 @@ class index:
 class cet:
     def GET(self):
         form = cet_form()
-        return render.cet(form)
+        return render.cet(form=form)
         #return render.cet_raise()
     def POST(self):
         form = cet_form()
@@ -122,7 +120,7 @@ class cet:
             #for i in res.keys():
             #    s = "%s%s\n%s\n"%(s,i,res[i])
             #return s
-            return render.result_list(items,res)
+            return render.result_list(items=items,res=res)
 
 #api
 class api_score:
@@ -177,12 +175,12 @@ class ttest:
 class score:
     def GET(self):
         form = xh_form()
-        return render.score(form)
+        return render.score(form=form)
 
     def POST(self):
         form = xh_form()
         if not form.validates():
-            return render.score(form)
+            return render.score(form=form)
         else:
             xh = form.d.xh
             a = ALL_SCORE()
@@ -190,11 +188,11 @@ class score:
 
             if table:
                 error = None
-                return render.result(table,error)
+                return render.result(table=table,error=error)
             else:
                 table = None
                 error = "can not get your score"
-                return render.result(table,error)
+                return render.result(table=table,error=error)
         
 
 application = web.application(urls, globals(),autoreload=False).wsgifunc()

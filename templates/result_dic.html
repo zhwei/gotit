@@ -1,0 +1,17 @@
+{% extends "base-result.html" %}
+
+
+{% block content %}
+  <table border="1" class= "table table-striped table-bordered table-condensed">
+    <tr>
+      {% for i in items %}
+        <td><strong>{{i}}</strong></td>
+      {% endfor %}
+    </tr>
+    <tr>
+      {% for key in res.keys() %}
+        <td><strong>{{ res[key] }}</strong></td>
+      {% endfor %}
+    </tr>
+  </table>
+{% endblock %}

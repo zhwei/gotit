@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Got it,正方教务系统查询工具">
+    <meta name="author" content="zhwei">
+
+    <!-- Le styles -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+    {% block header %}
+      
+    {% endblock %}
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="http://gotit.asia/">Got it</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">首页</a></li>
+              <li><a href="/score">成绩查询</a></li>
+              <li><a href="/cet">CET</a></li>
+              <li><a href="/notice.html">公告</a></li>
+              <li><a href="/contact.html">联系我们</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div id="container" class= "container"><br>
+
+      {% block content %}
+        
+      {% endblock %}
+
+      <hr>
+
+      <div style="text-align:center;">
+<a href="/notice.html"><img src="/static/forad.jpg"></a>
+      </div>
+
+      <hr>
+      <center>
+        Power by <a href="http://webpy.org/" target="_blank">web.py</a>&nbsp;
+        <a href="http://python.org/" target="_blank">python</a>&nbsp;
+        <a href="http://sdutlinux.org" target="_blank">SLUG</a>&nbsp;
+        Author:<a href="http://zhwei.42qu.com" target="_blank">zhwei</a>&nbsp;
+        Version:2.0
+      </center>
+    </div> <!-- /container -->
+	<script type="text/javascript" src="/static/js/jquery.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+
+<!-- baidu sitecenter   -->
+    <div style="display: none;">
+      <script type="text/javascript">
+        var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+        document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F8798cad9d47e876ea6c4f4ce5ff5fe5b' type='text/javascript'%3E%3C/script%3E"));
+      </script>
+    </div>
+<!-- baidu sitecenter   -->
+
+  </body>
+</html>
