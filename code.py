@@ -74,16 +74,12 @@ class index:
             elif t == "4":
                 gpa = GPA(_xh)
                 a = gpa.get_gpa()
-                table = [
-                    # "<tr><td><strong>姓名</strong></td><td><strong>" + str(a["name"])+"</strong></td></tr>",
-                    # "<tr><td><strong>班级</strong></td><td><strong>" + str(a["class"])+"</strong></td></tr>",
-                    "<tr><td><strong>平均学分绩点</strong></td><td><strong>" + str(a["ave_score"])+"</strong></td></tr>",
-                    # "<tr><td><strong>总基点</strong></td><td><strong>" + str(a["total_score"])+"</strong></td></tr>",
-                    # "<tr><td><strong>总学分</strong></td><td><strong>" + str(a["totle_credits"])+"</strong></td></tr>",
-                    # "<tr><td><strong>至今未通过科目</strong></td><td><strong>" + str(len(a['not_accept']))+"</strong></td></tr>",
-                ]
-                error = None
-                return render.result(table=table,error=error)
+                result = a["ave_score"]
+                #table = [
+                #    "<tr><td><strong>平均学分绩点</strong></td><td><strong>" + str(a["ave_score"]).encode('utf-8')+"</strong></td></tr>",
+                #]
+                #error = None
+                return render.result_gpa(gpa=result)
             else:
                 return '<script type="text/javascript">alert("输入不合理!");top.location="/"</script>'
 
@@ -93,11 +89,11 @@ class index:
 
             if table:
                 error = None
-                return render.result(table, error)
+                return render.result(table=table, error=error)
             else:
                 table = None
                 error = "can not find your index table"
-                return render.result(table, error)
+                return render.result(table=table, error=error)
 
 #cet
 class cet:
@@ -108,7 +104,7 @@ class cet:
     def POST(self):
         form = cet_form()
         if not form.validates():
-            return render.cet(form)
+            return render.cet(form=form)
         else:
             zkzh = form.d.zkzh
             name = form.d.name

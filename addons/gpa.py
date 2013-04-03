@@ -10,7 +10,7 @@ def getscore_page(num=0):
         url = 'http://210.44.176.116/cjcx/zcjcx_list.php',
         data = param,
         timeout=10
-        ).read()
+        ).read().decode('gbk')
     return page
 
 def calc_score(num=0):
