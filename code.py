@@ -18,6 +18,7 @@ from addons.calc_GPA import GPA
 from addons.get_CET import CET
 from addons.zf import ZF
 from addons.get_all_score import ALL_SCORE
+from addons.autocache import memorize
 
 
 urls = (
@@ -55,6 +56,7 @@ xh_form = form.Form(
 
 #成绩查询
 class index:
+    @memorize(1000)
     def GET(self):
         form = info_form()
         return render.index(form=form)
@@ -100,6 +102,7 @@ class index:
 
 #cet
 class cet:
+    @memorize(1000)
     def GET(self):
         form = cet_form()
         return render.cet(form=form)
@@ -157,11 +160,13 @@ class api_gpa:
 #contact us
 class contact:
     """contact us page"""
+    @memorize(1000)
     def GET(self):
         return render.contact()
         
 #notice 
 class notice:
+    @memorize(1000)
     def GET(self):
         return render.notice()
 
@@ -172,6 +177,7 @@ class ttest:
 
 #get all score
 class score:
+    @memorize(1000)
     def GET(self):
         form = xh_form()
         return render.score(form=form)
