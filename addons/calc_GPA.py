@@ -5,6 +5,7 @@ import re
 import urllib
 import urllib2
 import logging
+import config
 class GPA:
     '''Calculator Grade Point Average'''
     __num = 0
@@ -18,7 +19,7 @@ class GPA:
         '''获取成绩页面'''
         param = urllib.urlencode({'post_xuehao':GPA.__num})
         page = urllib2.urlopen(
-            url = 'http://210.44.176.116/cjcx/zcjcx_list.php',
+            url = config.score_url,
             data = param,
             timeout=10
             ).read().decode('utf-8')

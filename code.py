@@ -19,6 +19,7 @@ from addons.get_CET import CET
 from addons.zf import ZF
 from addons.get_all_score import ALL_SCORE
 from addons.autocache import memorize
+from addons import config
 
 
 urls = (
@@ -105,7 +106,10 @@ class cet:
     @memorize(1000)
     def GET(self):
         form = cet_form()
-        return render.cet(form=form)
+        if config.baefetch:
+            return render.cet_bae(form=form)
+        else:
+            return render.cet(form=form)
         #return render.cet_raise()
     def POST(self):
         form = cet_form()
@@ -122,7 +126,7 @@ class cet:
             #for i in res.keys():
             #    s = "%s%s\n%s\n"%(s,i,res[i])
             #return s
-            return render.result_list(items=items,res=res)
+            return render.result_dic(items=items,res=res)
 
 #api
 class api_score:

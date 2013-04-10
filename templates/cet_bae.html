@@ -1,14 +1,15 @@
 {% extends "base-search.html" %}
-{% block title %}成绩查询系统{% endblock %}
+{% block title %}四六级成绩查询 -- Got it {% endblock %}
 
 {% block content %}
-    <center><h1>成绩查询系统</h1></center>
+    <center><h1>四六级成绩查询</h1></center>
     <hr>
-    <form name="main" method="post" accept-charset="utf-8" class="form-signin">
+    <form name="main" method="post" accept-charset="utf-8" class="form-signin" action="http://zhweitest.duapp.com/cet">
       <div class="alert alert-success">
-      <p>本系统可查询全部学科成绩,包括第二专业和补考成绩,详情见<a href="/notice.html">公告</a></p>
+      姓名多于三个字的只输入前三个字.<br>
+      <h3><strong>查询较慢时可以多点几次 "查询" </strong><h3>
       </div>
-      {% if not form.valid %}
+      {% if  not form.valid: %}
         <p class="alert alert-danger">输入错误:</p>
       {% endif %}
       {{ form.render() }}
@@ -18,5 +19,4 @@
         <button type="reset" class="btn">重置</button>
       </center>
     </form>
-  
 {% endblock %}

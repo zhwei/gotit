@@ -6,6 +6,7 @@ import urllib2
 import logging
 from time import ctime
 import os
+import config
 DIR = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -22,7 +23,7 @@ class CET:
     def get_last_cet_score(self,num,name):
         '''从官方网站获取最新四六级成绩'''
         header = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6','Referer':'http://www.chsi.com.cn/cet/'}
-        url = 'http://www.chsi.com.cn/cet/query'
+        url = config.cet_url
         ####################################
         proxy = get_proxy()
         proxy_support = urllib2.ProxyHandler({'http':proxy})
@@ -30,7 +31,7 @@ class CET:
         ####################################
         params = urllib.urlencode({'zkzh':num,'xm':name})
         req = urllib2.Request(url,data=params,headers= header)
-        page = opener.open(req).read().decode('utf-8')
+        page = opener.open(req).read()#.decode('utf-8')
         #page = urllib2.urlopen(req).read().decode('utf-8')
         #解析
         ret = {}

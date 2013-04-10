@@ -5,10 +5,23 @@ import urllib
 import urllib2
 import re
 from BeautifulSoup import BeautifulSoup
+import config
 #import os
+from autocache import memorize
+
+@memorize(300)
+def get_base_url():
+    target = urllib2.urlopen(config.zf_url)
+    with_random_url = target.geturl()
+    base_url = with_random_url[:-13]
+    return base_url
+
 
 class ZF():
-    base_url = "http://210.44.176.132/"
+    if config.random:
+        base_url = get_base_url()
+    else:
+        base_url = config.zf_url
     login_url = base_url + "Default2.aspx"
     code_url = base_url + 'CheckCode.aspx'
     headers = {'Referer':base_url,'Host':base_url[7:21],'User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:18.0) Gecko/20100101 Firefox/18.0",'Connection':'Keep-Alive'}
