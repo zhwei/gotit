@@ -16,3 +16,6 @@ score_url = "http://210.44.176.116/cjcx/zcjcx_list.php"
 cet_url = "http://www.chsi.com.cn/cet/query"
 ##是否使用bae查询
 baefetch = True
+
+#查询页缓存时间(秒)
+index_cache = 1000

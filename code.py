@@ -20,6 +20,7 @@ from addons.zf import ZF
 from addons.get_all_score import ALL_SCORE
 from addons.autocache import memorize
 from addons import config
+from addons.config import index_cache
 
 
 urls = (
@@ -29,7 +30,8 @@ urls = (
         '/contact.html','contact',
         '/notice.html','notice', 
         '/root.txt', 'ttest', 
-#        '/api/score','api_score',
+#.        '/api/score','api_score',
+        '/api/kb','api_kb',
         '/api/cet','api_cet',
         '/api/gpa','api_gpa',
         )
@@ -57,7 +59,7 @@ xh_form = form.Form(
 
 #成绩查询
 class index:
-    @memorize(1000)
+    @memorize(index_cache)
     def GET(self):
         form = info_form()
         return render.index(form=form)
@@ -103,7 +105,7 @@ class index:
 
 #cet
 class cet:
-    @memorize(1000)
+    @memorize(index_cache)
     def GET(self):
         form = cet_form()
         if config.baefetch:
@@ -129,6 +131,17 @@ class cet:
             return render.result_dic(items=items,res=res)
 
 #api
+class api_kb:
+    def GET(self):
+        return 'Hello kb!'
+    def POST(self):
+        data=web.input()
+        _xh=data.xh
+        _pw=data.pw
+        zheng = ZF(_xh,_pw,'xskbcx')
+        json_object = zheng.get_json('xskbcx')
+        return json_object
+
 class api_score:
     def GET(self):
         return 'Hello World!'
@@ -164,13 +177,13 @@ class api_gpa:
 #contact us
 class contact:
     """contact us page"""
-    @memorize(1000)
+    @memorize(index_cache)
     def GET(self):
         return render.contact()
         
 #notice 
 class notice:
-    @memorize(1000)
+    @memorize(index_cache)
     def GET(self):
         return render.notice()
 
@@ -181,7 +194,7 @@ class ttest:
 
 #get all score
 class score:
-    @memorize(1000)
+    @memorize(index_cache)
     def GET(self):
         form = xh_form()
         return render.score(form=form)

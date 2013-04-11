@@ -111,10 +111,20 @@ class ZF():
             elif status == -1:
                 return 'ufo'
 
+    def get_json(self,func):
+        self.func = func
+        res = self.get_table()
+        dic = {}
+        dic['kebiao'] = res
+        import json
+        json_obj = json.dumps(dic)
+        return json_obj
 
 
-#xh = raw_input("xh")
-#pw = raw_input("pw")
-#z = ZF(xh,pw,'xscjcx_dq')
-#z.main()
-#z.get_table()
+
+
+xh = "1111051046"#raw_input("xh")
+pw = "zhejiushimima@JW"#raw_input("pw")
+z = ZF(xh,pw,'xskbcx')
+z.main()
+z.get_table()
