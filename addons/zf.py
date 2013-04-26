@@ -16,6 +16,11 @@ def get_base_url():
     base_url = with_random_url[:-13]
     return base_url
 
+def get_cookie_value(cookies):
+    for cookie in cookies:
+        return cookie.value
+
+#def get_viewstate
 
 class ZF():
     if config.random:
@@ -26,33 +31,56 @@ class ZF():
     code_url = base_url + 'CheckCode.aspx'
     headers = {'Referer':base_url,'Host':base_url[7:21],'User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:18.0) Gecko/20100101 Firefox/18.0",'Connection':'Keep-Alive'}
 
-    def __init__(self,xh,pw,func):
+    def __init__(self):
+#    def __init__(self,xh,pw,func):
+#        self.xh = xh
+#        self.pw = pw
+#        self.func = func
+        self.cookies = cookielib.LWPCookieJar()
+        self.opener =urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
+        urllib2.install_opener(self.opener)
+
+    def get(self):
+        # get CheckCode.aspx
+        req = urllib2.Request(self.code_url,headers = self.headers)
+        a = self.opener.open(req).read()
+        cookie_value = get_cookie_value(self.cookies)
+        filename = 'pic/'+str(cookie_value) + '.gif'
+        fi = file(filename,'wb')
+        fi.write(a)
+        fi.close()
+        return cookie_value
+
+
+    #def login(self):
+    def login(self,xh,pw,func,verify,cookie):
         self.xh = xh
         self.pw = pw
         self.func = func
-        cookies = cookielib.LWPCookieJar()
-        self.opener =urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
-        urllib2.install_opener(self.opener)
+        self.verify = verify
+        self.cookie = cookie
 
-    def login(self):
-        #get __VIEWSTATE
+        # get __VIEWSTATE
         req = urllib2.Request(self.base_url,headers=self.headers)
         ret = self.opener.open(req)
         page = ret.read()
         com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
         all = com.findall(page)
         __VIEWSTATE =  all[0]
+
+        # ===============================================
+
         # get CheckCode.aspx
         req = urllib2.Request(self.code_url,headers = self.headers)
         a = self.opener.open(req).read()
-        filename = 'pic/'+str(self.xh) + '.gif'
+        filename = 'pic/'+str(self.cookie_value) + '.gif'
         fi = file(filename,'wb')
         fi.write(a)
         fi.close()
         from sec_code.recg import verify
         yanzhengma = verify(filename)
-        #os.remove(filename)
 
+        # ===============================================
         data = {
             'Button1':'',
             'RadioButtonList1':"学生",
@@ -123,8 +151,7 @@ class ZF():
 
 
 
-xh = "1111051046"#raw_input("xh")
-pw = "zhejiushimima@JW"#raw_input("pw")
-z = ZF(xh,pw,'xskbcx')
-z.main()
-z.get_table()
+#xh = "1111051046"#raw_input("xh")
+#pw = raw_input("pw")
+z = ZF()
+print z.get()
