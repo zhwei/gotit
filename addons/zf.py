@@ -49,49 +49,50 @@ class ZF():
         fi = file(filename,'wb')
         fi.write(a)
         fi.close()
+        self.headers = {
+                'Referer':'http://210.44.176.132/default_ldap.aspx',
+                'Host':'210.44.176.132','User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:18.0) Gecko/20100101 Firefox/18.0",
+                'Cookie':'ASP.NET_SessionId=' + cookie_value,
+                'Connection':'keep-alive'
+                }
+
         return cookie_value
 
 
     #def login(self):
-    def login(self,xh,pw,func,verify,cookie):
-        self.xh = xh
-        self.pw = pw
-        self.func = func
-        self.verify = verify
-        self.cookie = cookie
-
+    def login(self):
         # get __VIEWSTATE
-        req = urllib2.Request(self.base_url,headers=self.headers)
-        ret = self.opener.open(req)
-        page = ret.read()
-        com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
-        all = com.findall(page)
-        __VIEWSTATE =  all[0]
+        #req = urllib2.Request(self.base_url,headers=self.headers)
+        #ret = self.opener.open(req)
+        #page = ret.read()
+        #com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
+        #all = com.findall(page)
+        #__VIEWSTATE =  all[0]
+        __VIEWSTATE =  "dDwtNDk1NTQ0MzAzOzs+PwcQRxUJ8/e+SJ7m2Y5kDNtbHJ4="
 
         # ===============================================
 
         # get CheckCode.aspx
-        req = urllib2.Request(self.code_url,headers = self.headers)
-        a = self.opener.open(req).read()
-        filename = 'pic/'+str(self.cookie_value) + '.gif'
-        fi = file(filename,'wb')
-        fi.write(a)
-        fi.close()
-        from sec_code.recg import verify
-        yanzhengma = verify(filename)
-
+#        req = urllib2.Request(self.code_url,headers = self.headers)
+#        a = self.opener.open(req).read()
+#        filename = 'pic/'+str(self.cookie_value) + '.gif'
+#        fi = file(filename,'wb')
+#        fi.write(a)
+#        fi.close()
+#        from sec_code.recg import verify
+#        yanzhengma = verify(filename)
+#
         # ===============================================
         data = {
             'Button1':'',
             'RadioButtonList1':"学生",
             "TextBox1":self.xh,
             'TextBox2':self.pw,
-            'TextBox3':yanzhengma,
+            'TextBox3':self.verify,
             '__VIEWSTATE':__VIEWSTATE,
             'lbLanguage':'',
         }
         post_data = urllib.urlencode(data)
-        #headers = {'Referer':'http://210.44.176.132/Default2.aspx','Host':'210.44.176.132','User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:18.0) Gecko/20100101 Firefox/18.0",'Connection':'keep-alive'}
         req = urllib2.Request(url=self.login_url,data=post_data,headers=self.headers)
         ret = self.opener.open(req).read().decode("gbk").encode("utf-8")
         return ret
@@ -105,6 +106,7 @@ class ZF():
         url = self.__get_url()
         req = urllib2.Request(url=url,headers=self.headers)
         target_html = self.opener.open(req)
+        print target_html.read().decode('gbk')
 
         soup = BeautifulSoup(target_html, fromEncoding='gbk')
         if self.func == "xskbcx":
@@ -113,7 +115,7 @@ class ZF():
             table_name = "DataGrid1"
         table = soup.find("table", {"id": table_name}) #table is class
         result = table.contents
-        #print result
+        print result
         return result
 
     def check_login(self,ret):
@@ -126,7 +128,14 @@ class ZF():
         else:
             return -1
     
-    def main(self):
+    def main(self,xh,pw,func,verify,cookie):
+
+        self.xh = xh
+        self.pw = pw
+        self.func = func
+        self.verify = verify
+        self.cookie = cookie
+
         for i in range(10):
             ret =self.login()
             status = self.check_login(ret)
@@ -151,7 +160,15 @@ class ZF():
 
 
 
-#xh = "1111051046"#raw_input("xh")
-#pw = raw_input("pw")
+xh = "1111051046"#raw_input("xh")
+pw = "waqei2F"#raw_input("pw")
+
 z = ZF()
-print z.get()
+cookie = z.get()
+import os
+os.system('eog pic/'+cookie+'.gif&')
+
+veri = raw_input("v")
+
+z.main(xh, pw, 'xskbcx', veri, cookie)
+z.get_table()

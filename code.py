@@ -59,10 +59,12 @@ xh_form = form.Form(
 
 #成绩查询
 class index:
-    @memorize(index_cache)
+    #@memorize(index_cache)
     def GET(self):
         form = info_form()
-        return render.index(form=form)
+        zf = ZF()
+        cookie = zf.get()
+        return render.index(form=form, cookie=cookie)
 
     def POST(self):
         form = info_form()
