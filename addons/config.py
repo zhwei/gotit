@@ -19,3 +19,6 @@ baefetch = True
 
 #查询页缓存时间(秒)
 index_cache = 1000
+
+#网站运行模式
+debug_mode = True

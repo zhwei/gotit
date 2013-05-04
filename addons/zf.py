@@ -8,6 +8,8 @@ from BeautifulSoup import BeautifulSoup
 import config
 #import os
 from autocache import memorize
+import random
+from image import process_image
 
 @memorize(300)
 def get_base_url():
@@ -16,9 +18,6 @@ def get_base_url():
     base_url = with_random_url[:-13]
     return base_url
 
-def get_cookie_value(cookies):
-    for cookie in cookies:
-        return cookie.value
 
 #def get_viewstate
 
@@ -29,67 +28,58 @@ class ZF():
         base_url = config.zf_url
     login_url = base_url + "Default2.aspx"
     code_url = base_url + 'CheckCode.aspx'
-    headers = {'Referer':base_url,'Host':base_url[7:21],'User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:18.0) Gecko/20100101 Firefox/18.0",'Connection':'Keep-Alive'}
+    headers = {
+            'Referer':base_url,
+            'Host':base_url[7:21],
+            'User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686;\
+                    rv:18.0) Gecko/20100101 Firefox/18.0",
+            'Connection':'Keep-Alive'
+            }
 
     def __init__(self):
-#    def __init__(self,xh,pw,func):
-#        self.xh = xh
-#        self.pw = pw
-#        self.func = func
         self.cookies = cookielib.LWPCookieJar()
         self.opener =urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
         urllib2.install_opener(self.opener)
 
-    def get(self):
+    def set_user_info(self,xh,pw):
+        self.xh = xh
+        self.pw = pw
+
+    def pre_login(self):
+        """
+        初始化登陆, 获取viewstate参数 创建验证码图片
+        放置在/static/pic/中, 并且返回验证码图片名
+        """
+        #get __VIEWSTATE
+        req = urllib2.Request(self.base_url,headers=self.headers)
+        ret = self.opener.open(req)
+        page = ret.read()
+        com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
+        all = com.findall(page)
+        __VIEWSTATE =  all[0]
+        self.VIEWSTATE = __VIEWSTATE
+        #print __VIEWSTATE
         # get CheckCode.aspx
         req = urllib2.Request(self.code_url,headers = self.headers)
         a = self.opener.open(req).read()
-        cookie_value = get_cookie_value(self.cookies)
-        filename = 'pic/'+str(cookie_value) + '.gif'
+        pic_name = str(random.randint(1,100)) + ".gif"
+        filename = 'static/pic/' + pic_name
         fi = file(filename,'wb')
         fi.write(a)
         fi.close()
-        self.headers = {
-                'Referer':'http://210.44.176.132/default_ldap.aspx',
-                'Host':'210.44.176.132','User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:18.0) Gecko/20100101 Firefox/18.0",
-                'Cookie':'ASP.NET_SessionId=' + cookie_value,
-                'Connection':'keep-alive'
-                }
-
-        return cookie_value
+        process_image(filename)
+        return __VIEWSTATE, pic_name
 
 
-    #def login(self):
-    def login(self):
-        # get __VIEWSTATE
-        #req = urllib2.Request(self.base_url,headers=self.headers)
-        #ret = self.opener.open(req)
-        #page = ret.read()
-        #com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
-        #all = com.findall(page)
-        #__VIEWSTATE =  all[0]
-        __VIEWSTATE =  "dDwtNDk1NTQ0MzAzOzs+PwcQRxUJ8/e+SJ7m2Y5kDNtbHJ4="
-
-        # ===============================================
-
-        # get CheckCode.aspx
-#        req = urllib2.Request(self.code_url,headers = self.headers)
-#        a = self.opener.open(req).read()
-#        filename = 'pic/'+str(self.cookie_value) + '.gif'
-#        fi = file(filename,'wb')
-#        fi.write(a)
-#        fi.close()
-#        from sec_code.recg import verify
-#        yanzhengma = verify(filename)
-#
-        # ===============================================
+    def login(self, yanzhengma, VIEWSTATE):
+        yanzhengma = yanzhengma.decode("utf-8").encode("gb2312")
         data = {
             'Button1':'',
             'RadioButtonList1':"学生",
             "TextBox1":self.xh,
             'TextBox2':self.pw,
-            'TextBox3':self.verify,
-            '__VIEWSTATE':__VIEWSTATE,
+            'TextBox3':yanzhengma,
+            '__VIEWSTATE':VIEWSTATE,
             'lbLanguage':'',
         }
         post_data = urllib.urlencode(data)
@@ -97,78 +87,58 @@ class ZF():
         ret = self.opener.open(req).read().decode("gbk").encode("utf-8")
         return ret
 
-    def __get_url(self):
-        func_url = self.base_url + self.func + ".aspx?xh=" + self.xh
-        return func_url
 
 
-    def get_table(self):
-        url = self.__get_url()
-        req = urllib2.Request(url=url,headers=self.headers)
-        target_html = self.opener.open(req)
-        print target_html.read().decode('gbk')
+    def get_html(self, search_item):
+        """
+        仅用来抓取目的网页
+        """
+        url = self.base_url + search_item + ".aspx?xh=" + self.xh
+        req = urllib2.Request(url = url, headers = self.headers)
+        target_html = self.opener.open(req).read().decode('gbk')
+        #print  target_html.encode("utf-8")
+        return target_html
 
-        soup = BeautifulSoup(target_html, fromEncoding='gbk')
-        if self.func == "xskbcx":
-            table_name = "Table1"
-        else:
-            table_name = "DataGrid1"
-        table = soup.find("table", {"id": table_name}) #table is class
-        result = table.contents
-        print result
+
+    def get_score(self):
+        """
+        查询当前学期成绩, 返回的内容为列表
+        """
+        html = self.get_html("xscjcx_dq")
+        soup = BeautifulSoup(html, fromEncoding='gbk')
+        result = soup.find("table", {"id": "DataGrid1"}).contents
         return result
 
-    def check_login(self,ret):
-        if ret.find('欢迎您') != -1:
-            return 0
-        elif ret.find('密码错误') != -1:
-            return 1
-        elif ret.find('验证码不正确') != -1:
-            return 2
-        else:
-            return -1
-    
-    def main(self,xh,pw,func,verify,cookie):
+    def get_kebiao(self):
+        """
+        课表 , 返回的内容为列表
+        """
+        html = self.get_html("xskbcx")
+        soup = BeautifulSoup(html, fromEncoding='gbk')
+        result = soup.find("table", {"id": "Table1"}).contents
+        return result
 
-        self.xh = xh
-        self.pw = pw
-        self.func = func
-        self.verify = verify
-        self.cookie = cookie
+    def get_kaoshi(self):
+        """
+        考试时间, 返回的内容为列表
+        """
+        html = self.get_html("xskscx")
+        soup = BeautifulSoup(html, fromEncoding='gbk')
+        result = soup.find("table", {"id": "DataGrid1"}).contents
+        return result
 
-        for i in range(10):
-            ret =self.login()
-            status = self.check_login(ret)
-            if status == 0:
-                break
-            elif status == 1:
-                return 'pwd'
-            elif status == 2:
-                continue
-            elif status == -1:
-                return 'ufo'
 
-    def get_json(self,func):
-        self.func = func
-        res = self.get_table()
-        dic = {}
-        dic['kebiao'] = res
-        import json
-        json_obj = json.dumps(dic)
-        return json_obj
+#    def get_json(self,func):
+#        self.func = func
+#        res = self.get_table()
+#        dic = {}
+#        dic['kebiao'] = res
+#        import json
+#        json_obj = json.dumps(dic)
+#        return json_obj
+#
 
 
 
-
-xh = "1111051046"#raw_input("xh")
-pw = "waqei2F"#raw_input("pw")
-
-z = ZF()
-cookie = z.get()
-import os
-os.system('eog pic/'+cookie+'.gif&')
-
-veri = raw_input("v")
-
-z.main(xh, pw, 'xskbcx', veri, cookie)
-z.get_table()
+#xh = raw_input("xh")
+#pw = raw_input("pw")

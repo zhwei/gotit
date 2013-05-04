@@ -6,20 +6,16 @@
     <hr>
     <form name="main" method="post" accept-charset="utf-8" class="form-signin">
       <div class="alert alert-success">
-			<h4>山东理工大学教育技术中心小组纳新！详见<a href="/notice.html" target="_blank">公告</a></h4>
-		  <hr>
-			<h4>已增加验证码识别功能，网站所有功能均能正常使用！</a></h4>
+		  中文验证码问题已经解决,验证码不清楚时可刷新页面,新增<a href="/contact.html">留言板</a>
       </div>
       <br>
-      {% if not form.valid %}
-      <p class="alert alert-danger">输入错误:</p>
-      {% endif %}
-      {{ form.render() }}
+      {{ form }}
+	  </table>
+
       <center>
         <button type="submit" class="btn btn-primary">查询</button>&nbsp;
         <button type="reset" class="btn">重置</button>
       </center>
     </form>
-	 <img src="/static/pic/{{ cookie }}.gif" alt="" />
   
 {% endblock %}
