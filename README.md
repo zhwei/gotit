@@ -5,3 +5,7 @@ Got it
 
 启动方式
 	gunicorn code:application
+	
+#### 依赖包
+	+ web.py
+	+ jinja2 
