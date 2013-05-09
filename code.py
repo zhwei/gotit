@@ -231,17 +231,18 @@ class score:
             #a = ALL_SCORE()
             #table = a.get_all_score(xh)
             gpa = GPA(xh)
-            if gpa.getscore_page():
-                table = gpa.get_all_score()
-                jidian = gpa.get_gpa()["ave_score"]
-                if table:
-                    return render.result(table=table, jidian=jidian)
-                else:
-                    table = None
-                    error = "can not get your score"
-                    return render.result(table=table,error=error)
+            #if gpa.getscore_page():
+            table = gpa.get_all_score()
+            jidian = gpa.get_gpa()["ave_score"]
+
+            if table:
+                return render.result(table=table, jidian=jidian)
             else:
-                return "成绩查询源出错,请稍后再试!"
+                table = None
+                error = "can not get your score"
+            return render.result(table=table,error=error)
+            #else:
+            #    return "成绩查询源出错,请稍后再试!"
 
 # 平均学分绩点计算说明页面
 class help_gpa:
