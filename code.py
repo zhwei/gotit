@@ -23,6 +23,7 @@ web.config.debug = debug_mode
 
 urls = (
         '/', 'index',
+        '/zheng', 'zheng',
         '/score', 'score',
         '/cet', 'cet',
         '/contact.html','contact',
@@ -78,7 +79,7 @@ def get_index_form(viewstate, pic_name):
     return index_form
 
 #成绩查询
-class index:
+class zheng:
     def GET(self):
         zf = ZF()
         viewstate, pic_name = zf.pre_login()
@@ -252,4 +253,10 @@ class comment:
     def GET(self):
         return render.comment()
         
+
+class index:
+    @memorize(index_cache)
+    def GET(self):
+        return render.aaa()
+
 application = web.application(urls, globals(),autoreload=False).wsgifunc()

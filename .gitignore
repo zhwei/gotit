@@ -6,6 +6,8 @@ tools.py
 dong.py
 test/*
 static/pic/*
+stop.sh
+restart.sh
  
 
 # C extensions

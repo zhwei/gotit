@@ -62,7 +62,7 @@ class ZF():
         # get CheckCode.aspx
         req = urllib2.Request(self.code_url,headers = self.headers)
         a = self.opener.open(req).read()
-        pic_name = str(random.randint(1,100)) + ".gif"
+        pic_name = str(random.randint(1,100000)) + ".gif"
         filename = 'static/pic/' + pic_name
         fi = file(filename,'wb')
         fi.write(a)
