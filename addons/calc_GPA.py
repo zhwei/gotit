@@ -11,23 +11,29 @@ class GPA:
     __num = 0
     __table = None
     __ret = {}
+    page = None
 
     def __init__(self,num):
         GPA.__num = num
 
-    def __getscore_page(self):
+    def getscore_page(self):
         '''获取成绩页面'''
         param = urllib.urlencode({'post_xuehao':GPA.__num})
-        page = urllib2.urlopen(
-            url = config.score_url,
-            data = param,
-            timeout=10
-            ).read().decode('utf-8')
-        return page
+        try:
+            self.page = urllib2.urlopen( url = config.score_url, data = param, timeout=5).read().decode('utf-8')
+        except urllib2.URLError:
+            return None
+
+    # 直接抓取表格内容并返回
+    def get_all_score(self):
+        page = self.page
+        patten = re.compile('<span class="style3">成绩信息</span>(.*?)</table>',re.M|re.S)  
+        return patten.findall(page)
+
 
     def __match_table(self):
         '''正则表达式获取完整表格'''
-        page = self.__getscore_page()
+        page = self.page
         patten = re.compile('<td scope="col" align=".*" valign="middle" nowrap>&nbsp;(.*)</td>')
         GPA.__table = patten.findall(page)
         return 0

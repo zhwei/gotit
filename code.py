@@ -15,7 +15,7 @@ from web.contrib.template import render_jinja
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
 from addons.zf import ZF
-from addons.get_all_score import ALL_SCORE
+#from addons.get_all_score import ALL_SCORE
 from addons.autocache import memorize
 from addons import config
 from addons.config import index_cache, debug_mode
@@ -94,7 +94,6 @@ class zheng:
         t = content['type']
         yanzhengma = content['verify']
         viewstate = content['viewstate']
-
         try:
             zf = all_client.pop(viewstate)
         except KeyError:
@@ -102,7 +101,6 @@ class zheng:
             pass
         zf.set_user_info(self.xh, self.pw)
         ret = zf.login(yanzhengma, viewstate)
-
         if ret.find('欢迎您') != -1:
             pass
         elif ret.find('密码错误') != -1:
@@ -112,8 +110,6 @@ class zheng:
             return '<script type="text/javascript">alert("验证码错误!");top.location="/"</script>'
         else:
             return '<script type="text/javascript">alert("未知错误,请联系管理员!");top.location="/"</script>'
-
-
         if t == "1":
             table = zf.get_score()
         elif t == "2":
@@ -215,12 +211,12 @@ class notice:
     def GET(self):
         return render.notice()
 
-#taobao accelerating
+# 阿里妈妈认证
 class ttest:
     def GET(self):
         return render.root()
 
-#get all score
+# 全部成绩
 class score:
     @memorize(index_cache)
     def GET(self):
@@ -233,9 +229,11 @@ class score:
             return render.score(form=form)
         else:
             xh = form.d.xh
-            a = ALL_SCORE()
-            table = a.get_all_score(xh)
+            #a = ALL_SCORE()
+            #table = a.get_all_score(xh)
             gpa = GPA(xh)
+            #if gpa.getscore_page():
+            table = gpa.get_all_score()
             jidian = gpa.get_gpa()["ave_score"]
 
             if table:
@@ -243,16 +241,26 @@ class score:
             else:
                 table = None
                 error = "can not get your score"
-                return render.result(table=table,error=error)
+            return render.result(table=table,error=error)
+            #else:
+            #    return "成绩查询源出错,请稍后再试!"
 
+# 平均学分绩点计算说明页面
 class help_gpa:
-    #@memorize(index_cache)
+    @memorize(index_cache)
     def GET(self):
         return render.help_gpa()
 
+# 评论页面, 使用多说评论
 class comment:
     def GET(self):
         return render.comment()
+
+# 首页索引页
+class index:
+    #@memorize(index_cache)
+    def GET(self):
+        return render.aaa()
         
 
 class index:
