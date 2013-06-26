@@ -63,29 +63,29 @@ xh_form = form.Form(
         form.Textbox("xh",description="学号:",class_="span3",pre="&nbsp;&nbsp;")
         )
 
-def get_index_form(viewstate, pic_name):
+def get_index_form(time_md5):
     index_form = '\
             <table><tr><th><label for="xh">学号:</label></th><td>&nbsp;&nbsp;<input type="text" id="xh" name="xh" class="span3"/></td></tr>\
             <tr><th><label for="pw">密码:</label></th><td>&nbsp;&nbsp;<input type="password" id="pw" name="pw" class="span3"/></td></tr>\
             <tr><th><label for="number">验证码:</label></th>\
-                <td>&nbsp;&nbsp;<input type="text" id="verify" name="verify"/>&nbsp;<img src="/static/pic/'+ pic_name +'" alt="" height="35" width="92"/></td>\
+                <td>&nbsp;&nbsp;<input type="text" id="verify" name="verify"/>&nbsp;<img src="/static/pic/'+ time_md5 +'.gif" alt="" height="35" width="92"/></td>\
                 <td></td>\
                 </tr>\
             <tr><th><tr><th><label for="Type">查询类型:</label></th><td>&nbsp;&nbsp;<select id="type" name="type">\
                 <option value="1">成绩查询</option>\
                 <option value="2">考试时间查询</option>\
                 <option value="3">课表查询</option></select></td></tr>\
-            <input type="hidden" value="'+ viewstate +'" name="viewstate"/>'
+            <input type="hidden" value="'+ time_md5 +'" name="time_md5"/>'
     return index_form
 
 #成绩查询
 class zheng:
     def GET(self):
         zf = ZF()
-        viewstate, pic_name = zf.pre_login()
-        all_client[viewstate] = zf
-        form = get_index_form(viewstate, pic_name)
-        return render.index(form=form ,viewstate=viewstate, pic_name=pic_name)
+        viewstate, time_md5 = zf.pre_login()
+        all_client[time_md5] = (zf, viewstate)
+        form = get_index_form(time_md5)
+        return render.index(form=form)
 
     def POST(self):
         content = web.input()
@@ -93,23 +93,27 @@ class zheng:
         self.pw = content['pw']
         t = content['type']
         yanzhengma = content['verify']
-        viewstate = content['viewstate']
+        time_md5 = content['time_md5']
+
         try:
-            zf = all_client.pop(viewstate)
+            value = all_client.pop(time_md5)
+            zf = value[0]
+            viewstate = value[1]
         except KeyError:
-            #return '<script type="text/javascript">alert("刷新首页再次查询!");top.location="/"</script>'
-            pass
+            return render.key_error()
+
         zf.set_user_info(self.xh, self.pw)
         ret = zf.login(yanzhengma, viewstate)
         if ret.find('欢迎您') != -1:
             pass
         elif ret.find('密码错误') != -1:
-            return '<script type="text/javascript">alert("密码错误!");top.location="/"</script>'
+            return render.pw_error()
 
         elif ret.find('验证码不正确') != -1:
-            return '<script type="text/javascript">alert("验证码错误!");top.location="/"</script>'
+            return render.recg_error()
         else:
-            return '<script type="text/javascript">alert("未知错误,请联系管理员!");top.location="/"</script>'
+            return render.ufo_error()
+
         if t == "1":
             table = zf.get_score()
         elif t == "2":
@@ -117,7 +121,7 @@ class zheng:
         elif t == "3":
             table = zf.get_kebiao()
         else:
-            return '<script type="text/javascript">alert("输入不合理!");top.location="/"</script>'
+            return render.input_error()
         if table:
             error = None
             return render.result(table=table, error=error)

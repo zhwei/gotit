@@ -8,7 +8,6 @@ from BeautifulSoup import BeautifulSoup
 import config
 #import os
 from autocache import memorize
-import random
 from image import process_image
 
 @memorize(300)
@@ -71,7 +70,7 @@ class ZF():
         fi.write(a)
         fi.close()
         process_image(filename)
-        return __VIEWSTATE, pic_name
+        return __VIEWSTATE, time_md5
 
 
     def login(self, yanzhengma, VIEWSTATE):
