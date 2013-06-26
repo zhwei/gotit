@@ -15,7 +15,7 @@ from web.contrib.template import render_jinja
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
 from addons.zf import ZF
-#from addons.get_all_score import ALL_SCORE
+from addons.get_all_score import ALL_SCORE
 from addons.autocache import memorize
 from addons import config
 from addons.config import index_cache, debug_mode
@@ -229,11 +229,11 @@ class score:
             return render.score(form=form)
         else:
             xh = form.d.xh
-            #a = ALL_SCORE()
-            #table = a.get_all_score(xh)
+            a = ALL_SCORE()
+            table = a.get_all_score(xh)
             gpa = GPA(xh)
-            #if gpa.getscore_page():
-            table = gpa.get_all_score()
+            gpa.getscore_page()
+            #table = gpa.get_all_score()
             jidian = gpa.get_gpa()["ave_score"]
 
             if table:
