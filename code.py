@@ -98,7 +98,8 @@ class zheng:
         try:
             zf = all_client.pop(viewstate)
         except KeyError:
-            return '<script type="text/javascript">alert("刷新首页再次查询!");top.location="/"</script>'
+            #return '<script type="text/javascript">alert("刷新首页再次查询!");top.location="/"</script>'
+            pass
         zf.set_user_info(self.xh, self.pw)
         ret = zf.login(yanzhengma, viewstate)
 
