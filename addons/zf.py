@@ -10,36 +10,36 @@ import config
 from autocache import memorize
 from image import process_image
 
-@memorize(300)
-def get_base_url():
-    target = urllib2.urlopen(config.zf_url)
-    with_random_url = target.geturl()
-    base_url = with_random_url[:-13]
-    return base_url
-
 
 #def get_viewstate
 
 class ZF():
-    if config.random:
-        base_url = get_base_url()
-    else:
-        base_url = config.zf_url
-    login_url = base_url + "Default2.aspx"
-    code_url = base_url + 'CheckCode.aspx'
-    headers = {
-            'Referer':base_url,
-            'Host':base_url[7:21],
-            'User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686;\
-                    rv:18.0) Gecko/20100101 Firefox/18.0",
-            'Connection':'Keep-Alive'
-            }
+
+    def get_base_url(self):
+        target = urllib2.urlopen(config.zf_url)
+        with_random_url = target.geturl()
+        base_url = with_random_url[:-13]
+        return base_url
 
     def __init__(self):
         self.cookies = cookielib.LWPCookieJar()
         self.opener =urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
         urllib2.install_opener(self.opener)
 
+        if config.random:
+            self.base_url = self.get_base_url()
+        else:
+            self.base_url = config.zf_url
+        self.login_url = self.base_url + "Default2.aspx"
+        self.code_url = self.base_url + 'CheckCode.aspx'
+        self.headers = {
+                'Referer':self.base_url,
+                'Host':self.base_url[7:21],
+                'User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686;\
+                        rv:18.0) Gecko/20100101 Firefox/18.0",
+                'Connection':'Keep-Alive'
+                }
+    
     def set_user_info(self,xh,pw):
         self.xh = xh
         self.pw = pw

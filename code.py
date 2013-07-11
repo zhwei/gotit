@@ -273,3 +273,7 @@ class index:
         return render.aaa()
 
 application = web.application(urls, globals(),autoreload=False).wsgifunc()
+#if __name__ == "__main__":
+#    app = web.application(urls, globals(),autoreload=False)
+#    app.run()
+
