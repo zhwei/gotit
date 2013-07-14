@@ -68,7 +68,7 @@ def get_index_form(time_md5):
             <table><tr><th><label for="xh">学号:</label></th><td>&nbsp;&nbsp;<input type="text" id="xh" name="xh" class="span3"/></td></tr>\
             <tr><th><label for="pw">密码:</label></th><td>&nbsp;&nbsp;<input type="password" id="pw" name="pw" class="span3"/></td></tr>\
             <tr><th><label for="number">验证码:</label></th>\
-                <td>&nbsp;&nbsp;<input type="text" id="verify" name="verify"/>&nbsp;<img src="/static/pic/'+ time_md5 +'.gif" alt="" height="35" width="92"/></td>\
+                <td>&nbsp;&nbsp;<span><input type="text" id="verify" name="verify"/></span>&nbsp;<span><img src="/static/pic/'+ time_md5 +'.gif" alt="" height="35" width="92"/></span></td>\
                 <td></td>\
                 </tr>\
             <tr><th><tr><th><label for="Type">查询类型:</label></th><td>&nbsp;&nbsp;<select id="type" name="type">\
