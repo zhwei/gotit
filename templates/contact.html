@@ -1,89 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>联系我们--Got it</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+{% extends "base-search.html" %}
+{% block title %}
+联系我们--Got it
+{% endblock %}
 
-    <!-- Le styles -->
-    <link href="/static/css/bootstrap.css" rel="stylesheet">
-    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
-    <style>
-      body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-      }
-    </style>
+{% block content %}
+<div style="width: 870px; MARGIN-RIGHT: auto;MARGIN-LEFT: auto;">
+  <h1>联系我们</h1>
+  <hr />
+    <h3>我们是<a href="http://sdutlinux.org" target="_blank">山东理工大学linux用户组</a></h3>
 
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
+    <p>如果您对本网站有新的需求或建议,请联系<a href="mailto:zhwei.yes@gmail.com">zhwei</a>,或者前往<a href="http://sdutlinux.org/t/339" target="_blank">http://sdutlinux.org/t/339</a>留言.</p>
 
-  <body>
-    <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <a class="brand" href="http://gotit.asia/">Got it</a>
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li><a href="/">首页</a></li>
-              <li><a href="/score">成绩查询</a></li>
-              <li><a href="/cet">CET</a></li>
-              <li><a href="/notice.html#">公告</a></li>
-              <li class="active"><a href="/contact.html">联系我们</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
+  <h3>关于作者</h3>
 
-    <div id="container" class= "container">
-      <div style="width: 870px; MARGIN-RIGHT: auto;MARGIN-LEFT: auto;">
-        <h1>联系我们</h1>
-        <hr />
-        <h3>我们是<a href="http://sdutlinux.org" target="_blank">山东理工大学linux用户组</a></h3>
+    <h4><p><a href="http://zhwei.42qu.com" target="_blank">zhwei</a></p></h4>
 
-        <p>如果您对本网站有新的需求或建议,请联系<a href="mailto:zhwei.yes@gmail.com">zhwei</a>,或者前往<a href="http://sdutlinux.org/t/339" target="_blank">http://sdutlinux.org/t/339</a>留言.</p>
-
-        <h3>关于作者</h3>
-
-        <h4><p><a href="http://zhwei.42qu.com" target="_blank">zhwei</a></p></h4>
-
-          <p><strong>QQ:&nbsp;963032551</strong></p>
-          <p><strong>Email:&nbsp;<a href="mailto:zhwei@gotit.asia">zhwei@gotit.asia</a></strong></p>
-    	     <p><strong>贡献</strong>:正方教务系统相关查询</p>
-        <h4><p><a href="http://www.cnblogs.com/ma6174/" target="_blank">马伟伟</a></p></h4>
-    	     <p><strong>贡献</strong>:学分绩点查询, 四六级成绩查询</p>
-      </div>
-
-  	</div> <!-- /container -->
-    <div class="container">
-      <hr>
-      <center>
-        Power by <a href="http://webpy.org/" target="_blank">web.py</a>&nbsp;
-        <a href="http://python.org/" target="_blank">python</a>&nbsp;
-        <a href="http://sdutlinux.org" target="_blank">SLUG</a>&nbsp;
-        Author:<a href="http://zhwei.42qu.com" target="_blank">zhwei</a>&nbsp;
-        Version:2.0
-      </center>
-    </div>
-	<script type="text/javascript" src="http://www.bootcss.com/assets/js/jquery.js"></script>
-	<script type="text/javascript" src="http://www.bootcss.com/assets/js/bootstrap.min.js"></script>
-<!-- baidu sitecenter   -->
-    <div style="display: none;">
-      <script type="text/javascript">
-        var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
-        document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F8798cad9d47e876ea6c4f4ce5ff5fe5b' type='text/javascript'%3E%3C/script%3E"));
-      </script>
-    </div>
-<!-- baidu sitecenter   -->
-  </body>
-</html>
+    <p><strong>QQ:&nbsp;963032551</strong></p>
+    <p><strong>Email:&nbsp;<a href="mailto:zhwei@gotit.asia">zhwei@gotit.asia</a></strong></p>
+    <p><strong>贡献</strong>:正方教务系统相关查询</p>
+    <h4><p><a href="http://www.cnblogs.com/ma6174/" target="_blank">马伟伟</a></p></h4>
+    <p><strong>贡献</strong>:学分绩点查询, 四六级成绩查询</p>
+</div>
+{% endblock %}

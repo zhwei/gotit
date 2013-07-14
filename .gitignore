@@ -8,6 +8,7 @@ test/*
 static/pic/*
 stop.sh
 restart.sh
+start.sh
  
 
 # C extensions
