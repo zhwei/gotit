@@ -1,0 +1,23 @@
+{% extends 'base-index.html' %}
+
+{% block title %}我们为你Got it{% endblock %}
+
+{% block nav %}
+<li><a href="#">首页</a></li>
+<li><a href="/notice.html">公告</a></li>
+<li><a href="/comment.html">留言</a></li>
+<li class="active"><a href="/donate.html" target="_blank">赞助</a></li>
+{% endblock %}
+
+{% block content %}
+
+<div class="jumbotron">
+  <a href="https://me.alipay.com/zhweifcx" target="_blank"><img src="/static/img/alipay.png"></a>
+  <p class="lead"></p>
+</div>
+
+<div>
+ <p>&nbsp;&nbsp;可以点击上面图片使用支付宝赞助我们, 只要您的金额&gt;0元,我们都会致以同样的感谢!</p>
+</div>
+
+{% endblock %}

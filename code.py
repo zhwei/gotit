@@ -34,6 +34,7 @@ urls = (
         '/api/gpa','api_gpa',
         '/help/gpa.html','help_gpa',
         '/comment.html','comment',
+        '/donate.html','donate',
         )
 
 #render = web.template.render('./template/') # your templates
@@ -259,6 +260,11 @@ class help_gpa:
 class comment:
     def GET(self):
         return render.comment()
+
+# 赞助页面
+class donate:
+    def GET(self):
+        return render.donate()
 
 # 首页索引页
 class index:
