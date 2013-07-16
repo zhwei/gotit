@@ -4,29 +4,29 @@
 {% block content %}
 
 {% if jidian %}
-      <table border="1" class= "table table-striped table-bordered table-condensed">
-		  <tr>
-		  <td>
-			  <strong>平均学分绩点</strong>
-		  </td>
-		  <td>
-			  <strong>{{ jidian }}</strong>
-		</td>
-		  <td>
-			  <strong><a href="/help/gpa.html">绩点计算方法</a></strong>
-		</td>
+<table border="1" class= "table table-striped table-bordered table-condensed">
+  <tr>
+    <td>
+      <strong>平均学分绩点</strong>
+    </td>
+    <td>
+      <strong>{{ jidian }}</strong>
+    </td>
+    <td>
+      <strong><a href="/help/gpa.html">绩点计算方法</a></strong>
+    </td>
   </tr>
-    </table>
+</table>
 <h3>各科成绩</h3>
 <hr />
 {% else %}
 {% endif %}
 
-      <table border="1" class= "table table-striped table-bordered table-condensed">
-        {% for i in table %}
-          {{i}}
-        {% endfor %}
-    </table>
-    <h2 id="error">{{ error }}</h2>
-  
+<table border="1" class= "table table-striped table-bordered table-condensed">
+  {% for i in table %}
+  {{i}}
+  {% endfor %}
+</table>
+<h2 id="error">{{ error }}</h2>
+
 {% endblock content %}

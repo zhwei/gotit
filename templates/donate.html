@@ -3,10 +3,10 @@
 {% block title %}我们为你Got it{% endblock %}
 
 {% block nav %}
-<li><a href="#">首页</a></li>
+<li><a href="/">首页</a></li>
 <li><a href="/notice.html">公告</a></li>
 <li><a href="/comment.html">留言</a></li>
-<li class="active"><a href="/donate.html" target="_blank">赞助</a></li>
+<li class="active"><a href="/donate.html">赞助</a></li>
 {% endblock %}
 
 {% block content %}
@@ -16,8 +16,33 @@
   <p class="lead"></p>
 </div>
 
+<hr />
+
 <div>
- <p>&nbsp;&nbsp;可以点击上面图片使用支付宝赞助我们, 只要您的金额&gt;0元,我们都会致以同样的感谢!</p>
+  <h5>&nbsp;&nbsp;点击上面图片使用支付宝赞助我们, 只要您的金额&nbsp;<i>&gt;0元</i>&nbsp;, 都代表着您对我们的支持, 我们都会致以您同样的感谢! 您可以选择自己名字是否出现在下面的<i>网站赞助者名单</i>上, 请在付款说明中注明, 谢谢!</h5>
+
+  <br />
+  <br />
+</div>
+
+<div>
+
+  <h4 id="names">赞助者名单</h4>
+  <br />
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th>赞助者</th>
+      <td><strong>金额</strong></td>
+    </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>zhwei</th>
+        <td>0.01元</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 {% endblock %}
