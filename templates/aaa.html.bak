@@ -72,6 +72,7 @@
           <li class="active"><a href="#">首页</a></li>
           <li><a href="/notice.html">公告</a></li>
           <li><a href="/comment.html">留言</a></li>
+          <li><a href="https://me.alipay.com/zhweifcx" target="_blank">赞助</a></li>
         </ul>
         <h3 class="muted">Got it</h3>
       </div>

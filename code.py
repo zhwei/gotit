@@ -34,6 +34,7 @@ urls = (
         '/api/gpa','api_gpa',
         '/help/gpa.html','help_gpa',
         '/comment.html','comment',
+        '/donate.html','donate',
         )
 
 #render = web.template.render('./template/') # your templates
@@ -75,8 +76,15 @@ def get_index_form(time_md5):
                 <option value="1">成绩查询</option>\
                 <option value="2">考试时间查询</option>\
                 <option value="3">课表查询</option></select></td></tr>\
-            <input type="hidden" value="'+ time_md5 +'" name="time_md5"/>'
+            <input type="hidden" value="'+ time_md5 +'" name="time_md5"/></table>'
     return index_form
+
+# 首页索引页
+class index:
+    #@memorize(index_cache)
+    def GET(self):
+        return render.index()
+
 
 #成绩查询
 class zheng:
@@ -85,7 +93,7 @@ class zheng:
         viewstate, time_md5 = zf.pre_login()
         all_client[time_md5] = (zf, viewstate)
         form = get_index_form(time_md5)
-        return render.index(form=form)
+        return render.zheng(form=form)
 
     def POST(self):
         content = web.input()
@@ -260,20 +268,13 @@ class comment:
     def GET(self):
         return render.comment()
 
-# 首页索引页
-class index:
-    #@memorize(index_cache)
+# 赞助页面
+class donate:
     def GET(self):
-        return render.aaa()
-        
+        return render.donate()
 
-class index:
-    @memorize(index_cache)
-    def GET(self):
-        return render.aaa()
-
-application = web.application(urls, globals(),autoreload=False).wsgifunc()
-#if __name__ == "__main__":
-#    app = web.application(urls, globals(),autoreload=False)
-#    app.run()
+#application = web.application(urls, globals(),autoreload=False).wsgifunc()
+if __name__ == "__main__":
+    app = web.application(urls, globals(),autoreload=False)
+    app.run()
 
