@@ -37,10 +37,12 @@
     </tr>
     </thead>
     <tbody>
+      {% for sp in sponsor %}
       <tr>
-        <th>zhwei</th>
-        <td>0.01元</td>
+        <th>{{ sp[0] }}</th>
+        <td>{{ sp[1] }}&nbsp;元</td>
       </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>

@@ -18,7 +18,7 @@ from addons.zf import ZF
 from addons.get_all_score import ALL_SCORE
 from addons.autocache import memorize
 from addons import config
-from addons.config import index_cache, debug_mode
+from addons.config import index_cache, debug_mode, sponsor, zheng_alert
 web.config.debug = debug_mode
 
 urls = (
@@ -82,9 +82,9 @@ def get_index_form(time_md5):
 
 # 首页索引页
 class index:
-    #@memorize(index_cache)
+    @memorize(index_cache)
     def GET(self):
-        return render.index()
+        return render.index(alert=zheng_alert)
 
 
 #成绩查询
@@ -94,7 +94,7 @@ class zheng:
         viewstate, time_md5 = zf.pre_login()
         all_client[time_md5] = (zf, viewstate)
         form = get_index_form(time_md5)
-        return render.zheng(form=form)
+        return render.zheng(alert=zheng_alert,form=form)
 
     def POST(self):
         content = web.input()
@@ -268,7 +268,7 @@ class comment:
 # 赞助页面
 class donate:
     def GET(self):
-        return render.donate()
+        return render.donate(sponsor=sponsor)
 
 # 阿里妈妈认证
 class ttest:

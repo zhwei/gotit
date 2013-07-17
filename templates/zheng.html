@@ -5,9 +5,11 @@
 <center><h1>正方教务系统查询工具</h1></center>
 <hr>
 <form name="main" method="post" accept-charset="utf-8" class="form-signin">
+  {% if alert %}
   <div class="alert alert-info">
-    <p>如果验证码只显示一个字, 请使用其他浏览器, 搜狗浏览器请使用高速模式.</p>
+    <p>{{ alert }}</p>
   </div>
+  {% endif %}
   <br>
 
   {{ form }}

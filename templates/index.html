@@ -21,9 +21,11 @@
     <div class="well" onclick="location.href='/';" style="cursor:pointer;">
       <h4><a href="/zheng">本学期课表 成绩 考试时间</a></h4>
       <p>查询本学期课表 成绩以及考试时间.</p>
-      <div class="alert alert-danger">
-        <p>如果您遇到“internal server error”近  请检查您是否完成了 <strong>教学质量评价</strong></></p>
+      {% if alert %}
+      <div class="alert alert-info">
+        <p>{{ alert }}</p>
       </div>
+      {% endif %}
     </div>
     <div class="well" onclick="location.href='/';" style="cursor:pointer;">
       <h4><a href="/cet">四六级成绩查询</a></h4>
