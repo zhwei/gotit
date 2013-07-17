@@ -28,13 +28,14 @@ urls = (
         '/cet', 'cet',
         '/contact.html','contact',
         '/notice.html','notice', 
-        '/root.txt', 'ttest', 
         '/api/kb','api_kb',
         '/api/cet','api_cet',
         '/api/gpa','api_gpa',
         '/help/gpa.html','help_gpa',
         '/comment.html','comment',
         '/donate.html','donate',
+        '/root.txt', 'ttest', 
+        '/360buy-union.txt', 'jd', 
         )
 
 #render = web.template.render('./template/') # your templates
@@ -223,10 +224,6 @@ class notice:
     def GET(self):
         return render.notice()
 
-# 阿里妈妈认证
-class ttest:
-    def GET(self):
-        return render.root()
 
 # 全部成绩
 class score:
@@ -272,6 +269,16 @@ class comment:
 class donate:
     def GET(self):
         return render.donate()
+
+# 阿里妈妈认证
+class ttest:
+    def GET(self):
+        return render.root()
+
+# 京东认证
+class jd:
+    def GET(self):
+        return render.jd()
 
 application = web.application(urls, globals(),autoreload=False).wsgifunc()
 #if __name__ == "__main__":
