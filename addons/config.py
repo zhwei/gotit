@@ -6,6 +6,11 @@ sponsor = (
     ('zhwei', '0.01'),
     ('*伟颖', '0.10'),
     ('*健', '3.00'),
+    ('*竞一', '1.00'),
+    ('*昌昌', '2.00'),
+    ('*德昊', '1.00'),
+    ('张宇', '0.01'),
+    ('杨林晓', '1.00'),
 )
 
 ## 正方 说明/警告
@@ -32,7 +37,7 @@ cet_url = "http://www.chsi.com.cn/cet/query"
 baefetch = True
 
 # 查询页缓存时间(秒)
-index_cache = 0
+index_cache = 1000
 
 # 网站运行模式
 debug_mode = False
