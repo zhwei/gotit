@@ -42,7 +42,7 @@ class CET:
             ret['write'] = re.findall('</span>(\d*)</strong></td>',page)[0]
             return ret
         except:
-            ret["error"] = u"请刷新!"
+            ret["error"] = u"暂无成绩"
             return ret
 
 
