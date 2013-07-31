@@ -11,10 +11,10 @@ import json
 from web import form
 from web.contrib.template import render_jinja
 
-#addons
+# addons
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
-from addons.zf import ZF
+from addons.zf import ZF, get_json
 from addons.get_all_score import ALL_SCORE
 from addons.autocache import memorize
 from addons import config
@@ -22,28 +22,29 @@ from addons.config import index_cache, debug_mode, sponsor, zheng_alert
 web.config.debug = debug_mode
 
 urls = (
-        '/', 'index',
-        '/zheng', 'zheng',
-        '/score', 'score',
-        '/cet', 'cet',
-        '/contact.html','contact',
-        '/notice.html','notice', 
-        '/api/kb','api_kb',
-        '/api/cet','api_cet',
-        '/api/gpa','api_gpa',
-        '/help/gpa.html','help_gpa',
-        '/comment.html','comment',
-        '/donate.html','donate',
-        '/root.txt', 'ttest', 
-        '/360buy-union.txt', 'jd', 
-        )
+    '/', 'index',
+    '/zheng', 'zheng',
+    '/score', 'score',
+    '/cet', 'cet',
+    '/contact.html', 'contact',
+    '/notice.html', 'notice',
+    '/api/score', 'api_zheng',
+    '/api/kb', 'api_kb',
+    '/api/cet', 'api_cet',
+    '/api/gpa', 'api_gpa',
+    '/help/gpa.html', 'help_gpa',
+    '/comment.html', 'comment',
+    '/donate.html', 'donate',
+    '/root.txt', 'ttest',
+    '/360buy-union.txt', 'jd',
+)
 
-#render = web.template.render('./template/') # your templates
+# render = web.template.render('./template/') # your templates
 render = render_jinja('templates', encoding='utf-8')
 all_client = {}
 
-#forms
-#def get_form(viewstate):
+# forms
+# def get_form(viewstate):
 #    info_form = form.Form(
 #        form.Textbox("number", description="学号:",class_="span3",pre="&nbsp;&nbsp;"),
 #        form.Password("password", description="密码:",class_="span3",pre="&nbsp;&nbsp;"),
@@ -56,14 +57,27 @@ all_client = {}
 #    return info_form()
 
 cet_form = form.Form(
-        form.Textbox("zkzh", description="准考证号:",class_="span3",pre="&nbsp;&nbsp;"),
-        form.Textbox("name", description="姓名:",class_="span3",pre="&nbsp;&nbsp;"),
-        validators = [
-            form.Validator('输入不合理!', lambda i:int(i.zkzh) != 15)]
-        )
+    form.Textbox(
+        "zkzh",
+        description="准考证号:",
+        class_="span3",
+        pre="&nbsp;&nbsp;"),
+    form.Textbox(
+        "name",
+        description="姓名:",
+        class_="span3",
+        pre="&nbsp;&nbsp;"),
+    validators=[
+        form.Validator('输入不合理!', lambda i:int(i.zkzh) != 15)]
+)
 xh_form = form.Form(
-        form.Textbox("xh",description="学号:",class_="span3",pre="&nbsp;&nbsp;")
-        )
+    form.Textbox(
+        "xh",
+        description="学号:",
+        class_="span3",
+        pre="&nbsp;&nbsp;")
+)
+
 
 def get_index_form(time_md5):
     index_form = '\
@@ -81,20 +95,24 @@ def get_index_form(time_md5):
     return index_form
 
 # 首页索引页
+
+
 class index:
+
     @memorize(index_cache)
     def GET(self):
         return render.index(alert=zheng_alert)
 
 
-#成绩查询
+# 成绩查询
 class zheng:
+
     def GET(self):
         zf = ZF()
         viewstate, time_md5 = zf.pre_login()
         all_client[time_md5] = (zf, viewstate)
         form = get_index_form(time_md5)
-        return render.zheng(alert=zheng_alert,form=form)
+        return render.zheng(alert=zheng_alert, form=form)
 
     def POST(self):
         content = web.input()
@@ -139,8 +157,11 @@ class zheng:
             error = "can not find your index table"
             return render.result(table=table, error=error)
 
-#cet
+# cet
+
+
 class cet:
+
     @memorize(index_cache)
     def GET(self):
         form = cet_form()
@@ -148,7 +169,8 @@ class cet:
             return render.cet_bae(form=form)
         else:
             return render.cet(form=form)
-        #return render.cet_raise()
+        # return render.cet_raise()
+
     def POST(self):
         form = cet_form()
         if not form.validates():
@@ -157,52 +179,120 @@ class cet:
             zkzh = form.d.zkzh
             name = form.d.name
             name = name.encode('utf-8')
-            items = ["学校","姓名","阅读","写作","综合", "准考证号", "考试时间","总分","考试类别","听力" ]
+            items = [
+                "学校",
+                "姓名",
+                "阅读",
+                "写作",
+                "综合",
+                "准考证号",
+                "考试时间",
+                "总分",
+                "考试类别",
+                "听力"]
             cet = CET()
-            res = cet.get_last_cet_score(zkzh,name)
-            #s = ""
-            #for i in res.keys():
+            res = cet.get_last_cet_score(zkzh, name)
+            # s = ""
+            # for i in res.keys():
             #    s = "%s%s\n%s\n"%(s,i,res[i])
-            #return s
-            return render.result_dic(items=items,res=res)
+            # return s
+            return render.result_dic(items=items, res=res)
 
-#api
+# api
+
+
 class api_kb:
+
     def GET(self):
         return 'Hello kb!'
+
     def POST(self):
-        data=web.input()
-        _xh=data.xh
-        _pw=data.pw
-        zheng = ZF(_xh,_pw,'xskbcx')
+        data = web.input()
+        _xh = data.xh
+        _pw = data.pw
+        zheng = ZF(_xh, _pw, 'xskbcx')
         json_object = zheng.get_json('xskbcx')
         return json_object
 
-class api_score:
+
+def json_err(content):
+    """用于生成json error内容"""
+    dic = {'error': content}
+    json_object = json.dumps(dic)
+    return json_object
+
+
+class api_zheng:
+
     def GET(self):
-        return 'Hello World!'
-    def POST(self):
-        data=web.input()
-        _xh=data.xh
-        _pw=data.pw
-        zheng = ZF(_xh,_pw,'xscjcx_dq')
-        json_object = zheng.get_json()
+        zf = ZF()
+        viewstate, time_md5 = zf.pre_login()
+        all_client[time_md5] = (zf, viewstate)
+        dic = {'time_md5': time_md5}
+        json_object = json.dumps(dic)
         return json_object
 
+    def POST(self):
+        data = web.input()
+        self.xh, self.pw = data.xh, data.pw
+        t, time_md5 = data.t, data.time_md5
+        verify = data.verify
+
+        try:
+
+            value = all_client.pop(time_md5)
+            zf, viewstate = value
+
+        except KeyError:
+            return json_err("can not find target time_md5")
+
+        zf.set_user_info(self.xh, self.pw)
+        ret = zf.login(verify, viewstate)
+
+        if ret.find('欢迎您') != -1:
+            pass
+        elif ret.find('密码错误') != -1:
+            return json_err("password wrong")
+        elif ret.find('验证码不正确') != -1:
+            return json_err("verify code wrong")
+        else:
+            return json_err("server is sleeping ...")
+
+        if t == "1":
+            table = zf.get_score()
+        elif t == "2":
+            table = zf.get_kaoshi()
+        elif t == "3":
+            table = zf.get_kebiao()
+        else:
+            return json_err("can not find your t")
+
+        if table:
+            json_object = get_json(table)
+            return json_object
+        else:
+            return json_err("can not find your contents")
+
 class api_cet:
+
     def GET(self):
         return 'cet'
+
     def POST(self):
-        data=web.input()
+        data = web.input()
         nu = data.nu
-        name=data.name.encode('utf-8')
+        name = data.name.encode('utf-8')
         cet = CET()
-        result = cet.get_last_cet_score(nu,name)
+        result = cet.get_last_cet_score(nu, name)
         result = json.dumps(result)
         return result
+
+
 class api_gpa:
+
     def GET(self):
         return 'gpa'
+
     def POST(self):
         data = web.input()
         xh = data.xh
@@ -211,15 +301,21 @@ class api_gpa:
         result = json.dumps(result)
         return result
 
-#contact us
+# contact us
+
+
 class contact:
+
     """contact us page"""
     @memorize(index_cache)
     def GET(self):
         return render.contact()
-        
-#notice 
+
+# notice
+
+
 class notice:
+
     @memorize(index_cache)
     def GET(self):
         return render.notice()
@@ -227,6 +323,7 @@ class notice:
 
 # 全部成绩
 class score:
+
     @memorize(index_cache)
     def GET(self):
         form = xh_form()
@@ -242,7 +339,7 @@ class score:
             table = a.get_all_score(xh)
             gpa = GPA(xh)
             gpa.getscore_page()
-            #table = gpa.get_all_score()
+            # table = gpa.get_all_score()
             jidian = gpa.get_gpa()["ave_score"]
 
             if table:
@@ -250,38 +347,52 @@ class score:
             else:
                 table = None
                 error = "can not get your score"
-            return render.result(table=table,error=error)
-            #else:
+            return render.result(table=table, error=error)
+            # else:
             #    return "成绩查询源出错,请稍后再试!"
 
 # 平均学分绩点计算说明页面
+
+
 class help_gpa:
+
     @memorize(index_cache)
     def GET(self):
         return render.help_gpa()
 
 # 评论页面, 使用多说评论
+
+
 class comment:
+
     def GET(self):
         return render.comment()
 
 # 赞助页面
+
+
 class donate:
+
     def GET(self):
         return render.donate(sponsor=sponsor)
 
 # 阿里妈妈认证
+
+
 class ttest:
+
     def GET(self):
         return render.root()
 
 # 京东认证
+
+
 class jd:
+
     def GET(self):
         return render.jd()
 
-application = web.application(urls, globals(),autoreload=False).wsgifunc()
-#if __name__ == "__main__":
+application = web.application(urls, globals(), autoreload=False).wsgifunc()
+# if __name__ == "__main__":
 #    app = web.application(urls, globals(),autoreload=False)
 #    app.run()
-

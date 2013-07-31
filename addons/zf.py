@@ -7,7 +7,6 @@ import re
 from BeautifulSoup import BeautifulSoup
 import config
 #import os
-from autocache import memorize
 from image import process_image
 
 
@@ -129,6 +128,18 @@ class ZF():
         result = soup.find("table", {"id": "DataGrid1"}).contents
         return result
 
+
+def get_json(table):
+    import json
+
+    score_re = re.compile('<td>.*</td><td>.</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td>')
+    result = score_re.findall(str(table).decode('utf-8'))
+    dic = {}
+    for i in result:
+        (key,value) = i
+        dic[key] = value
+    json_object = json.dumps(dic)
+    return json_object
 
 #    def get_json(self,func):
 #        self.func = func

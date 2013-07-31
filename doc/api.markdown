@@ -1,19 +1,54 @@
 # api
 * * *
 ## 成绩查询系统
-+ ### url: http://gotit.asia/api/score
+
++ ### 使用方法
+
+  1. **GET**:  先进行一次GET获取 `time_md5` 值(用户识别码), 用于区分不同的用户. 验证码链接为`http://gotit.asia/static/pic/**time_md5**.gif`,需要供用户识别并输入中文验证码, POST时需要提供, 注意:验证码图片会在五分钟后被删除
+
+  1. **POST**: POST的数据有: 学号, 密码, 查询种类(最新成绩, 本学期课表, 考试时间), 中文验证码(utf-8), `time_md5`
+
++ ### url 
+
+  [**http://gotit.asia/api/score**](http://gotit.asia/api/score)
 
 + ### 支持的方法:
-        POST
-        
-+ ### 参数
+
+        GET + POST
+
++ ### POST参数
+
         xh        #学号
         pw        #密码
-        
-+ ### 返回值
+        time_md5  #用户识别码(之前得到的
+        verify    #验证码(用户识别后的中文验证码, 两位汉字)
+        t         #查询种类
+
+  - #### t值对应查询种类
+
+            值      查询内容
+
+            1       最新成绩
+            2       考试时间
+            3       本学期课表
+
++ ### 返回值(utf-8)
+
         {"科目1":"成绩1",...,...}
-    
-    若为空则其用户名或密码错误
+        正常
+
+        {"error":"can not find target time_md5"}
+        time_md5值错误
+        {"error":"password wrong"}
+        密码错误
+        {"error":"verify code wrong"}
+        验证码错误
+        {"error":"server is sleeping ... "}
+        服务端挂起
+        {"error":"can not find your t"}
+        查询类型错误
+        {"error":"can not find your contents"}
+        无法匹配该用户的内容
 
 ## 四六级最新成绩查询
 + ### url: http://gotit.asia/api/cet
