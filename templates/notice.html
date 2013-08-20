@@ -1,14 +1,22 @@
-{% extends "base-search.html" %}
+{% extends "base-index.html" %}
 {% block title %}公告--Got it{% endblock %}
+
+{% block nav %}
+<li><a href="/">首页</a></li>
+<li class="active"><a href="#">公告</a></li>
+<li><a href="/comment.html">留言</a></li>
+<li><a href="/donate.html">赞助</a></li>
+{% endblock %}
+
 {% block content %}
 <h2>网站公告</h2>
 <ul class="unstyled">
   <li>
   <blockquote class="pull-left">
     <p><strong>山东理工大学教务处教育技术中心小组,现面向大一同学纳新！</strong></p>
-    <p><a href="http://jwch.sdut.edu.cn/blog/about/index.html"><strong>关于我们</strong></a>！</p>
-    <p><a href="http://jwch.sdut.edu.cn/blog/index.html"><strong>我们de博客</strong></a>！</p>
-    <p><a href="http://jwch.sdut.edu.cn/hero"><strong>加入我们</strong></a>！</p>
+    <p><a href="http://jwch.sdut.edu.cn/blog/about/index.html">关于我们</a>！</p>
+    <p><a href="http://jwch.sdut.edu.cn/blog/index.html">我们de博客</a>！</p>
+    <p><a href="http://jwch.sdut.edu.cn/hero">加入我们</a>！</p>
     <small>zhwei -- 2013.4.2-15:19</small>
   </blockquote>
   </li>

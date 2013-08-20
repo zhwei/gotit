@@ -288,7 +288,7 @@ class jd:
     def GET(self):
         return render.jd()
 
-application = web.application(urls, globals(), autoreload=False).wsgifunc()
-# if __name__ == "__main__":
-#    app = web.application(urls, globals(),autoreload=False)
-#    app.run()
+#application = web.application(urls, globals(), autoreload=False).wsgifunc()
+if __name__ == "__main__":
+   app = web.application(urls, globals(),autoreload=False)
+   app.run()
