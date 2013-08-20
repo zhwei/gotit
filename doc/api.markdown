@@ -1,5 +1,4 @@
-# api
-* * *
+# apis
 ## 成绩查询系统
 
 + ### 使用方法
@@ -29,14 +28,16 @@
             值      查询内容
 
             1       最新成绩
-            2       考试时间
-            3       本学期课表
+            2       考试时间 (json格式错误, 暂时不能使用)
+            3       本学期课表 (json格式错误, 暂时不能使用)
 
 + ### 返回值(utf-8)
 
+        **正常返回值**
         {"科目1":"成绩1",...,...}
         正常
 
+        **错误类型**
         {"error":"can not find target time_md5"}
         time_md5值错误
         {"error":"password wrong"}
@@ -51,7 +52,8 @@
         无法匹配该用户的内容
 
 ## 四六级最新成绩查询
-+ ### url: http://gotit.asia/api/cet
++ ### url: 
+    [**http://gotit.asia/api/cet**](http://gotit.asia/api/cet)
  
 + ### 支持的方法:  
         POST
@@ -77,6 +79,7 @@
 	####尚无成绩
 	    {'error': u'\u5c1a\u65e0\u6210\u7ee9!'}  
 	    
+        
 ## 学分绩点查询
 + ### url: http://gotit.asia/api/gpa
 
