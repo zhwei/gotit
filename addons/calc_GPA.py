@@ -196,12 +196,12 @@ class GPA:
 
 
 
-if __name__=='__main__':
-    num = raw_input("请输入你的学号: ")
-    gpa = GPA(num)
-    info = gpa.get_gpa()
-    if info == -1:
-        print "error"
-    else:
-        print "学号\t\t姓名\t\t专业\t\t班级\t\t学分基点\t总基点\t\t总学分\t至今未通过科目"
-        print "%s\t%s\t%s\t%s\t%s\t\t%s\t\t%s\t%d"%(info['id'],info['name'],info['major'],info['Class'],info['ave_score'],info['totle_score'],info['totle_credits'],len(info['not_accept']))
+#if __name__=='__main__':
+#    num = raw_input("请输入你的学号: ")
+#    gpa = GPA(num)
+#    info = gpa.get_gpa()
+#    if info == -1:
+#        print "error"
+#    else:
+#        print "学号\t\t姓名\t\t专业\t\t班级\t\t学分基点\t总基点\t\t总学分\t至今未通过科目"
+#        print "%s\t%s\t%s\t%s\t%s\t\t%s\t\t%s\t%d"%(info['id'],info['name'],info['major'],info['Class'],info['ave_score'],info['totle_score'],info['totle_credits'],len(info['not_accept']))

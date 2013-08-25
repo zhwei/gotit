@@ -9,8 +9,7 @@
     <meta name="author" content="">
 
     <!-- Le styles -->
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+    {% include "css.html" %}
     <style>
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
@@ -71,25 +70,9 @@
         {% block content %}
 
         {% endblock %}
-
+        
+        {% include "footer.html" %}
       </div> <!-- /container -->
-      <hr>
-      <center>
-        Power by <a href="http://webpy.org/" target="_blank">web.py</a>&nbsp;
-        <a href="http://python.org/" target="_blank">python</a>&nbsp;
-        <a href="http://sdutlinux.org" target="_blank">SLUG</a>&nbsp;
-        Author:<a href="http://zhwei.42qu.com" target="_blank">zhwei</a>&nbsp;
-        Version:beta 1.0
-      </center>
-      <script type="text/javascript" src="http://www.bootcss.com/assets/js/jquery.js"></script>
-      <script type="text/javascript" src="http://www.bootcss.com/assets/js/bootstrap.min.js"></script>
-      <!-- baidu sitecenter   -->
-      <div style="display: none;">
-        <script type="text/javascript">
-          var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
-          document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F8798cad9d47e876ea6c4f4ce5ff5fe5b' type='text/javascript'%3E%3C/script%3E"));
-          </script>
-        </div>
-        <!-- baidu sitecenter   -->
+
       </body>
     </html>
