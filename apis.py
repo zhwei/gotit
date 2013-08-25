@@ -1,16 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import re
 import web
 import json
-import re
+
+from web.contrib.template import render_jinja
 
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
 from addons.zf import ZF
 
+render = render_jinja('templates', encoding='utf-8')
 
 urls = (
+    '$', 'api_index',
     '/score', 'api_zheng',
     '/kb', 'api_kb',
     '/cet', 'api_cet',
@@ -26,6 +30,11 @@ def json_err(content):
     dic = {'error': content}
     json_object = json.dumps(dic)
     return json_object
+
+class api_index:
+
+    def GET(self):
+        return render.apis()
 
 class api_kb:
 
@@ -137,6 +146,7 @@ class api_gpa:
         data = web.input()
         xh = data.xh
         gpa = GPA(xh)
+        gpa.getscore_page()
         result = gpa.get_gpa()
         result = json.dumps(result)
         return result

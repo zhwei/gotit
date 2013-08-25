@@ -51,4 +51,4 @@ baefetch = True
 index_cache = 1000
 
 # 网站运行模式
-debug_mode = False
+debug_mode = True

@@ -1,21 +1,21 @@
 # apis
 ## 成绩查询系统
 
-+ ### 使用方法
+### 使用方法
 
   1. **GET**:  先进行一次GET获取 `time_md5` 值(用户识别码), 用于区分不同的用户. 验证码链接为`http://gotit.asia/static/pic/**time_md5**.gif`,需要供用户识别并输入中文验证码, POST时需要提供, 注意:验证码图片会在五分钟后被删除
 
   1. **POST**: POST的数据有: 学号, 密码, 查询种类(最新成绩, 本学期课表, 考试时间), 中文验证码(utf-8), `time_md5`
 
-+ ### url 
+### url 
 
   [**http://gotit.asia/api/score**](http://gotit.asia/api/score)
 
-+ ### 支持的方法:
+### 支持的方法:
 
         GET + POST
 
-+ ### POST参数
+### POST参数
 
         xh        #学号
         pw        #密码
@@ -23,7 +23,7 @@
         verify    #验证码(用户识别后的中文验证码, 两位汉字)
         t         #查询种类
 
-  - #### t值对应查询种类
+#### t值对应查询种类
 
             值      查询内容
 
@@ -31,7 +31,7 @@
             2       考试时间 (json格式错误, 暂时不能使用)
             3       本学期课表 (json格式错误, 暂时不能使用)
 
-+ ### 返回值(utf-8)
+### 返回值(utf-8)
 
         **正常返回值**
         {"科目1":"成绩1",...,...}
@@ -52,17 +52,19 @@
         无法匹配该用户的内容
 
 ## 四六级最新成绩查询
-+ ### url: 
-    [**http://gotit.asia/api/cet**](http://gotit.asia/api/cet)
- 
-+ ### 支持的方法:  
+
+### url
+
+[**http://gotit.asia/api/cet**](http://gotit.asia/api/cet)
+
+### 支持的方法:  
         POST
-        
-+ ### 参数
-    	nu		#准考证号
-    	name	#姓名
-    	
-+ ### 返回值  
+
+### 参数
+      nu		#准考证号
+      name		#姓名
+
+### 返回值  
         {
             "num":      考号，字符串,  
             "name":     姓名,字符串,
@@ -76,20 +78,25 @@
             "write":    写作成绩,字符串
         }
         
-	####尚无成绩
-	    {'error': u'\u5c1a\u65e0\u6210\u7ee9!'}  
-	    
-        
-## 学分绩点查询
-+ ### url: http://gotit.asia/api/gpa
+####尚无成绩
 
-+ ### 支持的方法:
-	    POST
-	    
-+ ### 参数:  
-	    xh		#学号
-	    
-+ ### 返回值:
+      {'error': u'\u5c1a\u65e0\u6210\u7ee9!'}  
+
+## 学分绩点查询
+
+### url
+
+[http://gotit.asia/api/gpa](http://gotit.asia/api/gpa)
+
+### 支持的方法:
+
+      POST
+
+### 参数:  
+
+     xh		#学号
+
+### 返回值:
         {
             "id":           学号,字符串
             "name":         姓名,字符串
