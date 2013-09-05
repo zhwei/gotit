@@ -10,6 +10,7 @@ from web.contrib.template import render_jinja
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
 from addons.zf import ZF
+from addons.kb_json import KBJSON
 
 render = render_jinja('templates', encoding='utf-8')
 
@@ -113,11 +114,8 @@ class api_zheng:
         elif t == "3":
             #return json_err("please contact admin")
             table = zf.get_kebiao()
-            import pickle
-            inp = open("kbb.list", 'wb')
-            pickle.dump(table, inp)
-            inp.close()
-            json_object = table
+            k = KBJSON(table)
+            json_object = k.get_json()
         else:
             return json_err("can not find your t")
 
