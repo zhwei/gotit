@@ -35,7 +35,6 @@ urls = (
     '/comment.html', 'comment',
     '/donate.html', 'donate',
     '/root.txt', 'ttest',
-    '/360buy-union.txt', 'jd',
 )
 
 # render = web.template.render('./template/') # your templates
@@ -280,15 +279,9 @@ class ttest:
     def GET(self):
         return render.root()
 
-# 京东认证
 
-
-class jd:
-
-    def GET(self):
-        return render.jd()
-
+# for gunicorn
 application = web.application(urls, globals(), autoreload=False).wsgifunc()
-#if __name__ == "__main__":
-#   app = web.application(urls, globals(),autoreload=False)
-#   app.run()
+
+# just for test
+app = web.application(urls, globals(),autoreload=False)

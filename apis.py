@@ -10,6 +10,7 @@ from web.contrib.template import render_jinja
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
 from addons.zf import ZF
+from addons.kb_json import KBJSON
 
 render = render_jinja('templates', encoding='utf-8')
 
@@ -75,7 +76,7 @@ class api_zheng:
         json_object = json.dumps(dic)
         return json_object
 
-    def __kb_get_json(self):
+    def __kb_get_json(self, table):
         pass
 
     def POST(self):
@@ -111,8 +112,10 @@ class api_zheng:
             return json_err("please contact admin")
             #table = zf.get_kaoshi()
         elif t == "3":
-            return json_err("please contact admin")
-            #table = zf.get_kebiao()
+            #return json_err("please contact admin")
+            table = zf.get_kebiao()
+            k = KBJSON(table)
+            json_object = k.get_json()
         else:
             return json_err("can not find your t")
 
@@ -129,8 +132,11 @@ class api_cet:
 
     def POST(self):
         data = web.input()
-        nu = data.nu
-        name = data.name.encode('utf-8')
+        try:
+            nu = data.nu
+            name = data.name.encode('utf-8')
+        except AttributeError:
+            return json_err("can not find your post content")
         cet = CET()
         result = cet.get_last_cet_score(nu, name)
         result = json.dumps(result)
@@ -144,10 +150,15 @@ class api_gpa:
 
     def POST(self):
         data = web.input()
-        xh = data.xh
+        try:
+            xh = data.xh
+        except AttributeError:
+            return json_err("The id is xh")
         gpa = GPA(xh)
         gpa.getscore_page()
         result = gpa.get_gpa()
+        if result == -1:
+            return json_err("can not find your xh")
         result = json.dumps(result)
         return result
 

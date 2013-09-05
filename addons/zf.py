@@ -38,7 +38,7 @@ class ZF():
                         rv:18.0) Gecko/20100101 Firefox/18.0",
                 'Connection':'Keep-Alive'
                 }
-    
+
     def set_user_info(self,xh,pw):
         self.xh = xh
         self.pw = pw
