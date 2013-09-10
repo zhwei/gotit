@@ -7,21 +7,25 @@ sys.setdefaultencoding('utf-8')
 
 
 import web
-from web import form
 from web.contrib.template import render_jinja
 
 # addons
-from addons.calc_GPA import GPA
-from addons.get_CET import CET
-from addons.zf import ZF#, get_json
-from addons.get_all_score import ALL_SCORE
-from addons.autocache import memorize
+
 from addons import config
+from addons.get_CET import CET
+from addons.calc_GPA import GPA
+from addons.autocache import memorize
+from addons.get_all_score import ALL_SCORE
+from addons.forms import xh_form, cet_form, get_index_form
 from addons.config import index_cache, debug_mode, sponsor, zheng_alert
-web.config.debug = debug_mode
+from addons.zf_cache import get_time_md5, get_from_used, cache_zf_start
 
 import apis
 
+# 缓存正方相关
+cache_zf_start()
+
+web.config.debug = debug_mode
 
 urls = (
     '/', 'index',
@@ -35,62 +39,14 @@ urls = (
     '/comment.html', 'comment',
     '/donate.html', 'donate',
     '/root.txt', 'ttest',
+    '/status', 'status'
 )
 
 # render = web.template.render('./template/') # your templates
 render = render_jinja('templates', encoding='utf-8')
 all_client = {}
 
-# forms
-# def get_form(viewstate):
-#    info_form = form.Form(
-#        form.Textbox("number", description="学号:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Password("password", description="密码:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Textbox("verify", description="验证码:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Dropdown('Type',[('3', '本学期课表查询'),('1', '本学期成绩查询'), ('2', '考试时间查询'),('4', '平均学分绩点查询')],description="查询类型:",pre="&nbsp;&nbsp;"),
-#        form.Hidden('viewstate',value=viewstate),
-#        validators = [
-#            form.Validator('输入不合理!', lambda i:int(i.number) > 9)]
-#        )
-#    return info_form()
 
-cet_form = form.Form(
-    form.Textbox(
-        "zkzh",
-        description="准考证号:",
-        class_="span3",
-        pre="&nbsp;&nbsp;"),
-    form.Textbox(
-        "name",
-        description="姓名:",
-        class_="span3",
-        pre="&nbsp;&nbsp;"),
-    validators=[
-        form.Validator('输入不合理!', lambda i:int(i.zkzh) != 15)]
-)
-xh_form = form.Form(
-    form.Textbox(
-        "xh",
-        description="学号:",
-        class_="span3",
-        pre="&nbsp;&nbsp;")
-)
-
-
-def get_index_form(time_md5):
-    index_form = '\
-            <table><tr><th><label for="xh">学号:</label></th><td>&nbsp;&nbsp;<input type="text" id="xh" name="xh" class="span3"/></td></tr>\
-            <tr><th><label for="pw">密码:</label></th><td>&nbsp;&nbsp;<input type="password" id="pw" name="pw" class="span3"/></td></tr>\
-            <tr><th><label for="number">验证码:</label></th>\
-            <td>&nbsp;&nbsp;<span><input type="text" id="verify" name="verify"/></span>&nbsp;<span><img style="position:absolute;" src="/static/pic/%s.gif" alt="" height="35" width="92"/></span></td>\
-                <td></td>\
-                </tr>\
-            <tr><th><tr><th><label for="Type">查询类型:</label></th><td>&nbsp;&nbsp;<select id="type" name="type">\
-                <option value="1">成绩查询</option>\
-                <option value="2">考试时间查询</option>\
-                <option value="3">课表查询</option></select></td></tr>\
-            <input type="hidden" value="%s" name="time_md5"/></table>' % (time_md5, time_md5)
-    return index_form
 
 # 首页索引页
 
@@ -101,14 +57,12 @@ class index:
     def GET(self):
         return render.index(alert=zheng_alert)
 
-
 # 成绩查询
 class zheng:
 
     def GET(self):
-        zf = ZF()
-        viewstate, time_md5 = zf.pre_login()
-        all_client[time_md5] = (zf, viewstate)
+        global allclients
+        time_md5= get_time_md5()
         form = get_index_form(time_md5)
         return render.zheng(alert=zheng_alert, form=form)
 
@@ -121,9 +75,9 @@ class zheng:
         time_md5 = content['time_md5']
 
         try:
-            value = all_client.pop(time_md5)
-            zf = value[0]
-            viewstate = value[1]
+            value = get_from_used(time_md5)
+            zf, viewstate, time_start = value
+            # viewstate = value[1]
         except KeyError:
             return render.key_error()
 
@@ -246,9 +200,19 @@ class score:
             # else:
             #    return "成绩查询源出错,请稍后再试!"
 
+
+# 网站状态
+import os
+
+class status:
+
+    def GET(self):
+        clients = len(all_client.keys())
+        pics = len(os.listdir("static/pic"))
+        return locals()
+
+
 # 平均学分绩点计算说明页面
-
-
 class help_gpa:
 
     @memorize(index_cache)
@@ -278,6 +242,8 @@ class ttest:
 
     def GET(self):
         return render.root()
+
+# 多线程缓存
 
 
 # for gunicorn

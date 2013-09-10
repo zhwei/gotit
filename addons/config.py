@@ -26,6 +26,11 @@ sponsor = (
     ('高世民', '1.88'),
 )
 
+## code.py目录
+
+pwd = '/home/bak/apps/gotit/'
+
+
 ## 正方 说明/警告
 zheng_alert = ""
 
