@@ -24,6 +24,7 @@ cet_form = form.Form(
     validators=[
         form.Validator('输入不合理!', lambda i:int(i.zkzh) != 15)]
 )
+
 xh_form = form.Form(
     form.Textbox(
         "xh",
@@ -47,3 +48,18 @@ def get_index_form(time_md5):
                 <option value="3">课表查询</option></select></td></tr>\
             <input type="hidden" value="%s" name="time_md5"/></table>' % (time_md5, time_md5)
     return index_form
+
+login_form = form.Form(
+    form.Textbox(
+        "xh",
+        description="学号:",
+        class_="span3",
+        pre="&nbsp;&nbsp;"),
+    form.Password(
+        "pw",
+        description="密码:",
+        class_="span3",
+        pre="&nbsp;&nbsp;"),
+    validators=[
+        form.Validator('输入不合理!', lambda i:int(i.xh) != 10 or int(i.xh) != 11)]
+)

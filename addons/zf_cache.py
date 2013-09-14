@@ -18,6 +18,7 @@ con = threading.Condition()
 mylock = threading.RLock()
 
 # 初始化全局变量
+
 ## 保存缓存的对象
 global all_clients
 all_clients = {}
@@ -27,7 +28,9 @@ temp_clients ={}
 ## 经过get后的对象
 global used_clients
 used_clients = {}
-
+## 成功登录的
+global login_succeed
+login_succeed = {}
 
 
 # 初始化客户数目
@@ -39,9 +42,9 @@ CREATE_THREAD_NUM = 2
 # 检查线程数目
 CHECK_THREAD_NUM = 1
 # 过期时间（秒）
-EXPIRE_SECOND = 50
+EXPIRE_SECOND = 120
 # 单次创建线程数目
-NEW_CLIENT_NUM = 5
+NEW_CLIENT_NUM = 2
 # 缓存的client数目
 CACHE_CLIENT_NUM = 60
 
@@ -56,11 +59,33 @@ def get_count():
     global all_clients
     return len(all_clients.keys())
 
+def get_client_num(name='all'):
+    '''
+    返回缓存的对象数目
+    all->all_clients
+    used->used_clients
+    login->login_succeed
+    '''
+    global all_clients
+    global used_clients
+    global login_succeed
+    if name=='all':
+        dic=all_clients
+    elif name=='used':
+        dic=used_clients
+    elif name=='login':
+        dic=login_succeed
+    else:
+        dic=all_clients
+    return len((dic.keys()))
+
 def zhengfang():
     """
-    正方相关操作,调用zf类
+    正方相关操作,直接调用zf类
+    返回（viewstate, timd_md5, zf)
     """
     viewstate=None
+    start = time.time()
     while viewstate is None:
         try:
             time.sleep(0.01)
@@ -76,6 +101,8 @@ def zhengfang():
             viewstate=None
             logger.error('io error can not write to gif')
             pass
+        if time.time() - start > 10:
+            break
     return (viewstate, time_md5, zf)
 
 def delete_verify_img(time_md5):
@@ -218,6 +245,9 @@ class Consumer(threading.Thread):
 
 
 def enumer():
+    '''
+    线程遍历
+    '''
     while True:
         time.sleep(5)
         logger.info("++++++++++++++++++++++++++++++++++")
@@ -230,47 +260,70 @@ def enumer():
             logger.error('too much threads now is %s'%n)
         logger.info("++++++++++++++++++++++++++++++++++")
 
+def get_enumer_num():
+    '''
+    返回线程数目
+    '''
+    n=0
+    for i in threading.enumerate():
+        n+=1
+    return n
+
+
 def check_clients():
     """
     检查字典中缓存的对象是否过期
     all_clients
     Used_clients
+    login_succeed
     """
     global all_clients
+    global used_clients
+    global login_succeed
 
     while True:
-        con.acquire()
-        on_check = all_clients
-        con.notify()
-        con.release()
 
-        time.sleep(3)
-        with mylock:
-            del_list = []
-        for key in on_check.keys():
-            if time.time() - on_check[key][2] > EXPIRE_SECOND:
-                with mylock:
-                    del_list.append(key)
-            else:
-                pass
-        con.acquire()
-        for d in del_list:
-            try:
-                all_clients.pop(d)
-                delete_verify_img(d)
-            except KeyError:
-                pass
-        # print 'REMOVE %s' % len(del_list)
-        logger.info('REMOVE %s' % len(del_list))
-        con.notify()
-        con.release()
+        time.sleep(30)
 
-        # print 'check over'
+        if config.zf_accelerate:
+            li=[all_clients, login_succeed, used_clients]
+        else:
+            li=[login_succeed,]
+
+        for dic in li:
+            con.acquire()
+            on_check = dic
+            con.notify()
+            con.release()
+
+            with mylock:
+                del_list = []
+            for key in on_check.keys():
+                if time.time() - on_check[key][2] > EXPIRE_SECOND:
+                    with mylock:
+                        del_list.append(key)
+                else:
+                    pass
+
+            con.acquire()
+
+            for d in del_list:
+                try:
+                    dic.pop(d)
+                    delete_verify_img(d)
+                except KeyError:
+                    pass
+            logger.info('REMOVE %s' % len(del_list))
+            con.notify()
+            con.release()
+
         logger.info('check over')
 
 
 def cache_zf_start():
-    init_client()
+    """
+    调用缓存的主方法
+    """
 
     for i in range(DAEMON_THREAD_NUM):
         p = DaemonThread()
@@ -279,11 +332,22 @@ def cache_zf_start():
 
     for i in range(CHECK_THREAD_NUM):
         ch = threading.Thread(name='Check_Thread '+str(i), target=check_clients)
+        ch.setDaemon(True)
         ch.start()
 
-    t = threading.Thread(target=enumer)
+    t = threading.Thread(name='Enumer_thread',target=enumer)
+    t.setDaemon(True)
     t.start()
 
+def just_check():
+    """
+    在不使用缓存的时候调用该方法
+    删除不使用的缓存
+    """
+    for i in range(CHECK_THREAD_NUM):
+        ch = threading.Thread(name='Check_Thread '+str(i), target=check_clients)
+        ch.setDaemon(True)
+        ch.start()
 
 
 def get_time_md5():
@@ -293,20 +357,52 @@ def get_time_md5():
     global all_clients
     global Used_Client
 
-    key = all_clients.keys()[0]
-    current = all_clients.pop(key)
-    time_md5 = key
-    used_clients[key] = current
+    if config.zf_accelerate:
+        time_md5 = all_clients.keys()[0]
+        zf, viewstate, time_start = all_clients.pop(time_md5)
+    else:
+        viewstate, time_md5, zf = zhengfang()
+        time_start = time.time()
+
+    used_clients[time_md5] = (zf, viewstate, time_start)
+
     return time_md5
 
-def get_from_used(time_md5):
+
+def zf_login(content):
     """
-    用于处理POST
+    传入content-表单输入
+    返回 zf 对象和登录返回信息
     """
     global used_clients
-    tup=used_clients.get(time_md5)
+    global login_succeed
+
+    xh = content['xh']
+    pw = content['pw']
+    yanzhengma = content['verify']
+    time_md5 = content['time_md5']
+
+    zf, viewstate, time_start = used_clients.get(time_md5)
+
+    zf.set_user_info(xh, pw)
+    ret = zf.login(yanzhengma, viewstate)
+
+    login_succeed[time_md5]=[zf, xh ,time.time()]
+
+    return zf, ret
+
+def find_login(time_md5):
+    """
+    二次查询
+    返回(zf, xh, time_start)
+    """
+    global login_succeed
+    tup = login_succeed.get(time_md5)
+    login_succeed[time_md5][2]=time.time()# 更新最后查询时间
     return tup
 
-if __name__ == '__main__':
 
-    cache_zf_start()
+
+# if __name__ == '__main__':
+#
+#     cache_zf_start()
