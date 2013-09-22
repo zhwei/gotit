@@ -146,6 +146,7 @@ def create_client(nu=2):
 
         cr=threading.Thread(name='Create Client Thread '+str(i),
                             target=create_clients_thread)
+        cr.setDaemon(True)
         cr.start()
         with mylock:
             second = dict(second, **temp_clients)
@@ -291,10 +292,7 @@ def check_clients():
             li=[login_succeed,]
 
         for dic in li:
-            con.acquire()
             on_check = dic
-            con.notify()
-            con.release()
 
             with mylock:
                 del_list = []

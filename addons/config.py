@@ -6,7 +6,7 @@
 pwd = '/home/bak/apps/gotit/'
 
 ## 是否启用多线程加速（正方）
-zf_accelerate=False
+zf_accelerate=True
 
 
 ## 正方 说明/警告

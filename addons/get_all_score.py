@@ -17,10 +17,10 @@ class ALL_SCORE():
         #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为 
         return patten.findall(page)
 
-if __name__=='__main__':
-    a = ALL_SCORE()
-    num = raw_input()
-    out =  a.get_all_score(num)
-    for i in out:
-        print i
+# if __name__=='__main__':
+#     a = ALL_SCORE()
+#     num = raw_input()
+#     out =  a.get_all_score(num)
+#     for i in out:
+#         print i
 

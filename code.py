@@ -15,14 +15,15 @@ render = render_jinja('templates', encoding='utf-8')
 
 # addons
 from addons import config
+from addons import get_old_cet, get_book
 from addons.get_CET import CET
-from addons.lib import get_book
+
 from addons.autocache import memorize
 from addons.forms import xh_form, cet_form, get_index_form, login_form
 from addons.config import index_cache, debug_mode, zheng_alert
 from addons.zf_cache import get_time_md5, cache_zf_start, zf_login, \
     find_login, just_check, get_count, get_client_num, get_enumer_num
-from addons.tools import zf_result, score_result, get_old_cet
+from addons.tools import zf_result, score_result
 
 import apis
 

@@ -99,10 +99,10 @@ class CET:
 
     
 
-if __name__=='__main__':
-     num = raw_input("请输入你的学号: ")
-     cet = CET()
-     print  cet.get_cet_table(num)
+# if __name__=='__main__':
+#      num = raw_input("请输入你的学号: ")
+#      cet = CET()
+#      print  cet.get_cet_table(num)
      # info =  cet.get_cet_dict(num)
      # for i in  range(info['total']):
      #     print info['num'],info['name'],
