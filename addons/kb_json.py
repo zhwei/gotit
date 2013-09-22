@@ -91,6 +91,9 @@ class KBJSON:
                     "weekTo":week_to,
                     }
 
+            # test
+            # print tu_course[3],tu_course[0],tu_course[1],tu_course[2],day_of_week, '\n'
+
             return dict_course
 
         except ValueError:
