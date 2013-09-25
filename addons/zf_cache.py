@@ -357,7 +357,10 @@ def get_time_md5():
 
     if config.zf_accelerate:
         time_md5 = all_clients.keys()[0]
-        zf, viewstate, time_start = all_clients.pop(time_md5)
+        try:
+            zf, viewstate, time_start = all_clients.pop(time_md5)
+        except KeyError:
+            viewstate, time_md5, zf = zhengfang()
     else:
         viewstate, time_md5, zf = zhengfang()
         time_start = time.time()

@@ -2,25 +2,22 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/addons/__init__.py" afterPath="$PROJECT_DIR$/addons/__init__.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/code.py" afterPath="$PROJECT_DIR$/code.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/addons/config.py" afterPath="$PROJECT_DIR$/addons/config.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/addons/get_CET.py" afterPath="$PROJECT_DIR$/addons/get_CET.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/addons/get_all_score.py" afterPath="$PROJECT_DIR$/addons/get_all_score.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/addons/zf_cache.py" afterPath="$PROJECT_DIR$/addons/zf_cache.py" />
     </list>
     <ignored path="zhengfang.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1379150931009" ignored="false" />
+    <file path="/Dummy.txt" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1380117716515" ignored="false" />
     <file path="/cache_clients.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1378622399523" ignored="false" />
     <file path="/test_cache.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1378814033522" ignored="false" />
-    <file path="/code.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1379158352341" ignored="false" />
-    <file path="/zf_cache.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1379165242786" ignored="false" />
+    <file path="/code.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1380115442396" ignored="false" />
+    <file path="/zf_cache.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1380114780381" ignored="false" />
     <file path="/tools.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1379039436312" ignored="false" />
     <file path="/donate.html" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1378890802181" ignored="false" />
     <file path="/zf.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1378891436333" ignored="false" />
-    <file path="/config.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1379158023839" ignored="false" />
+    <file path="/config.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1380117766527" ignored="false" />
     <file path="/test_run.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1378903009664" ignored="false" />
     <file path="/forms.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1379043226102" ignored="false" />
     <file path="/more.html" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1378992314837" ignored="false" />
@@ -30,6 +27,7 @@
     <file path="/lib.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1379042931780" ignored="false" />
     <file path="/__init__.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1379159186167" ignored="false" />
     <file path="/zf_ca.py" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1379157735079" ignored="false" />
+    <file path="/more_function.html" changelist="5b04c7b7-3695-4e66-b14c-beedc1c4fee0" time="1380115286872" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,30 +55,25 @@
       <file leaf-file-name="code.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/code.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="118" column="13" selection-start="2652" selection-end="2653" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#46#55#0" expanded="true" />
-              </folding>
+            <state line="272" column="7" selection-start="5651" selection-end="5651" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="__init__.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/addons/__init__.py">
+      <file leaf-file-name="what_you_need.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/what_you_need.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="12" selection-start="423" selection-end="423" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#47#77#0" expanded="true" />
-                <marker date="1379160453539" expanded="true" signature="286:309" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-              </folding>
+            <state line="18" column="0" selection-start="533" selection-end="533" vertical-scroll-proportion="-7.5555553">
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="zf_cache.py" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/addons/zf_cache.py">
+      <file leaf-file-name="config.py" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/config.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="293" column="22" selection-start="6614" selection-end="6614" vertical-scroll-proportion="0.24271844">
+            <state line="9" column="0" selection-start="129" selection-end="129" vertical-scroll-proportion="0.26213592">
               <folding />
             </state>
           </provider>
@@ -104,9 +97,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/log/log.txt" />
-        <option value="$PROJECT_DIR$/log/test.log" />
-        <option value="$PROJECT_DIR$/templates/cet_old.html" />
         <option value="$PROJECT_DIR$/config/__init__.py" />
         <option value="$PROJECT_DIR$/templates/normal_form.html" />
         <option value="$PROJECT_DIR$/addons/lib.py" />
@@ -117,9 +107,12 @@
         <option value="$PROJECT_DIR$/addons/get_CET.py" />
         <option value="$PROJECT_DIR$/addons/get_all_score.py" />
         <option value="$PROJECT_DIR$/addons/config.py" />
-        <option value="$PROJECT_DIR$/code.py" />
         <option value="$PROJECT_DIR$/addons/__init__.py" />
         <option value="$PROJECT_DIR$/addons/zf_cache.py" />
+        <option value="$PROJECT_DIR$/templates/more_function.html" />
+        <option value="$PROJECT_DIR$/code.py" />
+        <option value="$PROJECT_DIR$/templates/what_you_need.html" />
+        <option value="$PROJECT_DIR$/config.py" />
       </list>
     </option>
   </component>
@@ -155,6 +148,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -173,23 +167,8 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="zhengfang" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="gotit" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="addons" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -210,6 +189,11 @@
     <option name="myDjangoConsoleState">
       <PyConsoleSettings />
     </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/templates" />
+    </key>
   </component>
   <component name="RunManager" selected="Python.test_run">
     <configuration default="false" name="cache_clients" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -408,11 +392,11 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32991317" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20363063" sideWeight="0.72143775" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21783741" sideWeight="0.31993818" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3989704" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3294964" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27856225" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.6800618" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" x="152" y="208" width="1117" height="544" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -485,121 +469,88 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/templates/result.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="11" selection-start="1193" selection-end="1193" vertical-scroll-proportion="0.7936508" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/addons/get_CET.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="101" column="26" selection-start="3413" selection-end="3413" vertical-scroll-proportion="2.466757">
-          <folding>
-            <element signature="e#36#45#0" expanded="false" />
-          </folding>
-        </state>
+        <state line="101" column="26" selection-start="3413" selection-end="3413" vertical-scroll-proportion="2.466757" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/addons/config.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="21" selection-start="21" selection-end="21" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="21" selection-start="21" selection-end="21" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/addons/forms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="11" selection-start="68" selection-end="68" vertical-scroll-proportion="0.097693354">
-          <folding />
-        </state>
+        <state line="4" column="11" selection-start="68" selection-end="68" vertical-scroll-proportion="0.097693354" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test_run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/addons/tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="95" column="0" selection-start="2313" selection-end="2313" vertical-scroll-proportion="0.864">
-          <folding />
-        </state>
+        <state line="95" column="0" selection-start="2313" selection-end="2313" vertical-scroll-proportion="0.864" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/addons/get_all_score.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="0" selection-start="705" selection-end="705" vertical-scroll-proportion="0.624">
-          <folding>
-            <element signature="e#36#45#0" expanded="false" />
-          </folding>
-        </state>
+        <state line="26" column="0" selection-start="705" selection-end="705" vertical-scroll-proportion="0.624" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/addons/calc_GPA.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="194" column="24" selection-start="6109" selection-end="6109" vertical-scroll-proportion="0.53595656">
-          <folding />
-        </state>
+        <state line="194" column="24" selection-start="6109" selection-end="6109" vertical-scroll-proportion="0.53595656" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/addons/autocache.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file:///usr/lib/python2.7/xml/etree/ElementTree.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="606" column="23" selection-start="20097" selection-end="20097" vertical-scroll-proportion="0.33333334">
-          <folding />
-        </state>
+        <state line="606" column="23" selection-start="20097" selection-end="20097" vertical-scroll-proportion="0.33333334" />
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/.PyCharm20/system/python_stubs/-1247972723/_elementtree.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="103" column="6" selection-start="1803" selection-end="1803" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/addons/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="12" selection-start="423" selection-end="423" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#47#77#0" expanded="true" />
-            <marker date="1379160453539" expanded="true" signature="286:309" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/total.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="35" selection-start="15479" selection-end="15479" vertical-scroll-proportion="0.29308006">
-          <folding />
-        </state>
+        <state line="103" column="6" selection-start="1803" selection-end="1803" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/addons/lib.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="20" selection-start="695" selection-end="695" vertical-scroll-proportion="0.75728154">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/code.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="118" column="13" selection-start="2652" selection-end="2653" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#46#55#0" expanded="true" />
-          </folding>
-        </state>
+        <state line="30" column="20" selection-start="695" selection-end="695" vertical-scroll-proportion="0.75728154" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/addons/zf_cache.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="293" column="22" selection-start="6614" selection-end="6614" vertical-scroll-proportion="0.24271844">
+        <state line="7" column="0" selection-start="106" selection-end="106" vertical-scroll-proportion="0.168" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/addons/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="12" selection-start="423" selection-end="423" vertical-scroll-proportion="0.552" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="272" column="7" selection-start="5651" selection-end="5651" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/what_you_need.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="0" selection-start="533" selection-end="533" vertical-scroll-proportion="-7.5555553">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="0" selection-start="129" selection-end="129" vertical-scroll-proportion="0.26213592">
           <folding />
         </state>
       </provider>

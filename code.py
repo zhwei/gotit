@@ -48,6 +48,7 @@ urls = (
     '/notice.html', 'notice',
     '/help/gpa.html', 'help_gpa',
     '/comment.html', 'comment',
+    '/what_you_need.html', 'what',
     '/donate.html', 'donate',
     '/root.txt', 'ttest',
     '/status', 'status'
@@ -254,6 +255,15 @@ class comment:
 
     def GET(self):
         return render.comment()
+
+class what:
+    '''
+    功能征集页面, 使用多说评论
+    '''
+
+    def GET(self):
+        return render.what_you_need()
+
 
 
 
