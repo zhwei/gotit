@@ -1,0 +1,21 @@
+{% extends "base-search.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+  <center><h1>{{ title }}</h1></center>
+    <hr>
+    <form name="main" method="post" accept-charset="utf-8" class="form-signin">
+
+      {% if not form.valid %}
+        <p class="alert alert-danger">输入错误:</p>
+      {% endif %}
+      {{ form.render() }}
+
+      <br>
+      <center>
+        <button type="submit" class="btn btn-primary">查询</button>&nbsp;
+        <button type="reset" class="btn">重置</button>
+      </center>
+    </form>
+  
+{% endblock %}

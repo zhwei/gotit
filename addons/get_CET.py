@@ -24,11 +24,11 @@ class CET:
         '''从官方网站获取最新四六级成绩'''
         header = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6','Referer':'http://www.chsi.com.cn/cet/'}
         url = config.cet_url
-        ####################################
+
         proxy = get_proxy()
         proxy_support = urllib2.ProxyHandler({'http':proxy})
         opener = urllib2.build_opener(proxy_support,urllib2.HTTPHandler)
-        ####################################
+
         params = urllib.urlencode({'zkzh':num,'xm':name})
         req = urllib2.Request(url,data=params,headers= header)
         page = opener.open(req).read()#.decode('utf-8')
@@ -99,11 +99,12 @@ class CET:
 
     
 
-if __name__=='__main__':
-     num = raw_input("请输入你的学号: ")
-     cet = CET()
-     info =  cet.get_cet_dict(num)
-     for i in  range(info['total']):
-         print info['num'],info['name'],
-         print info['cet_num'][i],info['cet_time'][i],
-         print info['cet_type'][i],info['cet_score'][i]
+# if __name__=='__main__':
+#      num = raw_input("请输入你的学号: ")
+#      cet = CET()
+#      print  cet.get_cet_table(num)
+     # info =  cet.get_cet_dict(num)
+     # for i in  range(info['total']):
+     #     print info['num'],info['name'],
+     #     print info['cet_num'][i],info['cet_time'][i],
+     #     print info['cet_type'][i],info['cet_score'][i]

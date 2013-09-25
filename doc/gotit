@@ -1,0 +1,20 @@
+#!/bin/sh
+
+GUNICORN=/usr/local/bin/gunicorn
+# 项目目录
+ROOT=/home/group/gotit
+# 进程PID
+PID=/var/run/gunicorn.pid
+
+APP=code:application
+
+# 监听的IP及端口
+IP=127.0.0.1:5555
+
+if [ -f $PID ]; then
+    rm $PID
+fi
+
+cd $ROOT
+#exec $GUNICORN -c $ROOT/gunicorn.conf.py --pid=$PID $APP -D -b $IP
+exec $GUNICORN --pid=$PID $APP -D -b $IP

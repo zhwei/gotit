@@ -1,0 +1,38 @@
+{% extends "base-index.html" %}
+
+{% block title %}更多功能{% endblock %}
+
+{% block nav %}
+<li><a href="/">首页</a></li>
+<li><a href="/notice.html">公告</a></li>
+<li class="active"><a href="/comment.html">留言</a></li>
+<li><a href="/donate.html">赞助</a></li>
+{% endblock %}
+
+{% block content %}
+
+  <p>Gotit正式上线接近一年了，一直努力做到更好，虽然期间因为自身或者正方的原因有多几次失误，但我努力一直维护着，
+      现在也已经是大三了，gotit是我至今为止最得意的作品了，到现在为止总访问量已经超过120万，现在每天的PV也超过2000, 很高兴各位能喜欢这个网站。</p>
+  <p>一直想做个校内的信息平台，这个想法被搁置了好久，大家有什么需求可以在下面提出来。</p>
+  <p>说到底就一句话: </p>
+    <h2>What You Need !!!</h2>
+    <p><b>广纳良言，你敢说，我就能做出来！</b></p>
+  <p>每一个建议我都会认真考虑(当然，改成绩之类的就免了...)。</p>
+  <p>---祝安康！</p>
+
+<!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"gotit"};
+(function() {
+ var ds = document.createElement('script');
+ ds.type = 'text/javascript';ds.async = true;
+ ds.src = 'http://static.duoshuo.com/embed.js';
+ ds.charset = 'UTF-8';
+ (document.getElementsByTagName('head')[0] 
+  || document.getElementsByTagName('body')[0]).appendChild(ds);
+ })();
+</script>
+<!-- Duoshuo Comment END -->
+
+{% endblock %}

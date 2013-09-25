@@ -10,6 +10,7 @@ stop.sh
 restart.sh
 start.sh
 .idea/*
+sessions/*
  
 
 # C extensions

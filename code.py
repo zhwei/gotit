@@ -1,134 +1,94 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+# import time
 
 import web
-from web import form
 from web.contrib.template import render_jinja
+render = render_jinja('templates', encoding='utf-8')
+
 
 # addons
-from addons.calc_GPA import GPA
-from addons.get_CET import CET
-from addons.zf import ZF#, get_json
-from addons.get_all_score import ALL_SCORE
-from addons.autocache import memorize
 from addons import config
-from addons.config import index_cache, debug_mode, sponsor, zheng_alert
-web.config.debug = debug_mode
+from addons import get_old_cet, get_book
+from addons.get_CET import CET
+
+from addons.autocache import memorize
+from addons.forms import xh_form, cet_form, get_index_form, login_form
+from addons.config import index_cache, debug_mode, zheng_alert
+from addons.zf_cache import get_time_md5, cache_zf_start, zf_login, \
+    find_login, just_check, get_count, get_client_num, get_enumer_num
+from addons.tools import zf_result, score_result
 
 import apis
+
+if config.zf_accelerate:
+    # 缓存正方相关
+    cache_zf_start()
+else:
+    just_check()
+
 
 
 urls = (
     '/', 'index',
     '/zheng', 'zheng',
+    '/more/([0-9a-zA-Z]+)/([1-5])', 'more',
     '/score', 'score',
     '/cet', 'cet',
+    '/cet/old', 'cet_old',
+    '/lib', 'lib',
     '/api', apis.apis,
     '/contact.html', 'contact',
     '/notice.html', 'notice',
     '/help/gpa.html', 'help_gpa',
     '/comment.html', 'comment',
+    '/what_you_need.html', 'what',
     '/donate.html', 'donate',
     '/root.txt', 'ttest',
+    '/status', 'status'
 )
 
-# render = web.template.render('./template/') # your templates
-render = render_jinja('templates', encoding='utf-8')
-all_client = {}
-
-# forms
-# def get_form(viewstate):
-#    info_form = form.Form(
-#        form.Textbox("number", description="学号:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Password("password", description="密码:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Textbox("verify", description="验证码:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Dropdown('Type',[('3', '本学期课表查询'),('1', '本学期成绩查询'), ('2', '考试时间查询'),('4', '平均学分绩点查询')],description="查询类型:",pre="&nbsp;&nbsp;"),
-#        form.Hidden('viewstate',value=viewstate),
-#        validators = [
-#            form.Validator('输入不合理!', lambda i:int(i.number) > 9)]
-#        )
-#    return info_form()
-
-cet_form = form.Form(
-    form.Textbox(
-        "zkzh",
-        description="准考证号:",
-        class_="span3",
-        pre="&nbsp;&nbsp;"),
-    form.Textbox(
-        "name",
-        description="姓名:",
-        class_="span3",
-        pre="&nbsp;&nbsp;"),
-    validators=[
-        form.Validator('输入不合理!', lambda i:int(i.zkzh) != 15)]
-)
-xh_form = form.Form(
-    form.Textbox(
-        "xh",
-        description="学号:",
-        class_="span3",
-        pre="&nbsp;&nbsp;")
-)
-
-
-def get_index_form(time_md5):
-    index_form = '\
-            <table><tr><th><label for="xh">学号:</label></th><td>&nbsp;&nbsp;<input type="text" id="xh" name="xh" class="span3"/></td></tr>\
-            <tr><th><label for="pw">密码:</label></th><td>&nbsp;&nbsp;<input type="password" id="pw" name="pw" class="span3"/></td></tr>\
-            <tr><th><label for="number">验证码:</label></th>\
-            <td>&nbsp;&nbsp;<span><input type="text" id="verify" name="verify"/></span>&nbsp;<span><img style="position:absolute;" src="/static/pic/%s.gif" alt="" height="35" width="92"/></span></td>\
-                <td></td>\
-                </tr>\
-            <tr><th><tr><th><label for="Type">查询类型:</label></th><td>&nbsp;&nbsp;<select id="type" name="type">\
-                <option value="1">成绩查询</option>\
-                <option value="2">考试时间查询</option>\
-                <option value="3">课表查询</option></select></td></tr>\
-            <input type="hidden" value="%s" name="time_md5"/></table>' % (time_md5, time_md5)
-    return index_form
-
-# 首页索引页
+# 调试模式
+web.config.debug = debug_mode
+app = web.application(urls, globals(),autoreload=False)
+# gunicorn 部署使用
+application = app.wsgifunc()
 
 
 class index:
-
-    @memorize(index_cache)
+    '''
+    索引页面
+    '''
+    # @memorize(index_cache)
     def GET(self):
         return render.index(alert=zheng_alert)
 
 
-# 成绩查询
 class zheng:
-
+    '''
+    正方教务系统登录，成绩、课表、考试时间查询
+    '''
     def GET(self):
-        zf = ZF()
-        viewstate, time_md5 = zf.pre_login()
-        all_client[time_md5] = (zf, viewstate)
+        global allclients
+        time_md5= get_time_md5()
         form = get_index_form(time_md5)
         return render.zheng(alert=zheng_alert, form=form)
 
     def POST(self):
         content = web.input()
-        self.xh = content['xh']
-        self.pw = content['pw']
         t = content['type']
-        yanzhengma = content['verify']
-        time_md5 = content['time_md5']
-
+        time_md5=content['time_md5']
         try:
-            value = all_client.pop(time_md5)
-            zf = value[0]
-            viewstate = value[1]
+            zf, ret = zf_login(content)
         except KeyError:
             return render.key_error()
 
-        zf.set_user_info(self.xh, self.pw)
-        ret = zf.login(yanzhengma, viewstate)
         if ret.find('欢迎您') != -1:
             pass
         elif ret.find('密码错误') != -1:
@@ -139,26 +99,32 @@ class zheng:
         else:
             return render.ufo_error()
 
-        if t == "1":
-            table = zf.get_score()
-        elif t == "2":
-            table = zf.get_kaoshi()
-        elif t == "3":
-            table = zf.get_kebiao()
-        else:
-            return render.input_error()
-        if table:
-            error = None
-            return render.result(table=table, error=error)
-        else:
-            table = None
-            error = "can not find your index table"
-            return render.result(table=table, error=error)
+        return zf_result(t, zf, time_md5)
 
-# cet
+
+
+class more:
+    """
+    查询结果页面， 用于查询更多信息
+    """
+    def GET(self, time_md5, t):
+        try:
+            zf, xh, time_start = find_login(time_md5)
+        except KeyError:
+            return render.key_error()
+        if t == '4':
+            return score_result(xh)
+        elif t == '5':
+            table=get_old_cet(xh)
+            return render.result(just_table=table)
+        else:
+            return zf_result(t, zf, time_md5)
 
 
 class cet:
+    """
+    四六级成绩查询
+    """
 
     @memorize(index_cache)
     def GET(self):
@@ -167,7 +133,6 @@ class cet:
             return render.cet_bae(form=form)
         else:
             return render.cet(form=form)
-        # return render.cet_raise()
 
     def POST(self):
         form = cet_form()
@@ -177,26 +142,47 @@ class cet:
             zkzh = form.d.zkzh
             name = form.d.name
             name = name.encode('utf-8')
-            items = [
-                "学校",
-                "姓名",
-                "阅读",
-                "写作",
-                "综合",
-                "准考证号",
-                "考试时间",
-                "总分",
-                "考试类别",
-                "听力"]
+            items = ["学校", "姓名", "阅读", "写作", "综合", "准考证号",
+                     "考试时间", "总分", "考试类别", "听力"]
             cet = CET()
             res = cet.get_last_cet_score(zkzh, name)
-            # s = ""
-            # for i in res.keys():
-            #    s = "%s%s\n%s\n"%(s,i,res[i])
-            # return s
             return render.result_dic(items=items, res=res)
 
-# contact us
+class cet_old:
+    """
+    往年cet成绩查询
+    """
+    def GET(self):
+        form=xh_form
+        title='往年四六级成绩'
+        return render.normal_form(title=title, form=form)
+    def POST(self):
+        form = xh_form()
+        title='往年四六级成绩'
+        if not form.validates():
+            return render.normal_form(title=title,form=form)
+        else:
+            xh = form.d.xh
+        table=get_old_cet(xh)
+        return render.result(just_table=table)
+
+class lib:
+    '''
+    图书馆相关
+    '''
+    def GET(self):
+        form=login_form
+        title='图书馆借书查询'
+        return render.normal_form(title=title, form=form)
+    def POST(self):
+        form=login_form()
+        title='图书馆借书查询'
+        if not form.validates():
+            return render.normal_form(title=title,form=form)
+        else:
+            xh, pw=form.d.xh, form.d.pw
+        table=get_book(xh,pw)
+        return render.result(title=title, just_table=table)
 
 
 class contact:
@@ -206,19 +192,21 @@ class contact:
     def GET(self):
         return render.contact()
 
-# notice
-
 
 class notice:
-
+    '''
+    notice
+    '''
     @memorize(index_cache)
     def GET(self):
         return render.notice()
 
 
-# 全部成绩
-class score:
 
+class score:
+    '''
+    全部成绩
+    '''
     @memorize(index_cache)
     def GET(self):
         form = xh_form()
@@ -230,58 +218,71 @@ class score:
             return render.score(form=form)
         else:
             xh = form.d.xh
-            a = ALL_SCORE()
-            table = a.get_all_score(xh)
-            gpa = GPA(xh)
-            gpa.getscore_page()
-            # table = gpa.get_all_score()
-            jidian = gpa.get_gpa()["ave_score"]
 
-            if table:
-                return render.result(table=table, jidian=jidian)
-            else:
-                table = None
-                error = "can not get your score"
-            return render.result(table=table, error=error)
-            # else:
-            #    return "成绩查询源出错,请稍后再试!"
+        return score_result(xh)
 
-# 平均学分绩点计算说明页面
+
+
+
+class status:
+    '''
+    网站状态，返回相关值
+    '''
+    def GET(self):
+        clients = get_count()
+        used_client= get_client_num(name='used')
+        login_client=get_client_num(name='login')
+        thread_num=get_enumer_num()
+        pics = len(os.listdir("static/pic"))
+        return locals()
+
 
 
 class help_gpa:
-
+    '''
+    平均学分绩点计算说明页面
+    '''
     @memorize(index_cache)
     def GET(self):
         return render.help_gpa()
 
-# 评论页面, 使用多说评论
 
 
 class comment:
+    '''
+    评论页面, 使用多说评论
+    '''
 
     def GET(self):
         return render.comment()
 
-# 赞助页面
+class what:
+    '''
+    功能征集页面, 使用多说评论
+    '''
+
+    def GET(self):
+        return render.what_you_need()
+
+
 
 
 class donate:
-
+    '''
+    赞助页面
+    '''
     def GET(self):
-        return render.donate(sponsor=sponsor)
+        import json
+        file_name=os.path.join(config.pwd, 'data/sponsor.json')
+        with open(file_name) as s_file:
+            json_obj=json.load(s_file)
+        return render.donate(sponsor=json_obj)
 
-# 阿里妈妈认证
 
 
 class ttest:
-
+    '''
+    阿里妈妈认证
+    '''
     def GET(self):
         return render.root()
-
-
-# for gunicorn
-application = web.application(urls, globals(), autoreload=False).wsgifunc()
-
-# just for test
-app = web.application(urls, globals(),autoreload=False)

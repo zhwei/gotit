@@ -64,10 +64,10 @@ class ZF():
         import md5
         time_md5 = md5.md5(str(time.time())).hexdigest()
         pic_name = time_md5 + ".gif"
-        filename = 'static/pic/' + pic_name
-        fi = file(filename,'wb')
-        fi.write(a)
-        fi.close()
+        filename = config.pwd + 'static/pic/' + pic_name
+        with open(filename,'wb') as fi:
+            fi.write(a)
+            fi.close()
         process_image(filename)
         return __VIEWSTATE, time_md5
 
