@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>{% block title %}{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Got it,正方教务系统查询工具">
     <meta name="author" content="zhwei">
 
@@ -47,30 +48,32 @@
     {% endblock %}
   </head>
 
-  <body>
+  <body class="bs-background">
 
-    <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+    <nav class="navbar navbar-inverse navbar-fixed-top bs-navbar" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
-          </a>
-          <a class="brand" href="http://gotit.asia/">Got it</a>
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li><a href="/">首页</a></li>
-              <li><a href="/score">绩点·成绩</a></li>
-              <li><a href="/cet">CET</a></li>
-              <li><a href="/notice.html">公告</a></li>
-              <li><a href="/contact.html">联系我们</a></li>
-              <li><a href="/comment.html">留言</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
+          </button>
+          <a class="navbar-brand" href="#">Gotit</a>
         </div>
-      </div>
-    </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">首页</a></li>
+            <li><a href="/score">绩点·成绩</a></li>
+            <li><a href="/cet">CET</a></li>
+            <li><a href="/notice.html">公告</a></li>
+            <li><a href="/contact.html">联系我们</a></li>
+            <li><a href="/comment.html">留言</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+          </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
 
     <div id="container" class= "container"><br>
 
@@ -78,7 +81,9 @@
 
       {% endblock %}
 
-      <div style="text-align:center;">
+
+
+      <div style="text-align:center; display:none;">
         <script type="text/javascript">
           document.write('<a style="display:none!important" id="tanx-a-mm_34979126_3463384_11269475"></a>');
           tanx_s = document.createElement("script");
@@ -92,15 +97,16 @@
           </script>
         </div>
 
-        <hr>
-        {% include "footer.html" %}
+      {% include "footer.html" %}
 
       </div> <!-- /container -->
       
       {% include "js.html" %}
 
+      {% block foot %}
+         
+      {% endblock %} 
+
       <!-- baidu sitecenter   -->
-
-
       </body>
     </html>

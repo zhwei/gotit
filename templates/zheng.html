@@ -10,14 +10,37 @@
     <p>{{ alert }}</p>
   </div>
   {% endif %}
-  <br>
 
-  {{ form }}
 
+    <p>
+      <input type="text" id="xh" name="xh"  class="form-control" placeholder="学号" autofocus/>
+    </p>
+    <p><input type="password" id="pw" name="pw" class="form-control" placeholder="密码"/></p>
+    <p>
+      <input type="text" id="verify" name="verify" class="form-control" placeholder="验证码" style="width:50%; float:left;"/>
+      <img style="" src="/static/pic/{{ time_md5 }}.gif" alt=""/>
+    </p>
+    <p>
+      <select id="type" name="type" class="selectpicker">
+        <option value="1">成绩查询</option>
+        <option value="2">考试时间查询</option>
+        <option value="3">课表查询</option>
+      </select>
+    </p>
+    <input type="hidden" value="{{ time_md5 }}" name="time_md5"/>    
+    <br>
   <center>
     <button type="submit" class="btn btn-primary">查询</button>&nbsp;
     <button type="reset" class="btn">重置</button>
   </center>
+
 </form>
 
+{% endblock %}
+
+{% block foot %}
+<script type="text/javascript">
+
+  $('select').selectpicker();
+</script>
 {% endblock %}

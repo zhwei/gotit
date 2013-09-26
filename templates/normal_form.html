@@ -9,7 +9,9 @@
       {% if not form.valid %}
         <p class="alert alert-danger">输入错误:</p>
       {% endif %}
-      {{ form.render() }}
+      {% for d in form.inputs %}
+        <input type="{{ d.get_type() }}" id="{{ d.id }}" name="{{ d.name }}" class="form-control" placeholder="{{ d.description }}" autofocus/>
+      {% endfor %}
 
       <br>
       <center>

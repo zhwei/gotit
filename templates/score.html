@@ -11,7 +11,8 @@
       {% if not form.valid %}
         <p class="alert alert-danger">输入错误:</p>
       {% endif %}
-      {{ form.render() }}
+      <tr>
+        <input type="text" id="xh" name="xh" class="form-control" placeholder="请输入学号" autofocus/>
       <br>
       <center>
         <button type="submit" class="btn btn-primary">查询</button>&nbsp;

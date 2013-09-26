@@ -78,7 +78,7 @@ class zheng:
         global allclients
         time_md5= get_time_md5()
         form = get_index_form(time_md5)
-        return render.zheng(alert=zheng_alert, form=form)
+        return render.zheng(alert=zheng_alert, form=form,time_md5=time_md5)
 
     def POST(self):
         content = web.input()
@@ -126,10 +126,11 @@ class cet:
     四六级成绩查询
     """
 
-    @memorize(index_cache)
+    # @memorize(index_cache)
     def GET(self):
         form = cet_form()
         if config.baefetch:
+            print form
             return render.cet_bae(form=form)
         else:
             return render.cet(form=form)
@@ -207,7 +208,7 @@ class score:
     '''
     全部成绩
     '''
-    @memorize(index_cache)
+    # @memorize(index_cache)
     def GET(self):
         form = xh_form()
         return render.score(form=form)
