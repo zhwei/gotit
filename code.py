@@ -10,7 +10,6 @@ sys.setdefaultencoding('utf-8')
 
 import web
 from web.contrib.template import render_jinja
-render = render_jinja('templates', encoding='utf-8')
 
 
 # addons
@@ -38,6 +37,7 @@ else:
 urls = (
     '/', 'index',
     '/login', 'login',
+    '/logout', 'logout',
     '/succeed', 'succeed',
 
     '/old', 'old_index',
@@ -83,6 +83,8 @@ web.config.session_parameters['expired_message'] = '您需要重新登录！'
 
 # end sessions
 
+render = render_jinja('templates', encoding='utf-8', globals={'context':session})
+
 class old_index:
     '''
     索引页面
@@ -105,15 +107,17 @@ class login:
     def GET(self):
         global allclients
         time_md5= get_time_md5()
+        session['time_md5'] = time_md5
         form = get_index_form(time_md5)
-        return render.login(alert=zheng_alert, form=form,time_md5=time_md5)
+        return render.login(alert=zheng_alert, form=form)
 
     def POST(self):
         content = web.input()
-        time_md5=content['time_md5']
+
+        time_md5=session['time_md5']
 
         try:
-            zf, ret = zf_login(content)
+            zf, ret = zf_login(content, time_md5)
         except KeyError:
             return render.key_error()
 
@@ -127,10 +131,9 @@ class login:
         else:
             return render.ufo_error()
 
-        session['time_md5'] = time_md5
 
+        session.logged_in=True
         raise web.seeother('/succeed')
-        #return render.succeed(time_md5=time_md5)
 
 class succeed:
     """
@@ -138,9 +141,18 @@ class succeed:
     """
     def GET(self):
 
-        time_md5=session['time_md5']
+        try:
+            time_md5=session['time_md5']
+        except KeyError:
+            return render.key_error()
+
         return render.succeed(time_md5=time_md5)
 
+class logout:
+    def GET(self):
+
+        session.kill()
+        raise web.seeother('/')
 
 class zheng:
     '''

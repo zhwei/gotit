@@ -67,6 +67,22 @@
             <a href="/donate.html">赞助</a>
           </li>
         </ul>
+        <ul class="nav navbar-nav navbar-right">
+        {% if context.logged_in %}
+          <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">13<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="/succeed">个人中心</a></li>
+              <li><a href="#">action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">学分</a></li>
+            </ul>
+          </li>
+        {% else %}
+          <li><a href="/login">登录</a></li>
+        {% endif %}
+        </ul>
       </nav>
     </div> <!-- container -->
     </header>

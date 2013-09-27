@@ -370,7 +370,7 @@ def get_time_md5():
     return time_md5
 
 
-def zf_login(content):
+def zf_login(content, time_md5):
     """
     传入content-表单输入
     返回 zf 对象和登录返回信息
@@ -381,7 +381,6 @@ def zf_login(content):
     xh = content['xh']
     pw = content['pw']
     yanzhengma = content['verify']
-    time_md5 = content['time_md5']
 
     zf, viewstate, time_start = used_clients.get(time_md5)
 
