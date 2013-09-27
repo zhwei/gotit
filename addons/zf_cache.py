@@ -42,7 +42,7 @@ CREATE_THREAD_NUM = 2
 # 检查线程数目
 CHECK_THREAD_NUM = 1
 # 过期时间（秒）
-EXPIRE_SECOND = 120
+EXPIRE_SECOND = 300
 # 单次创建线程数目
 NEW_CLIENT_NUM = 2
 # 缓存的client数目

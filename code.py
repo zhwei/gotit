@@ -37,8 +37,12 @@ else:
 
 urls = (
     '/', 'index',
+    '/login', 'login',
+    '/succeed', 'succeed',
+
+    '/old', 'old_index',
     '/zheng', 'zheng',
-    '/more/([0-9a-zA-Z]+)/([1-5])', 'more',
+    '/more/([1-5])', 'more',
     '/score', 'score',
     '/cet', 'cet',
     '/cet/old', 'cet_old',
@@ -61,13 +65,81 @@ app = web.application(urls, globals(),autoreload=False)
 application = app.wsgifunc()
 
 
-class index:
+# session settings
+
+if web.config.get('_session') is None:
+    session = web.session.Session(app, web.session.DiskStore('sessions'), {'count': 0})
+    web.config._session = session
+else:
+    session = web.config._session
+
+web.config.session_parameters['cookie_name'] = 'gotit_session_id'
+web.config.session_parameters['cookie_domain'] = "gotit.asia"
+web.config.session_parameters['timeout'] = 600, #in seconds
+web.config.session_parameters['ignore_expiry'] = True
+web.config.session_parameters['ignore_change_ip'] = True
+web.config.session_parameters['secret_key'] = 'wqerjkhbasdfhsdakyarweqr'
+web.config.session_parameters['expired_message'] = '您需要重新登录！'
+
+# end sessions
+
+class old_index:
     '''
     索引页面
     '''
+    def GET(self):
+        return render.old_index(alert=zheng_alert)
+
+class index:
+    '''
+    new  索引页面
+    '''
     # @memorize(index_cache)
     def GET(self):
-        return render.index(alert=zheng_alert)
+        return render.index()
+
+class login:
+    '''
+    正方教务系统登录，成绩、课表、考试时间查询
+    '''
+    def GET(self):
+        global allclients
+        time_md5= get_time_md5()
+        form = get_index_form(time_md5)
+        return render.login(alert=zheng_alert, form=form,time_md5=time_md5)
+
+    def POST(self):
+        content = web.input()
+        time_md5=content['time_md5']
+
+        try:
+            zf, ret = zf_login(content)
+        except KeyError:
+            return render.key_error()
+
+        if ret.find('欢迎您') != -1:
+            pass
+        elif ret.find('密码错误') != -1:
+            return render.pw_error()
+
+        elif ret.find('验证码不正确') != -1:
+            return render.recg_error()
+        else:
+            return render.ufo_error()
+
+        session['time_md5'] = time_md5
+
+        raise web.seeother('/succeed')
+        #return render.succeed(time_md5=time_md5)
+
+class succeed:
+    """
+    登录成功界面
+    """
+    def GET(self):
+
+        time_md5=session['time_md5']
+        return render.succeed(time_md5=time_md5)
 
 
 class zheng:
@@ -107,7 +179,8 @@ class more:
     """
     查询结果页面， 用于查询更多信息
     """
-    def GET(self, time_md5, t):
+    def GET(self, t):
+        time_md5=session['time_md5']
         try:
             zf, xh, time_start = find_login(time_md5)
         except KeyError:
