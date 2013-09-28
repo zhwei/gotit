@@ -23,8 +23,9 @@ from addons.config import index_cache, debug_mode, zheng_alert
 from addons.zf_cache import get_time_md5, cache_zf_start, zf_login, \
     find_login, just_check, get_count, get_client_num, get_enumer_num
 from addons.tools import zf_result, score_result
+from addons.rediswebpy import RedisStore
 
-import apis
+from urls import urls
 
 if config.zf_accelerate:
     # 缓存正方相关
@@ -33,30 +34,6 @@ else:
     just_check()
 
 
-
-urls = (
-    '/', 'index',
-    '/login', 'login',
-    '/logout', 'logout',
-    '/succeed', 'succeed',
-
-    '/old', 'old_index',
-    '/zheng', 'zheng',
-    '/more/([1-5])', 'more',
-    '/score', 'score',
-    '/cet', 'cet',
-    '/cet/old', 'cet_old',
-    '/lib', 'lib',
-    '/api', apis.apis,
-    '/contact.html', 'contact',
-    '/notice.html', 'notice',
-    '/help/gpa.html', 'help_gpa',
-    '/comment.html', 'comment',
-    '/what_you_need.html', 'what',
-    '/donate.html', 'donate',
-    '/root.txt', 'ttest',
-    '/status', 'status'
-)
 
 # 调试模式
 web.config.debug = debug_mode
@@ -68,7 +45,7 @@ application = app.wsgifunc()
 # session settings
 
 if web.config.get('_session') is None:
-    session = web.session.Session(app, web.session.DiskStore('sessions'), {'count': 0})
+    session = web.session.Session(app, RedisStore(), {'count': 0})
     web.config._session = session
 else:
     session = web.config._session
@@ -130,8 +107,6 @@ class login:
             return render.recg_error()
         else:
             return render.ufo_error()
-
-
         session.logged_in=True
         raise web.seeother('/succeed')
 
