@@ -194,7 +194,7 @@ class more:
         elif t == '5':
             # 往年cet
             table=get_old_cet(xh)
-            return render.result(just_table=table)
+            return render.result(cet_table=table)
         else:
             # 正方相关的查询
             return zf_result(t, zf, time_md5)
@@ -244,7 +244,7 @@ class cet_old:
         else:
             xh = form.d.xh
         table=get_old_cet(xh)
-        return render.result(just_table=table)
+        return render.result(cet_table=table)
 
 class lib:
     '''

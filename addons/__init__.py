@@ -31,7 +31,7 @@ def get_gpa(xh):
     """
     gpa_obj = GPA(xh)
     gpa_obj.getscore_page()
-    gpa = gpa_obj.get_gpa()["ave_score"]
+    gpa = gpa_obj.get_gpa()#["ave_score"]
 
     return gpa
 

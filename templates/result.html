@@ -55,12 +55,20 @@
   </div>
 {% endif %}
 
+{% if cet_table %}
+
+  <table  class="base-table cet-old-table">
+    {{ cet_table }}
+  </table>
+
+{% endif %}
+
 {% if just_table %}
-<!-- <div class="table-responsive"> -->
-  <table  class="base-table">
+
+  <table  class="base-table cet-old-table">
     {{ just_table }}
   </table>
-<!-- </div> -->
+
 {% endif %}
 
 {% if error %}

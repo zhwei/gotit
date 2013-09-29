@@ -17,7 +17,14 @@
 {% block content %}
 
 <div>
-  您的学分：{{ gpa }}
+  <p>学号：{{ gpa['id'] }}</p>
+  <p>姓名：{{ gpa['name'] }}</p>
+  <p>班级：{{ gpa['Class'] }}</p>
+  <p>层次：{{ gpa['level'] }}</p>
+  <p>专业：{{ gpa['major'] }}</p>
+  <p>至今未通过的科目：{% for i in gpa['not_accept'] %}{{ i }}&nbsp;,{% endfor %}</p>
+  <p></p>
+  <p>学分绩点：<b>{{ gpa['ave_score'] }}</b></p>
 </div>
 
 {% endblock %}
