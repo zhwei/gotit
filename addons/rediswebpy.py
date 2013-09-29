@@ -3,11 +3,11 @@
 
 import redis
 import web
-
+ 
 SESSION = 'SESSION:'
-
+ 
 class RedisStore(web.session.Store):
-
+ 
     """Store for saving a session in redis:
     import rediswebpy
     session = web.session.Session(app, rediswebpy.RedisStore(), initializer={'count': 0})
@@ -35,7 +35,7 @@ class RedisStore(web.session.Store):
     def __contains__(self, key):
         # test if session exists for given key
         return bool(self.redis_server.get(SESSION+key))
-
+ 
     def __getitem__(self, key):
         # attempt to get session data from redis store for given key
         data = self.redis_server.get(SESSION+key)
@@ -43,10 +43,11 @@ class RedisStore(web.session.Store):
         if data:
             # update the expiration time
             self.redis_server.expire(SESSION+key,
-                                     web.webapi.config.session_parameters.timeout)
+                                     web.config.session_parameters['timeout'])
             return self.decode(data)
         else:
             raise KeyError
+
 
     def __setitem__(self, key, value):
         # set the redis value for given key to the encoded value, and reset the
@@ -54,10 +55,11 @@ class RedisStore(web.session.Store):
         self.redis_server.set(SESSION+key,
                               self.encode(value))
         self.redis_server.expire(SESSION+key,
-                                     web.webapi.config.session_parameters.timeout)
+                                     web.config.session_parameters['timeout'])
 
     def __delitem__(self, key):
         self.redis_server.delete(SESSION+key)
+
 
     def cleanup(self, timeout):
         # since redis takes care of expiration for us, we don't need to do any

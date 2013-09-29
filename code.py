@@ -14,7 +14,7 @@ from web.contrib.template import render_jinja
 
 # addons
 from addons import config
-from addons import get_old_cet, get_book
+from addons import get_old_cet, get_book, get_gpa, get_score
 from addons.get_CET import CET
 
 from addons.autocache import memorize
@@ -22,8 +22,10 @@ from addons.forms import xh_form, cet_form, get_index_form, login_form
 from addons.config import index_cache, debug_mode, zheng_alert
 from addons.zf_cache import get_time_md5, cache_zf_start, zf_login, \
     find_login, just_check, get_count, get_client_num, get_enumer_num
+
 from addons.tools import zf_result, score_result
-from addons.rediswebpy import RedisStore
+
+from addons.RedisStore import RedisStore
 
 from urls import urls
 
@@ -45,7 +47,7 @@ application = app.wsgifunc()
 # session settings
 
 if web.config.get('_session') is None:
-    session = web.session.Session(app, RedisStore(), {'count': 0})
+    session = web.session.Session(app, RedisStore(), {'count': 0, 'logged_in':False})
     web.config._session = session
 else:
     session = web.config._session
@@ -57,6 +59,7 @@ web.config.session_parameters['ignore_expiry'] = True
 web.config.session_parameters['ignore_change_ip'] = True
 web.config.session_parameters['secret_key'] = 'wqerjkhbasdfhsdakyarweqr'
 web.config.session_parameters['expired_message'] = '您需要重新登录！'
+
 
 # end sessions
 
@@ -92,6 +95,7 @@ class login:
         content = web.input()
 
         time_md5=session['time_md5']
+        session['xh']=content['xh']
 
         try:
             zf, ret = zf_login(content, time_md5)
@@ -116,12 +120,15 @@ class succeed:
     """
     def GET(self):
 
+        if session['logged_in']==False:
+            raise web.seeother('/login')
+
         try:
-            time_md5=session['time_md5']
+            xh=session['xh']
         except KeyError:
             return render.key_error()
 
-        return render.succeed(time_md5=time_md5)
+        return render.succeed(gpa=get_gpa(xh))
 
 class logout:
     def GET(self):
@@ -140,9 +147,11 @@ class zheng:
         return render.zheng(alert=zheng_alert, form=form,time_md5=time_md5)
 
     def POST(self):
+
         content = web.input()
         t = content['type']
         time_md5=content['time_md5']
+
         try:
             zf, ret = zf_login(content)
         except KeyError:
@@ -167,17 +176,27 @@ class more:
     查询结果页面， 用于查询更多信息
     """
     def GET(self, t):
+
+        if session['logged_in']==False:
+            raise web.seeother('/login')
+
         time_md5=session['time_md5']
+
         try:
             zf, xh, time_start = find_login(time_md5)
         except KeyError:
             return render.key_error()
+
         if t == '4':
-            return score_result(xh)
+            # 全部成绩
+            return render.result(score_table=get_score(xh))
+
         elif t == '5':
+            # 往年cet
             table=get_old_cet(xh)
             return render.result(just_table=table)
         else:
+            # 正方相关的查询
             return zf_result(t, zf, time_md5)
 
 

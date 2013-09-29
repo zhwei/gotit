@@ -1,23 +1,23 @@
 {% extends "base-succeed.html" %}
 
 {% block title %}
-登录
+个人中心
 {% endblock %}
 
 {% block nav %}
-
   <li class="active"><a href="/succeed">个人中心</a></li>
   <li><a href="/more/1">成绩</a></li>
-  <li><a href="/more/4">绩点</a></li>
   <li><a href="/more/4">总成绩</a></li>
   <li><a href="/more/3">课表</a></li>
   <li><a href="/more/5">往年CET</a></li>
   <li><a href="/more/2">考试时间</a></li>
   <li><a href="/">返回首页</a></li>
-
 {% endblock %}
 
 {% block content %}
 
+<div>
+  您的学分：{{ gpa }}
+</div>
 
 {% endblock %}
