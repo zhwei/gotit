@@ -22,7 +22,7 @@
     <p><input type="password" id="pw" name="pw" class="form-control" placeholder="密码"/></p>
     <p>
       <input type="text" id="verify" name="verify" class="form-control" placeholder="验证码" style="width:50%; float:left;"/>
-      <img style="float:right;" class="img-thumbnail" src="/static/pic/{{ context['time_md5'] }}.gif" alt=""/>
+      <img style="float:right;" class="img-thumbnail" src="{{ checkcode }}" alt=""/>
     </p>
     <br />
     <br />

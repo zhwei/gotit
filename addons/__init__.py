@@ -6,6 +6,8 @@ from addons.lib import login, getbooklist_table
 from addons.calc_GPA import GPA
 from addons.get_all_score import ALL_SCORE
 
+from addons import config
+
 def get_old_cet(xh):
 
     """
@@ -44,9 +46,6 @@ def get_score(xh):
     score = score_obj.get_all_score(xh)
 
     return score
-
-
-
 
 
 

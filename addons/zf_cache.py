@@ -51,6 +51,14 @@ CACHE_CLIENT_NUM = 60
 # 初始化日志模块
 logger = init_log(log_name='zf_cache', level_name='info',fi=False)
 
+import urllib2
+
+def zf_ok():
+    if urllib2.urlopen(config.zf_url).code == 200:
+        return True
+    else:
+        return False
+
 
 def get_count():
     """
@@ -142,23 +150,23 @@ def create_client(nu=2):
     global all_clients
 
     second = {}
-    for i in range(nu):
+    if zf_ok():
+        for i in range(nu):
+            cr=threading.Thread(name='Create Client Thread '+str(i),
+                                target=create_clients_thread)
+            cr.setDaemon(True)
+            cr.start()
+            with mylock:
+                second = dict(second, **temp_clients)
+                temp_clients = {}
 
-        cr=threading.Thread(name='Create Client Thread '+str(i),
-                            target=create_clients_thread)
-        cr.setDaemon(True)
-        cr.start()
-        with mylock:
-            second = dict(second, **temp_clients)
-            temp_clients = {}
-
-    # print 'second ', len(second.keys())
-    con.acquire()
-    all_clients = dict(all_clients, **second)
-    con.notify()
-    con.release()
-    # print 'After C  left %s' % len(all_clients.keys())
-    logger.info('After C  left %s' % get_count())
+        # print 'second ', len(second.keys())
+        con.acquire()
+        all_clients = dict(all_clients, **second)
+        con.notify()
+        con.release()
+        # print 'After C  left %s' % len(all_clients.keys())
+        logger.info('After C  left %s' % get_count())
 
 def init_client():
 

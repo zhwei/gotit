@@ -9,6 +9,8 @@ import config
 #import os
 from image import process_image
 
+from tools import init_redis
+
 
 #def get_viewstate
 
@@ -63,12 +65,14 @@ class ZF():
         import time
         import md5
         time_md5 = md5.md5(str(time.time())).hexdigest()
-        pic_name = time_md5 + ".gif"
-        filename = config.pwd + 'static/pic/' + pic_name
-        with open(filename,'wb') as fi:
-            fi.write(a)
-            fi.close()
-        process_image(filename)
+        #pic_name = time_md5 + ".gif"
+        #filename = config.pwd + 'static/pic/' + pic_name
+        #with open(filename,'wb') as fi:
+        #    fi.write(a)
+        #    fi.close()
+        #process_image(filename)
+        redis_server = init_redis()
+        redis_server.hset('checkcode',time_md5,a.encode('base64').replace('\n',''))
         return __VIEWSTATE, time_md5
 
 

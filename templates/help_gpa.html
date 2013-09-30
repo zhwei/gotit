@@ -1,4 +1,19 @@
-{% extends "base-result.html" %}
+{% extends "base-succeed.html" %}
+
+
+{% block nav %}
+
+  <li id="self"><a href="/succeed">个人中心</a></li>
+  <li id="score"><a href="/more/1">成绩</a></li>
+  <li id="all"><a href="/more/4">总成绩</a></li>
+  <li id="seh"><a href="/more/3">课表</a></li>
+  <li id="old-cet"><a href="/more/5">往年CET</a></li>
+  <li id="time"><a href="/more/2">考试时间</a></li>
+  <li id="back"><a href="/">返回首页</a></li>
+
+{% endblock %}
+
+
 {% block content %}
 
         <h3>学分基点计算说明：</h3>
@@ -7,7 +22,7 @@
 
         <h5>数据来源：</h5>
 
-        <p><a href="http://210.44.176.116/cjcx/zcjcx_login.html">http://210.44.176.116/cjcx/zcjcx_login.html</a></p>
+        <p class="a"><a href="http://210.44.176.116/cjcx/zcjcx_login.html">http://210.44.176.116/cjcx/zcjcx_login.html</a></p>
 
         <h5>计算细节：</h5>
 
@@ -31,7 +46,7 @@
 
         <h5>程序源码：</h5>
 
-        <p><a href="https://github.com/ma6174/calc_GPA/blob/master/calc_GPA.py">https://github.com/ma6174/calc<em>GPA/blob/master/calc</em>GPA.py</a></p>
+        <p class="a"><a href="https://github.com/ma6174/calc_GPA/blob/master/calc_GPA.py">https://github.com/ma6174/calc<em>GPA/blob/master/calc</em>GPA.py</a></p>
 
 
 {% endblock %}

@@ -3,11 +3,11 @@
 
 from PIL import Image,ImageDraw
 
-def process_image(pwd):
+def process_image(image):
     """
     处理验证码,使其只剩下红色字体
     """
-    im = Image.open(pwd)
+    im = Image.open(image)
     draw = ImageDraw.Draw(im)
     length = im.size[0]
     height = im.size[1]
@@ -17,4 +17,4 @@ def process_image(pwd):
             if c < 220:
                 draw.point((i,j),255)
     im.show()
-    im.save(pwd)
+    im.save(image)

@@ -16,7 +16,7 @@
 
 {% block content %}
 
-<div>
+
   <p>学号：{{ gpa['id'] }}</p>
   <p>姓名：{{ gpa['name'] }}</p>
   <p>班级：{{ gpa['Class'] }}</p>
@@ -25,6 +25,7 @@
   <p>至今未通过的科目：{% for i in gpa['not_accept'] %}{{ i }}&nbsp;,{% endfor %}</p>
   <p></p>
   <p>学分绩点：<b>{{ gpa['ave_score'] }}</b></p>
+  <p class="a"><a href="/help/gpa.html">绩点计算方法</a></p>
 </div>
 
 {% endblock %}

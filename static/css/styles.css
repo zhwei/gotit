@@ -242,6 +242,20 @@ a:hover {
   border-right: 1px solid #ddd;
 
 }
+.a a {
+  color: #08c;
+  text-decoration: none;
+}
+
+.a a:hover, .a a:focus {
+  color: #005580;
+  text-decoration: underline;
+}
+
+.a a:hover, .a a:active {
+  outline: 0;
+}
+
 
 .base-table a {
   color: #08c;

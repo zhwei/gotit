@@ -9,8 +9,9 @@ sys.setdefaultencoding('utf-8')
 # import time
 
 import web
-from web.contrib.template import render_jinja
+import redis
 
+from web.contrib.template import render_jinja
 
 # addons
 from addons import config
@@ -89,7 +90,10 @@ class login:
         time_md5= get_time_md5()
         session['time_md5'] = time_md5
         form = get_index_form(time_md5)
-        return render.login(alert=zheng_alert, form=form)
+
+        r = redis.StrictRedis(host='localhost', port=6379, db=0)
+        checkcode = "data:image/gif;base64,"+r.hget('checkcode',time_md5)
+        return render.login(alert=zheng_alert, form=form, checkcode=checkcode)
 
     def POST(self):
         content = web.input()
