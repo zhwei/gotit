@@ -2,7 +2,6 @@
 *.out
 log/*
 addons/*.pyc
-tools.py
 dong.py
 test/*
 static/pic/*
