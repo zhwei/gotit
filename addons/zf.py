@@ -7,7 +7,7 @@ import re
 from BeautifulSoup import BeautifulSoup
 import config
 #import os
-from image import process_image
+from image import process_image_string
 
 from tools import init_redis
 
@@ -61,18 +61,15 @@ class ZF():
         #print __VIEWSTATE
         # get CheckCode.aspx
         req = urllib2.Request(self.code_url,headers = self.headers)
-        a = self.opener.open(req).read()
+        image_content = self.opener.open(req).read()
         import time
         import md5
         time_md5 = md5.md5(str(time.time())).hexdigest()
-        #pic_name = time_md5 + ".gif"
-        #filename = config.pwd + 'static/pic/' + pic_name
-        #with open(filename,'wb') as fi:
-        #    fi.write(a)
-        #    fi.close()
-        #process_image(filename)
+        #import StringIO
+        #filename = StringIO.StringIO()
+        image_content=process_image_string(image_content)
         redis_server = init_redis()
-        redis_server.hset('checkcode',time_md5,a.encode('base64').replace('\n',''))
+        redis_server.hset('checkcode',time_md5,image_content.encode('base64').replace('\n',''))
         return __VIEWSTATE, time_md5
 
 

@@ -7,7 +7,7 @@ import threading
 from urllib2 import URLError
 
 from zf import ZF
-from tools import init_log
+from tools import init_log, init_redis
 
 import config
 
@@ -117,12 +117,11 @@ def delete_verify_img(time_md5):
     """
     用于删除验证码文件
     """
-    import os
     try:
-        path = os.path.join(config.pwd,'static/pic/', '%s.gif'%time_md5)
-        os.remove(path)
+        redis_server=init_redis()
+        redis_server.hdel('checkcode', time_md5)
     except:
-        logger.error('Delete file %s.gif error'%time_md5)
+        logger.error('hash delete field %s error'%time_md5)
 
 def create_clients_thread():
 
