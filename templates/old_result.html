@@ -1,0 +1,72 @@
+{% extends "base-search.html" %}
+
+{% block content %}
+<br>
+<div>
+  {% if jidian %}
+  <div class="auto-over-x">
+    <table class="base-table" >
+      <tr>
+        <th>
+          <strong>平均学分绩点</strong>
+        </th>
+        <td>
+          <strong>{{ jidian }}</strong>
+        </td>
+        <td>
+          <strong><a href="/help/gpa.html">绩点计算方法</a></strong>
+        </td>
+      </tr>
+    </table>
+  </div>  
+  {% endif %}
+
+  {% if score_table %}
+    <div class="auto-over-x">
+      <table class="base-table score-table" id="all_score">
+        {% for i in score_table %}
+        {{i}}
+        {% endfor %}
+      </table>
+    </div>
+  {% endif %}
+
+  {% if table %}
+    <div class="auto-over-x">
+
+      <table class="base-table">
+        {% for i in table %}
+        {{i}}
+        {% endfor %}
+      </table>
+
+    </div>
+  {% endif %}
+
+  {% if cet_table %}
+  <div class="auto-over-x">
+    <table  class="base-table cet-old-table">
+      {{ cet_table }}
+    </table>
+  </div>
+  {% endif %}
+
+  {% if just_table %}
+  <div class="auto-over-x">
+    <table  class="base-table cet-old-table">
+      {{ just_table }}
+    </table>
+  </div>
+  {% endif %}
+
+  {% if error %}
+    <h2 id="error">{{ error }}</h2>
+  {% endif %}
+
+</div>
+
+{% endblock content %}
+
+{% block foot %}
+
+{% endblock %}

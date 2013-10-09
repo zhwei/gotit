@@ -114,4 +114,4 @@ def unescape(text):
 
 def get_book(xh, pw):
     if login(xh,pw) is True:
-        return getbooklist_table()
+        return getbooklist_table().replace("../opac/","http://222.206.65.12/opac/")

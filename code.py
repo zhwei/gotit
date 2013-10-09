@@ -135,7 +135,11 @@ class succeed:
         except KeyError:
             return render.key_error()
 
-        return render.succeed(gpa=get_gpa(xh))
+        gpa=get_gpa(xh)
+
+        session['name']=gpa['name']
+
+        return render.succeed(gpa=gpa)
 
 class logout:
     def GET(self):
@@ -154,7 +158,7 @@ class zheng:
 
         r = init_redis()
         checkcode = "data:image/gif;base64,"+r.hget('checkcode',time_md5)
-        return render.zheng(alert=zheng_alert, form=form,check_code=checkcode)
+        return render.zheng(alert=zheng_alert, form=form,checkcode=checkcode)
 
     def POST(self):
 
@@ -272,7 +276,7 @@ class lib:
         else:
             xh, pw=form.d.xh, form.d.pw
         table=get_book(xh,pw)
-        return render.result(title=title, just_table=table)
+        return render.old_result(title=title, just_table=table)
 
 
 class contact:

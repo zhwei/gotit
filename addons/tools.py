@@ -71,11 +71,11 @@ def zf_result(t, zf, time_md5):
         return render.input_error()
     if table:
         error = None
-        return render.result(table=table, error=error, time_md5=time_md5)
+        return render.old_result(table=table, error=error, time_md5=time_md5)
     else:
         table = None
         error = "can not find your index table"
-        return render.result(table=table, error=error, time_md5=time_md5)
+        return render.old_result(table=table, error=error, time_md5=time_md5)
 
 def score_result(xh):
     '''
