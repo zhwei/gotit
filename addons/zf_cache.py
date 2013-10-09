@@ -95,20 +95,16 @@ def zhengfang():
     viewstate=None
     start = time.time()
     while viewstate is None:
-        try:
-            time.sleep(0.01)
-            zf = ZF()
-            viewstate, time_md5 = zf.pre_login()
-            with mylock:
-                temp_clients[time_md5] = (zf, viewstate, time.time())
-        except URLError:
-            viewstate = None
-            logger.error('can not touch zheng fang')
-            pass
-        except IOError:
-            viewstate=None
-            logger.error('io error can not write to gif')
-            pass
+        #try:
+        time.sleep(0.01)
+        zf = ZF()
+        viewstate, time_md5 = zf.pre_login()
+        with mylock:
+            temp_clients[time_md5] = (zf, viewstate, time.time())
+        #except IOError:
+        #    viewstate=None
+        #    logger.error('io error can not write to gif')
+        #    pass
         if time.time() - start > 10:
             break
     return (viewstate, time_md5, zf)

@@ -9,7 +9,7 @@ sys.setdefaultencoding('utf-8')
 # import time
 
 import web
-import redis
+from urllib2 import URLError
 
 from web.contrib.template import render_jinja
 
@@ -24,7 +24,7 @@ from addons.config import index_cache, debug_mode, zheng_alert
 from addons.zf_cache import get_time_md5, cache_zf_start, zf_login, \
     find_login, just_check, get_count, get_client_num, get_enumer_num
 
-from addons.tools import zf_result, score_result
+from addons.tools import zf_result, score_result, init_redis
 
 from addons.RedisStore import RedisStore
 
@@ -87,11 +87,14 @@ class login:
     '''
     def GET(self):
         global allclients
-        time_md5= get_time_md5()
+        try:
+            time_md5= get_time_md5()
+        except URLError:
+            return "can not touch zhengfang!"
         session['time_md5'] = time_md5
         form = get_index_form(time_md5)
 
-        r = redis.StrictRedis(host='localhost', port=6379, db=0)
+        r = init_redis()
         checkcode = "data:image/gif;base64,"+r.hget('checkcode',time_md5)
         return render.login(alert=zheng_alert, form=form, checkcode=checkcode)
 
@@ -148,7 +151,10 @@ class zheng:
         global allclients
         time_md5= get_time_md5()
         form = get_index_form(time_md5)
-        return render.zheng(alert=zheng_alert, form=form,time_md5=time_md5)
+
+        r = init_redis()
+        checkcode = "data:image/gif;base64,"+r.hget('checkcode',time_md5)
+        return render.zheng(alert=zheng_alert, form=form,check_code=checkcode)
 
     def POST(self):
 
