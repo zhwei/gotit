@@ -199,7 +199,7 @@ a:hover {
 
 @media screen and (min-width: 76em) {
   .nav-collapse { width: 18em }
-  .main { width: auto; left: 18em }
+  .main { width: auto; left: 18em ;}
 }
 
 /*responsive table  author zhwei*/
@@ -242,6 +242,17 @@ a:hover {
   border-right: 1px solid #ddd;
 
 }
+
+.auto-over-x {
+  overflow-x:auto;
+}
+.auto-over-y {
+  overflow-y:auto;
+}
+
+
+
+
 .a a {
   color: #08c;
   text-decoration: none;
@@ -401,6 +412,7 @@ a:hover {
 
 /* 横向放置的手机及分辨率更小的设备 */
 @media (max-width: 480px) {
+
   .score-table tbody th:nth-of-type(1),
   .score-table tbody tr td:nth-of-type(1),
   .score-table tbody th:nth-of-type(2),
@@ -432,7 +444,11 @@ a:hover {
   }
   .score-table tbody th:nth-of-type(6),
   .score-table tbody tr td:nth-of-type(6){
-    width: 220px;
+    width: 200px;
+  }
+  .score-table tbody th:nth-of-type(10),
+  .score-table tbody tr td:nth-of-type(10){
+    width: 36px;
   }
   .cet-old-table tbody th:nth-of-type(1),
   .cet-old-table tbody tr td:nth-of-type(1),
