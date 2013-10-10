@@ -24,7 +24,7 @@ from addons.config import index_cache, debug_mode, zheng_alert
 from addons.zf_cache import get_time_md5, cache_zf_start, zf_login, \
     find_login, just_check, get_count, get_client_num, get_enumer_num
 
-from addons.tools import zf_result, score_result, init_redis
+from addons.tools import init_redis
 
 from addons.RedisStore import RedisStore
 
@@ -46,7 +46,6 @@ application = app.wsgifunc()
 
 
 # session settings
-
 if web.config.get('_session') is None:
     session = web.session.Session(app, RedisStore(), {'count': 0, 'logged_in':False})
     web.config._session = session
@@ -60,18 +59,11 @@ web.config.session_parameters['ignore_expiry'] = True
 web.config.session_parameters['ignore_change_ip'] = True
 web.config.session_parameters['secret_key'] = 'wqerjkhbasdfhsdakyarweqr'
 web.config.session_parameters['expired_message'] = '您需要重新登录！'
-
-
 # end sessions
+
 
 render = render_jinja('templates', encoding='utf-8', globals={'context':session})
 
-class old_index:
-    '''
-    索引页面
-    '''
-    def GET(self):
-        return render.old_index(alert=zheng_alert)
 
 class index:
     '''
@@ -137,58 +129,18 @@ class succeed:
         except KeyError:
             return render.key_error()
 
-        gpa=get_gpa(xh)
-
+        gpa=get_gpa(xh) 
         session['name']=gpa['name']
 
         return render.succeed(gpa=gpa)
 
 class logout:
+    """
+    登出
+    """
     def GET(self):
-
         session.kill()
         raise web.seeother('/')
-
-class zheng:
-    '''
-    正方教务系统登录，成绩、课表、考试时间查询
-    '''
-    def GET(self):
-
-        global allclients
-
-        time_md5= get_time_md5()
-        session['time_md5']=time_md5
-
-        form = get_index_form(time_md5)
-
-        r = init_redis()
-        checkcode = "data:image/gif;base64,"+r.hget('checkcode',time_md5)
-        return render.zheng(alert=zheng_alert, form=form,checkcode=checkcode)
-
-    def POST(self):
-
-        content = web.input()
-        t = content['type']
-
-        time_md5=session['time_md5']
-
-        try:
-            zf, ret = zf_login(content, time_md5)
-        except KeyError:
-            return render.key_error()
-
-        if ret.find('欢迎您') != -1:
-            pass
-        elif ret.find('密码错误') != -1:
-            return render.pw_error()
-
-        elif ret.find('验证码不正确') != -1:
-            return render.recg_error()
-        else:
-            return render.ufo_error()
-
-        return zf_result(t, zf, time_md5)
 
 
 
@@ -243,6 +195,67 @@ class more:
         else:
             error = "can not find your index table"
             return render.result(error=error)
+
+
+class old_index:
+    '''
+    旧的索引页面
+    /old
+    '''
+    def GET(self):
+        return render.old_index(alert=zheng_alert)
+
+class zheng:
+    '''
+    正方教务系统登录，成绩、课表、考试时间查询
+    旧页面
+    '''
+    def GET(self):
+
+        time_md5= get_time_md5()
+        session['time_md5']=time_md5
+
+        r = init_redis()
+        checkcode = "data:image/gif;base64,"+r.hget('checkcode',time_md5)
+
+        return render.zheng(alert=zheng_alert, checkcode=checkcode)
+
+    def POST(self):
+
+        content = web.input()
+        t = content['type']
+
+        time_md5=session['time_md5']
+
+        try:
+            zf, ret = zf_login(content, time_md5)
+        except KeyError:
+            return render.key_error()
+
+        if ret.find('欢迎您') != -1:
+            pass
+        elif ret.find('密码错误') != -1:
+            return render.pw_error()
+
+        elif ret.find('验证码不正确') != -1:
+            return render.recg_error()
+        else:
+            return render.ufo_error()
+
+        if t == "1":
+            table = zf.get_score()
+        elif t == "2":
+            table = zf.get_kaoshi()
+        elif t == "3":
+            table = zf.get_kebiao()
+        else:
+            return render.input_error()
+        if table:
+            return render.old_result(table=table)
+        else:
+            error = "can not find your index table"
+            return render.old_result(error=error)
+
 
 class cet:
     """

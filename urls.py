@@ -17,6 +17,7 @@ urls = (
     '/cet/old', 'cet_old',
     '/lib', 'lib',
     '/api', apis.apis,
+
     '/contact.html', 'contact',
     '/notice.html', 'notice',
     '/help/gpa.html', 'help_gpa',

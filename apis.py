@@ -22,8 +22,6 @@ urls = (
     '/gpa', 'api_gpa',
 )
 
-all_client = {}
-
 # api
 
 def json_err(content):
@@ -51,14 +49,17 @@ class api_kb:
         return json_object
 
 
+from addons.tools import init_redis
+from addons.zf_cache import get_time_md5, zf_login
 
 class api_zheng:
 
     def GET(self):
-        zf = ZF()
-        viewstate, time_md5 = zf.pre_login()
-        all_client[time_md5] = (zf, viewstate)
-        dic = {'time_md5': time_md5}
+
+        time_md5=get_time_md5()
+        r = init_redis()
+        checkcode = "data:image/gif;base64,"+r.hget('checkcode',time_md5)
+        dic = {'time_md5': time_md5, 'checkcode':checkcode}
         json_object = json.dumps(dic)
         return json_object
 
@@ -81,20 +82,19 @@ class api_zheng:
 
     def POST(self):
         data = web.input()
+
         self.xh, self.pw = data.xh, data.pw
         t, time_md5 = data.t, data.time_md5
-        verify = data.verify
 
         try:
 
-            value = all_client.pop(time_md5)
-            zf, viewstate = value
+            zf, ret = zf_login(data, time_md5)
+            #value = all_client.pop(time_md5)
+            #zf, viewstate = value
 
         except KeyError:
             return json_err("can not find target time_md5")
 
-        zf.set_user_info(self.xh, self.pw)
-        ret = zf.login(verify, viewstate)
 
         if ret.find('欢迎您') != -1:
             pass
