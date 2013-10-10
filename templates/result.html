@@ -34,13 +34,11 @@
   {% endif %}
 
   {% if score_table %}
-    <div class="auto-over-x">
       <table class="base-table score-table" id="all_score">
         {% for i in score_table %}
         {{i}}
         {% endfor %}
       </table>
-    </div>
   {% endif %}
 
   {% if table %}
@@ -56,11 +54,9 @@
   {% endif %}
 
   {% if cet_table %}
-  <div class="auto-over-x">
     <table  class="base-table cet-old-table">
       {{ cet_table }}
     </table>
-  </div>
   {% endif %}
 
   {% if just_table %}
@@ -82,11 +78,64 @@
 {% block foot %}
 
 <script type="text/javascript">
+
 var t = Number(window.location.href.slice(-1));
 var dic = ["back","score","time","seh","all","old-cet"]
 
 document.getElementById(dic[t]).className="active";
-
 </script>
+
+
+{% if score_table or cet_table %}
+  
+
+<script>
+if ($(document).width()<=640) {
+  // counts total number of td in a head so that we can can use it for label extraction
+  var head_col_count =  $('tbody th').size();
+  // loop which replaces td
+  for ( i=0; i <= head_col_count; i++ )  {
+    // head column label extraction
+    var head_col_label = $('th:nth-child('+ i +')').text();
+    // replaces td with <div class="column" data-label="label">
+    $('tr td:nth-child('+ i +')').replaceWith(
+      function(){
+        return $('<div class="column" data-label="'+ head_col_label +'">').append($(this).contents());
+      }
+    );
+  } 
+  // replaces table with <div class="table">
+  $('table').replaceWith(
+    function(){
+      return $('<div class="table">').append($(this).contents());
+    }
+  );  
+  // replaces thead with <div class="table-head">
+  $('tbody tr:nth-child(1)').replaceWith(
+    function(){
+      return $('<div class="table-head">').append($(this).contents());
+    }
+  );  
+  // replaces tr with <div class="row">
+  $('tr').replaceWith(
+    function(){
+      return $('<div class="row">').append($(this).contents());
+    }
+  );  
+  // replaces th with <div class="column">
+  $('th').replaceWith(
+    function(){
+      return $('<div class="column">').append($(this).contents());
+    }
+  );
+  $('tbody').replaceWith(
+    function(){
+      return $('<div class="table-body">').append($(this).contents());
+    }
+  );  
+  };
+</script>
+
+{% endif %}
 
 {% endblock %}

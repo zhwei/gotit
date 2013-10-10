@@ -1,11 +1,10 @@
-{% extends "base-search.html" %}
+{% extends "base-result.html" %}
 
 {% block content %}
 <br>
 <div>
   {% if jidian %}
-  <div class="auto-over-x">
-    <table class="base-table" >
+    <table class="table table-striped table-bordered table-condensed" >
       <tr>
         <th>
           <strong>平均学分绩点</strong>
@@ -22,38 +21,36 @@
   {% endif %}
 
   {% if score_table %}
-    <div class="auto-over-x">
-      <table class="base-table score-table" id="all_score">
-        {% for i in score_table %}
-        {{i}}
-        {% endfor %}
-      </table>
-    </div>
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-condensed">
+      {% for i in score_table %}
+      {{i}}
+      {% endfor %}
+    </table>
+  </div>
   {% endif %}
 
   {% if table %}
-    <div class="auto-over-x">
-
-      <table class="base-table">
-        {% for i in table %}
-        {{i}}
-        {% endfor %}
-      </table>
-
-    </div>
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-condensed">
+      {% for i in table %}
+      {{i}}
+      {% endfor %}
+    </table>
+  </div>
   {% endif %}
 
   {% if cet_table %}
-  <div class="auto-over-x">
-    <table  class="base-table cet-old-table">
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-condensed">
       {{ cet_table }}
     </table>
   </div>
   {% endif %}
 
   {% if just_table %}
-  <div class="auto-over-x">
-    <table  class="base-table cet-old-table">
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-condensed">
       {{ just_table }}
     </table>
   </div>

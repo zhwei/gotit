@@ -114,11 +114,13 @@ class login:
         elif ret.find('密码错误') != -1:
             return render.pw_error()
 
+
         elif ret.find('验证码不正确') != -1:
             return render.recg_error()
         else:
             return render.ufo_error()
         session.logged_in=True
+
         raise web.seeother('/succeed')
 
 class succeed:
@@ -152,8 +154,12 @@ class zheng:
     正方教务系统登录，成绩、课表、考试时间查询
     '''
     def GET(self):
+
         global allclients
+
         time_md5= get_time_md5()
+        session['time_md5']=time_md5
+
         form = get_index_form(time_md5)
 
         r = init_redis()
@@ -164,10 +170,11 @@ class zheng:
 
         content = web.input()
         t = content['type']
-        time_md5=content['time_md5']
+
+        time_md5=session['time_md5']
 
         try:
-            zf, ret = zf_login(content)
+            zf, ret = zf_login(content, time_md5)
         except KeyError:
             return render.key_error()
 
@@ -209,10 +216,33 @@ class more:
             # 往年cet
             table=get_old_cet(xh)
             return render.result(cet_table=table)
-        else:
-            # 正方相关的查询
-            return zf_result(t, zf, time_md5)
 
+        elif t == "1":
+            # 成绩
+            try:
+                table = zf.get_score()
+            except AttributeError:
+                return render.key_error()
+        elif t == "2":
+            # 考试时间
+            try:
+                table = zf.get_kaoshi()
+            except AttributeError:
+                return render.key_error()
+        elif t == "3":
+            # 课表
+            try:
+                table = zf.get_kebiao()
+            except AttributeError:
+                return render.key_error()
+        else:
+            return render.input_error()
+
+        if table:
+            return render.result(table=table)
+        else:
+            error = "can not find your index table"
+            return render.result(error=error)
 
 class cet:
     """
@@ -258,7 +288,7 @@ class cet_old:
         else:
             xh = form.d.xh
         table=get_old_cet(xh)
-        return render.result(cet_table=table)
+        return render.old_result(cet_table=table)
 
 class lib:
     '''
@@ -313,7 +343,12 @@ class score:
         else:
             xh = form.d.xh
 
-        return score_result(xh)
+        from addons import get_gpa, get_score
+
+        gpa=get_gpa(xh)
+        score=get_score(xh)
+
+        return render.old_result(score_table=score, jidian=gpa['ave_score'])
 
 
 

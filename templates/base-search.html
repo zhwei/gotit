@@ -48,7 +48,7 @@
     {% endblock %}
   </head>
 
-  <body class="bs-background">
+  <body>
 
     <nav class="navbar navbar-inverse navbar-fixed-top bs-navbar" role="navigation">
         <div class="navbar-header">
@@ -65,9 +65,17 @@
           <ul class="nav navbar-nav">
             <li><a href="/">首页</a></li>
             <li><a href="/score">绩点·成绩</a></li>
-            <li><a href="/cet">CET</a></li>
-            <li><a href="/notice.html">公告</a></li>
-            <li><a href="/contact.html">联系我们</a></li>
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">更多<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/lib">图书馆余书查询</a></li>
+                <li><a href="/cet">CET</a></li>
+                <li><a href="/cet/old">往年CET成绩</a></li>
+                <li class="divider"></li>
+                <li><a href="/notice.html">公告</a></li>
+                <li><a href="/contact.html">联系我们</a></li>
+              </ul>
+            </li>
             <li><a href="/comment.html">留言</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
