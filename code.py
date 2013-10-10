@@ -69,7 +69,7 @@ class index:
     '''
     new  索引页面
     '''
-    # @memorize(index_cache)
+    @memorize(index_cache)
     def GET(self):
         return render.index()
 
@@ -202,6 +202,7 @@ class old_index:
     旧的索引页面
     /old
     '''
+    @memorize(index_cache)
     def GET(self):
         return render.old_index(alert=zheng_alert)
 
@@ -262,7 +263,7 @@ class cet:
     四六级成绩查询
     """
 
-    # @memorize(index_cache)
+    @memorize(index_cache)
     def GET(self):
         form = cet_form()
         if config.baefetch:
@@ -289,6 +290,7 @@ class cet_old:
     """
     往年cet成绩查询
     """
+    @memorize(index_cache)
     def GET(self):
         form=xh_form
         title='往年四六级成绩'
@@ -307,6 +309,7 @@ class lib:
     '''
     图书馆相关
     '''
+    @memorize(index_cache)
     def GET(self):
         form=login_form
         title='图书馆借书查询'
@@ -344,7 +347,7 @@ class score:
     '''
     全部成绩
     '''
-    # @memorize(index_cache)
+    @memorize(index_cache)
     def GET(self):
         form = xh_form()
         return render.score(form=form)

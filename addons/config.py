@@ -6,7 +6,7 @@
 pwd = '/home/bak/apps/gotit/'
 
 ## 是否启用多线程加速（正方）
-zf_accelerate=False
+zf_accelerate=True
 
 
 ## 正方 说明/警告
@@ -27,6 +27,6 @@ cet_url = "http://www.chsi.com.cn/cet/query"
 # 是否使用bae查询
 baefetch = True
 # 查询页缓存时间(秒)
-index_cache = 0
+index_cache = 1000
 # 网站运行模式
-debug_mode = True
+debug_mode = False
