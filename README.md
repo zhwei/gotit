@@ -4,7 +4,6 @@ Got it
 
 [http://gotit.asia](http://gotit.asia)
 
-## 启动
 
 启动前需要启动`redis`
 
