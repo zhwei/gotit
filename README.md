@@ -4,7 +4,7 @@ Got it
 
 [http://gotit.asia](http://gotit.asia)
 
-### 这里是`gunicorn`分支
+启动前需要启动`redis`
 
 启动方式
 
