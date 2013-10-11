@@ -1,1 +1,0 @@
-kill `pgrep -f "python /home/group/zheng/code.py 7070"`

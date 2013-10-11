@@ -2,11 +2,15 @@
 *.out
 log/*
 addons/*.pyc
-tools.py
 dong.py
 test/*
-/static/pic/*
- 
+static/pic/*
+stop.sh
+restart.sh
+start.sh
+.idea/*
+sessions/*
+dump.rdb
 
 # C extensions
 *.so

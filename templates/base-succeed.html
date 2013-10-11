@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>
+      {% block title %}
+      {% endblock %} Gotit
+    </title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <link rel="stylesheet" href="/static/css/styles2.css">
+    <link rel="stylesheet" href="/static/css/responsive-nav.css">
+    <script src="/static/js/responsive-nav.min.js"></script>
+    <script src="/static/js/jquery.min.js"></script>  
+
+
+  </head>
+  <body>
+
+    <div role="navigation" id="foo" class="nav-collapse">
+      <ul>
+        {% block nav %}
+        {% endblock %}
+      </ul>
+    </div>
+
+    <div role="main" class="main">
+      <a href="#nav" class="nav-toggle">Menu</a>
+      <p class="intro">个人中心</p>
+      <div style="clear:both;"></div>
+      {% block content %}
+      {% endblock %}
+    </div>
+
+    <script>
+      var navigation = responsiveNav("foo", {customToggle: ".nav-toggle"});
+    </script>
+    {% block foot %}
+    {% endblock %}
+  </body>
+</html>

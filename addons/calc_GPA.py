@@ -5,28 +5,35 @@ import re
 import urllib
 import urllib2
 import logging
+import config
 class GPA:
     '''Calculator Grade Point Average'''
     __num = 0
     __table = None
     __ret = {}
+    page = None
 
     def __init__(self,num):
         GPA.__num = num
 
-    def __getscore_page(self):
+    def getscore_page(self):
         '''获取成绩页面'''
         param = urllib.urlencode({'post_xuehao':GPA.__num})
-        page = urllib2.urlopen(
-            url = 'http://210.44.176.116/cjcx/zcjcx_list.php',
-            data = param,
-            timeout=10
-            ).read().decode('utf-8')
-        return page
+        try:
+            self.page = urllib2.urlopen( url = config.score_url, data = param, timeout=5).read().decode('utf-8')
+        except urllib2.URLError:
+            return None
+
+    # 直接抓取表格内容并返回
+    def get_all_score(self):
+        page = self.page
+        patten = re.compile('<span class="style3">成绩信息</span>(.*?)</table>',re.M|re.S)  
+        return patten.findall(page)
+
 
     def __match_table(self):
         '''正则表达式获取完整表格'''
-        page = self.__getscore_page()
+        page = self.page
         patten = re.compile('<td scope="col" align=".*" valign="middle" nowrap>&nbsp;(.*)</td>')
         GPA.__table = patten.findall(page)
         return 0
@@ -189,12 +196,12 @@ class GPA:
 
 
 
-if __name__=='__main__':
-    num = raw_input("请输入你的学号: ")
-    gpa = GPA(num)
-    info = gpa.get_gpa()
-    if info == -1:
-        print "error"
-    else:
-        print "学号\t\t姓名\t\t专业\t\t班级\t\t学分基点\t总基点\t\t总学分\t至今未通过科目"
-        print "%s\t%s\t%s\t%s\t%s\t\t%s\t\t%s\t%d"%(info['id'],info['name'],info['major'],info['Class'],info['ave_score'],info['totle_score'],info['totle_credits'],len(info['not_accept']))
+#if __name__=='__main__':
+#    num = raw_input("请输入你的学号: ")
+#    gpa = GPA(num)
+#    info = gpa.get_gpa()
+#    if info == -1:
+#        print "error"
+#    else:
+#        print "学号\t\t姓名\t\t专业\t\t班级\t\t学分基点\t总基点\t\t总学分\t至今未通过科目"
+#        print "%s\t%s\t%s\t%s\t%s\t\t%s\t\t%s\t%d"%(info['id'],info['name'],info['major'],info['Class'],info['ave_score'],info['totle_score'],info['totle_credits'],len(info['not_accept']))

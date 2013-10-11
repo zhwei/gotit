@@ -1,0 +1,29 @@
+{% extends "base-new.html" %}
+
+{% block title %}我们为你Got it{% endblock %}
+
+
+{% block content %}
+
+
+
+<main class="bs-masthead" id="content" role="main">
+  <div class="container">
+    <h1>Let's Got it</h1>
+    <p class="lead">您的支持会让这个网站做到更好。</p>
+    <p class="lead">我们为你Gotit。</p>
+    <p>
+    {% if context.logged_in %}
+    <a href="/succeed" class="btn btn-outline-inverse btn-lg" >个人中心</a>
+    <a class="btn btn-line" href="/logout">注销</a>
+    {% else %}
+    <a href="/login" class="btn btn-outline-inverse btn-lg" >登录&nbsp;Gotit</a>
+    {% endif %}
+    <a href="/old" class="btn btn-outline-inverse btn-lg" >旧版</a>
+    </p>
+  </div>
+</main>
+
+
+
+{% endblock %}

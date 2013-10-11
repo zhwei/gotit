@@ -1,14 +1,21 @@
 #!/usr/bin/env python
 #coding=utf-8
+
+
+import os
 import re
 import urllib
 import urllib2
 import logging
 from time import ctime
 
+import config
+
+DIR = os.path.abspath(os.path.dirname(__file__))
+
 
 def get_proxy():
-    proxy_file = file("addons/proxy.txt")
+    proxy_file = file(DIR + "/proxy.txt")
     line = proxy_file.readlines()
     second = int(str(ctime())[-7:-5])
     proxy = line[second].strip()
@@ -20,15 +27,15 @@ class CET:
     def get_last_cet_score(self,num,name):
         '''从官方网站获取最新四六级成绩'''
         header = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6','Referer':'http://www.chsi.com.cn/cet/'}
-        url = 'http://www.chsi.com.cn/cet/query'
-        ####################################
+        url = config.cet_url
+
         proxy = get_proxy()
         proxy_support = urllib2.ProxyHandler({'http':proxy})
         opener = urllib2.build_opener(proxy_support,urllib2.HTTPHandler)
-        ####################################
+
         params = urllib.urlencode({'zkzh':num,'xm':name})
         req = urllib2.Request(url,data=params,headers= header)
-        page = opener.open(req).read().decode('utf-8')
+        page = opener.open(req).read()#.decode('utf-8')
         #page = urllib2.urlopen(req).read().decode('utf-8')
         #解析
         ret = {}
@@ -39,7 +46,7 @@ class CET:
             ret['write'] = re.findall('</span>(\d*)</strong></td>',page)[0]
             return ret
         except:
-            ret["error"] = u"请刷新!"
+            ret["error"] = u"暂无成绩"
             return ret
 
 
@@ -96,11 +103,12 @@ class CET:
 
     
 
-if __name__=='__main__':
-     num = raw_input("请输入你的学号: ")
-     cet = CET()
-     info =  cet.get_cet_dict(num)
-     for i in  range(info['total']):
-         print info['num'],info['name'],
-         print info['cet_num'][i],info['cet_time'][i],
-         print info['cet_type'][i],info['cet_score'][i]
+# if __name__=='__main__':
+#      num = raw_input("请输入你的学号: ")
+#      cet = CET()
+#      print  cet.get_cet_table(num)
+     # info =  cet.get_cet_dict(num)
+     # for i in  range(info['total']):
+     #     print info['num'],info['name'],
+     #     print info['cet_num'][i],info['cet_time'][i],
+     #     print info['cet_type'][i],info['cet_score'][i]

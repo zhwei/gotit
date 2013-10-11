@@ -1,0 +1,23 @@
+{% extends "base-search.html" %}
+{% block title %}成绩查询系统{% endblock %}
+
+{% block content %}
+    <center><h1>成绩查询系统</h1></center>
+    <hr>
+    <form name="main" method="post" accept-charset="utf-8" class="form-signin">
+      <div class="alert alert-success">
+      <p>本系统可查询全部学科成绩,包括第二专业和补考成绩以及平均学分绩点查询!</p>
+      </div>
+      {% if not form.valid %}
+        <p class="alert alert-danger">输入错误:</p>
+      {% endif %}
+      <tr>
+        <input type="text" id="xh" name="xh" class="form-control" placeholder="请输入学号" autofocus/>
+      <br>
+      <center>
+        <button type="submit" class="btn btn-primary">查询</button>&nbsp;
+        <button type="reset" class="btn">重置</button>
+      </center>
+    </form>
+  
+{% endblock %}

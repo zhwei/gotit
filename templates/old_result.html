@@ -1,0 +1,69 @@
+{% extends "base-result.html" %}
+
+{% block content %}
+<br>
+<div>
+  {% if jidian %}
+    <table class="table table-striped table-bordered table-condensed" >
+      <tr>
+        <th>
+          <strong>平均学分绩点</strong>
+        </th>
+        <td>
+          <strong>{{ jidian }}</strong>
+        </td>
+        <td>
+          <strong><a href="/help/gpa.html">绩点计算方法</a></strong>
+        </td>
+      </tr>
+    </table>
+  </div>  
+  {% endif %}
+
+  {% if score_table %}
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-condensed">
+      {% for i in score_table %}
+      {{i}}
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
+  {% if table %}
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-condensed">
+      {% for i in table %}
+      {{i}}
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
+  {% if cet_table %}
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-condensed">
+      {{ cet_table }}
+    </table>
+  </div>
+  {% endif %}
+
+  {% if just_table %}
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-condensed">
+      {{ just_table }}
+    </table>
+  </div>
+  {% endif %}
+
+  {% if error %}
+    <h2 id="error">{{ error }}</h2>
+  {% endif %}
+
+</div>
+
+{% endblock content %}
+
+{% block foot %}
+
+{% endblock %}

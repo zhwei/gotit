@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>
+      {% block title %}
+      {% endblock %}
+    </title>
+
+    {% include 'css.html' %}
+
+    <link rel="stylesheet" href="/static/css/docs.css" />
+
+    <style>
+      body{font-family:"ff-tisa-web-pro-1","ff-tisa-web-pro-2","Lucida Grande","Helvetica Neue",Helvetica,Arial,"Hiragino Sans GB","Hiragino Sans GB W3","WenQuanYi Micro Hei",sans-serif;}
+      h1, .h1, h2, .h2, h3, .h3, h4, .h4, .lead {font-family:"ff-tisa-web-pro-1","ff-tisa-web-pro-2","Lucida Grande","Helvetica Neue",Helvetica,Arial,"Hiragino Sans GB","Hiragino Sans GB W3","Microsoft YaHei UI","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;}
+      pre code { background: transparent; }
+    </style>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="./assets/js/html5shiv.js"></script>
+    <script src="./assets/js/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Favicons -->
+
+  </head>
+  <body class="bs-docs-home">
+    <a class="sr-only" href="#content">Skip navigation</a>
+
+    <!-- Docs master nav -->
+    <header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" role="banner">
+    <div class="container">
+      <div class="navbar-header">
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/" class="navbar-brand">Gotit</a>
+      </div>
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">更多<span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="/notice.html">公告</a></li>
+              <li><a href="/contact.html">联系我们</a></li>
+              <li class="divider"></li>
+              <li><a href="/what_you_need.html"><b>what you need?</b></a></li>
+            </ul>
+          </li>
+          <li>
+            <a href="/comment.html">留言</a>
+          </li>
+          <li>
+            <a href="/api">API</a>
+          </li>
+          <li>
+            <a href="/donate.html">赞助</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+        {% if context.logged_in %}
+          <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ context['name'] }}<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="/succeed">个人中心</a></li>
+              <li class="divider"></li>
+              <li><a href="/succeed">学分</a></li>
+              <li class="divider"></li>
+              <li><a href="/logout">注销</a></li>
+            </ul>
+          </li>
+        {% else %}
+          <li><a href="/login">登录</a></li>
+        {% endif %}
+        </ul>
+      </nav>
+    </div> <!-- container -->
+    </header>
+
+
+    <!-- Page content of course! -->
+
+    {% block content %}
+
+    {% endblock %}
+
+
+    <footer class="container" role="contentinfo">
+
+    <ul class="bs-masthead-links">
+      <li>
+        <a href="/api" target="_blank">APIs</a>
+      </li>
+      <li>
+        Power by <a href="http://webpy.org/" target="_blank">web.py</a>
+      </li>
+      <li>
+        <a href="http://python.org/" target="_blank">python</a>
+      </li>
+      <li>
+        <a href="http://sdutlinux.org" target="_blank">SLUG</a>
+      </li>
+      <li>
+        Author:&nbsp;<a href="http://zhwei.42qu.com" target="_blank">zhwei</a>
+      </li>
+      <li class="current-version">
+      当前版本：v2.5.1
+      </li>
+    </ul>
+    </footer>
+
+
+    {% include "js.html" %}
+
+    {% include 'analytics.html' %}
+
+    {% block foot %}
+
+    {% endblock %}
+
+  </body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>{% block title %}{% endblock %}</title>
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Got it,正方教务系统查询工具">
+    <meta name="author" content="zhwei">
+
+    <!-- Le styles -->
+    {% include "css.html" %}
+    <style type="text/css">
+      body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+      }
+      .form-signin {
+        max-width: 400px;
+        padding: 19px 29px 29px;
+        margin: 0 auto 20px;
+        background-color: #fff;
+        border: 1px solid #e5e5e5;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+        -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+        box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      }
+      .form-signin .form-signin-heading,
+      .form-signin .checkbox {
+        margin-bottom: 10px;
+      }
+      .form-signin input[type="text"],
+      .form-signin input[type="password"] {
+        font-size: 16px;
+        height: auto;
+        margin-bottom: 15px;
+        padding: 7px 9px;
+      }
+    </style>
+
+    {% block header %}
+
+    {% endblock %}
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top bs-navbar" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Gotit</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">首页</a></li>
+            <li><a href="/score">绩点·成绩</a></li>
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">更多<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/lib">图书馆余书查询</a></li>
+                <li><a href="/cet">CET</a></li>
+                <li><a href="/cet/old">往年CET成绩</a></li>
+                <li class="divider"></li>
+                <li><a href="/notice.html">公告</a></li>
+                <li><a href="/contact.html">联系我们</a></li>
+              </ul>
+            </li>
+            <li><a href="/comment.html">留言</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+          </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+
+    <div id="container" class= "container"><br>
+
+      {% block content %}
+
+      {% endblock %}
+
+
+
+      <div style="text-align:center; display:none;">
+        <script type="text/javascript">
+          document.write('<a style="display:none!important" id="tanx-a-mm_34979126_3463384_11269475"></a>');
+          tanx_s = document.createElement("script");
+          tanx_s.type = "text/javascript";
+          tanx_s.charset = "gbk";
+          tanx_s.id = "tanx-s-mm_34979126_3463384_11269475";
+          tanx_s.async = true;
+          tanx_s.src = "http://p.tanx.com/ex?i=mm_34979126_3463384_11269475";
+          tanx_h = document.getElementsByTagName("head")[0];
+          if(tanx_h)tanx_h.insertBefore(tanx_s,tanx_h.firstChild);
+          </script>
+        </div>
+
+      {% include "footer.html" %}
+
+      </div> <!-- /container -->
+      
+      {% include "js.html" %}
+
+      {% block foot %}
+         
+      {% endblock %} 
+
+      <!-- baidu sitecenter   -->
+      </body>
+    </html>

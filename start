@@ -1,1 +1,0 @@
-nohup python /home/group/zheng/code.py 7070 > /home/group/zheng/log/print.log&

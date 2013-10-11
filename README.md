@@ -1,31 +1,31 @@
 Got it
 =========
+校内信息查询平台  
 
-### sdut正方教务系统查询平台  
+[http://gotit.asia](http://gotit.asia)
 
-+ 现在已经将所有的功能函数转移到`addons`目录下,后续添加其他功能时,将功能封装成类放在`addons`中,从`code.py`中调用.  
-+ 日志全部放在`log`目录下,命名类似`zheng.log`.  
-+ 所有文档已放在`doc`目录下,欢迎各位添加新功能.
-+ 敏感信息文件注意修改`.gitignore`.
+启动前需要启动`redis`
 
-### 工程环境
-+ python  
-+ web.py  
+启动方式
+
+    gunicorn code:application
+
+测试启动
+
+    python test_run.py
+
+#### 依赖包
+
++ web.py
++ jinja2
++ redis
 
 
+#### install redis
 
 
+    $ wget http://download.redis.io/releases/redis-2.6.16.tar.gz
+    $ tar xzf redis-2.6.16.tar.gz
+    $ cd redis-2.6.16
+    $ make
 
-### 正方教务系统查询工具启动方式  
------------------------------------                                   
-	nohup python code.py 7070 & 
-
-	#然后可以  ctrl+c   中断,可在后台运行  
-
-### 停止方式  
--------------------------------------------                                           
-
-	kill `pgrep -f "python code.py 7070"`
-	
-
-### 修改时推荐在本地修改, 提交到dev分支  

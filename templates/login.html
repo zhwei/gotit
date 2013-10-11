@@ -1,0 +1,38 @@
+{% extends "base-new.html" %}
+
+{% block title %}
+登录
+{% endblock %}
+
+
+{% block content %}
+
+
+<main class="bs-masthead" id="content" role="main">
+
+<form name="main" method="post" accept-charset="utf-8" class="form-signin">
+  {% if alert %}
+  <div class="alert alert-info">
+    <p>{{ alert }}</p>
+  </div>
+  {% endif %}
+    <p>
+      <input type="text" id="xh" name="xh"  class="form-control" placeholder="学号" autofocus/>
+    </p>
+    <p><input type="password" id="pw" name="pw" class="form-control" placeholder="密码"/></p>
+    <p>
+      <input type="text" id="verify" name="verify" class="form-control" placeholder="验证码" style="width:50%; float:left;"/>
+      <img style="float:right;" class="img-thumbnail" src="{{ checkcode }}" alt=""/>
+    </p>
+    <br />
+    <br />
+    <br />
+
+    <button type="submit" class="btn btn-lg btn-primary btn-block">登录</button>&nbsp;
+
+</form>
+
+</main>
+
+
+{% endblock %}
