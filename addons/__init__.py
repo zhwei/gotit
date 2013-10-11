@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from addons.kb_json import KBJSON
 from addons.get_CET import CET
-from addons.lib import login, getbooklist_table
 from addons.calc_GPA import GPA
 from addons.get_all_score import ALL_SCORE
-
-from addons import config
+from addons.lib import login, getbooklist_table
 
 def get_old_cet(xh):
 
@@ -47,7 +46,10 @@ def get_score(xh):
 
     return score
 
+def get_kb_json(kb):
 
+    k = KBJSON(kb)
+    return k.get_json()
 
 
 

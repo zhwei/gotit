@@ -10,25 +10,24 @@ sys.setdefaultencoding('utf-8')
 
 import web
 from urllib2 import URLError
-
 from web.contrib.template import render_jinja
+
 
 # addons
 from addons import config
-from addons import get_old_cet, get_book, get_gpa, get_score
 from addons.get_CET import CET
-
+from addons.tools import init_redis
 from addons.autocache import memorize
-from addons.forms import xh_form, cet_form, get_index_form, login_form
+from addons.RedisStore import RedisStore
 from addons.config import index_cache, debug_mode, zheng_alert
+from addons import get_old_cet, get_book, get_gpa, get_score
+from addons.forms import xh_form, cet_form, get_index_form, login_form
 from addons.zf_cache import get_time_md5, cache_zf_start, zf_login, \
     find_login, just_check, get_count, get_client_num, get_enumer_num
 
-from addons.tools import init_redis
-
-from addons.RedisStore import RedisStore
 
 from urls import urls
+
 
 if config.zf_accelerate:
     # 缓存正方相关
@@ -69,7 +68,7 @@ class index:
     '''
     new  索引页面
     '''
-    @memorize(index_cache)
+    # @memorize(index_cache)
     def GET(self):
         return render.index()
 

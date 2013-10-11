@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 #coding=utf-8
+
+
+import os
 import re
 import urllib
 import urllib2
 import logging
 from time import ctime
-import os
+
 import config
+
 DIR = os.path.abspath(os.path.dirname(__file__))
 
 
