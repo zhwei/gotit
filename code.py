@@ -69,7 +69,7 @@ class index:
     '''
     new  索引页面
     '''
-    @memorize(index_cache)
+    #@memorize(index_cache)
     def GET(self):
         return render.index()
 
