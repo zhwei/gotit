@@ -35,6 +35,7 @@ urls = (
     '/comment.html', 'comment',
     '/donate.html', 'donate',
     '/root.txt', 'ttest',
+    '/status', 'status',
 )
 
 # render = web.template.render('./template/') # your templates
@@ -197,6 +198,11 @@ class cet:
             return render.result_dic(items=items, res=res)
 
 # contact us
+
+class status:
+
+    def GET(self):
+        return len(all_client.keys())
 
 
 class contact:

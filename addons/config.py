@@ -34,9 +34,9 @@ zheng_alert = ""
 # ---------------------------
 # 正方教务系统
 # 教务系统url,注意不要忘记最后的"/"
-zf_url = "http://210.44.176.133/"
+zf_url = "http://210.44.176.132/"
 # url中是否有随机字符串
-random = True
+random = False
 
 # 成绩查询网址
 score_url = "http://210.44.176.116/cjcx/zcjcx_list.php"
@@ -53,4 +53,4 @@ baefetch = True
 index_cache = 1000
 
 # 网站运行模式
-debug_mode = True
+debug_mode = False
