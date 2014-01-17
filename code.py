@@ -18,9 +18,12 @@ from addons.get_all_score import ALL_SCORE
 from addons.autocache import memorize
 from addons import config
 from addons.config import index_cache, debug_mode, sponsor, zheng_alert
+from addons.RedisStore import RedisStore
+
 web.config.debug = debug_mode
 
 import apis
+import manage
 
 
 urls = (
@@ -29,6 +32,7 @@ urls = (
     '/score', 'score',
     '/cet', 'cet',
     '/api', apis.apis,
+    '/manage', manage.manage,
     '/contact.html', 'contact',
     '/notice.html', 'notice',
     '/help/gpa.html', 'help_gpa',
@@ -37,22 +41,19 @@ urls = (
     '/root.txt', 'ttest',
 )
 
-# render = web.template.render('./template/') # your templates
-render = render_jinja('templates', encoding='utf-8')
-all_client = {}
+# main app
+app = web.application(urls, globals(),autoreload=False)
 
-# forms
-# def get_form(viewstate):
-#    info_form = form.Form(
-#        form.Textbox("number", description="学号:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Password("password", description="密码:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Textbox("verify", description="验证码:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Dropdown('Type',[('3', '本学期课表查询'),('1', '本学期成绩查询'), ('2', '考试时间查询'),('4', '平均学分绩点查询')],description="查询类型:",pre="&nbsp;&nbsp;"),
-#        form.Hidden('viewstate',value=viewstate),
-#        validators = [
-#            form.Validator('输入不合理!', lambda i:int(i.number) > 9)]
-#        )
-#    return info_form()
+
+if web.config.get('_session') is None:
+    session = web.session.Session(app, RedisStore(), {'count': 0})
+    web.config._session = session
+else:
+    session = web.config._session
+
+render = render_jinja('templates', encoding='utf-8', globals={'context':session})
+
+all_client = {}
 
 cet_form = form.Form(
     form.Textbox(
@@ -109,8 +110,11 @@ class zheng:
         zf = ZF()
         viewstate, time_md5 = zf.pre_login()
         all_client[time_md5] = (zf, viewstate)
-        form = get_index_form(time_md5)
-        return render.zheng(alert=zheng_alert, form=form)
+        #form = get_index_form(time_md5)
+        from addons.utils import init_redis
+        r = init_redis()
+        checkcode = "data:image/gif;base64,"+r.get('CheckCode_'+time_md5)
+        return render.zheng(alert=zheng_alert, checkcode=checkcode)
 
     def POST(self):
         content = web.input()
@@ -280,8 +284,13 @@ class ttest:
         return render.root()
 
 
-# for gunicorn
-application = web.application(urls, globals(), autoreload=False).wsgifunc()
 
-# just for test
-app = web.application(urls, globals(),autoreload=False)
+
+def session_hook():
+    """ share session with sub apps
+    """
+    web.ctx.session = session
+app.add_processor(web.loadhook(session_hook))
+
+# for gunicorn
+application = app.wsgifunc()

@@ -6,8 +6,9 @@ import urllib2
 import re
 from BeautifulSoup import BeautifulSoup
 import config
-#import os
-from image import process_image
+
+from utils import init_redis
+from image import process_image_string
 
 
 #def get_viewstate
@@ -56,21 +57,17 @@ class ZF():
         all = com.findall(page)
         __VIEWSTATE =  all[0]
         self.VIEWSTATE = __VIEWSTATE
-        #print __VIEWSTATE
+
         # get CheckCode.aspx
         req = urllib2.Request(self.code_url,headers = self.headers)
-        a = self.opener.open(req).read()
+        image_content = self.opener.open(req).read()
         import time
         import md5
         time_md5 = md5.md5(str(time.time())).hexdigest()
-        pic_name = time_md5 + ".gif"
-        filename = 'static/pic/' + pic_name
-        fi = file(filename,'wb')
-        fi.write(a)
-        fi.close()
-        process_image(filename)
+        image_content=process_image_string(image_content)
+        redis_server = init_redis()
+        redis_server.setex('CheckCode_'+time_md5, 100,image_content.encode('base64').replace('\n',''))
         return __VIEWSTATE, time_md5
-
 
     def login(self, yanzhengma, VIEWSTATE):
         yanzhengma = yanzhengma.decode("utf-8").encode("gb2312")
