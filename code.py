@@ -13,7 +13,7 @@ from web.contrib.template import render_jinja
 # addons
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
-from addons.zfr import ZF#, get_json
+from addons.zfr import ZF, Login
 from addons.get_all_score import ALL_SCORE
 from addons.autocache import memorize
 from addons import config
@@ -93,13 +93,11 @@ class zheng:
     def GET(self):
 
         zf = ZF()
-        viewstate, time_md5 = zf.pre_login()
-        all_client[time_md5] = (zf, viewstate)
-
+        time_md5 = zf.pre_login()
         session.time_md5 = time_md5
 
         r = init_redis()
-        checkcode = "data:image/gif;base64,"+r.get('CheckCode_'+time_md5)
+        checkcode = r.hget(time_md5, 'checkcode')
 
         return render.zheng(alert=zheng_alert, checkcode=checkcode)
 
@@ -108,20 +106,22 @@ class zheng:
         self.xh = content['xh']
         self.pw = content['pw']
         t = content['type']
-        yanzhengma = content['verify']
+        yanzhengma = content['verify'].decode("utf-8").encode("gb2312")
         time_md5 = session.time_md5
 
-        try:
-            for i in all_client:
-                print all_client[i]
-            value = all_client.pop(time_md5)
-            zf = value[0]
-            viewstate = value[1]
-        except KeyError:
-            return render.key_error()
+        #try:
+        #    value = all_client.pop(time_md5)
+        #    zf = value[0]
+        #    viewstate = value[1]
+        #except KeyError:
+        #    return render.key_error()
 
-        zf.set_user_info(self.xh, self.pw)
-        ret = zf.login(yanzhengma, viewstate)
+        zf = Login(time_md5, self.xh, self.pw, yanzhengma)
+        ret = zf.text
+
+        #zf.set_user_info(self.xh, self.pw)
+        #ret = zf.login(yanzhengma, viewstate)
+
         if ret.find('欢迎您') != -1:
             pass
         elif ret.find('密码错误') != -1:

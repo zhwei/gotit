@@ -2,7 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import re
-#import os
+import base64
+
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 import requests
 from BeautifulSoup import BeautifulSoup
@@ -15,15 +20,15 @@ from image import process_image_string
 
 class ZF:
 
-    def get_random(self):
-        with_random_url = requests.get(config.zf_url).url
-        random = with_random_url.split('/')[-2]
-        return random
+    #def get_random(self):
+    #    return random
 
     def __init__(self):
 
         if config.random:
-            self.base_url=config.zf_url+self.get_random()+'/'
+            with_random_url = requests.get(config.zf_url).url
+            _random = with_random_url.split('/')[-2]
+            self.base_url=config.zf_url+_random+'/'
         else:
             self.base_url = config.zf_url
         self.login_url = self.base_url + "Default2.aspx"
@@ -36,11 +41,6 @@ class ZF:
                 'Connection':'Keep-Alive'
                 }
 
-    def set_user_info(self,xh,pw):
-        self.xh = xh
-        self.pw = pw
-
-
     def pre_login(self):
 
         # get __VIEWSTATE
@@ -51,37 +51,77 @@ class ZF:
 
         # get checkcode
         _req1 = requests.get(self.code_url, cookies=_req.cookies, headers=self.headers)
-        self.cookies = _req1.cookies
-        image_content = _req1.content
 
         import time
         import md5
-        time_md5 = md5.md5(str(time.time())).hexdigest()
+        image_content = _req1.content
+        time_md5 = 'user_'+md5.md5(str(time.time())).hexdigest()
         image_content=process_image_string(image_content)
-        base64 = image_content.encode('base64').replace('\n','')
+        base64_image="data:image/gif;base64,"+image_content.encode('base64').replace('\n','')
 
-        redis_server = init_redis()
-        redis_server.setex('CheckCode_'+time_md5, 100,base64)
-        return self.VIEWSTATE, time_md5
+        rds= init_redis()
+
+        rds.hset(time_md5, 'checkcode', base64_image)
+        rds.hset(time_md5, 'base_url', self.base_url)
+        rds.hset(time_md5, 'viewstate', self.VIEWSTATE)
+
+        pickled = pickle.dumps(_req1.cookies)
+        rds.hset(time_md5, 'cookies', base64.encodestring(pickled))
+
+        rds.pexpire(time_md5, 200000) # expire milliseconds
+
+        return time_md5
 
 
-    def login(self, yanzhengma, VIEWSTATE):
+class Login:
 
-        yanzhengma = yanzhengma.decode("utf-8").encode("gb2312")
+    def __init__(self, time_md5, xh, pw, yanzhengma):
+
+        # init datas
+        rds= init_redis()
+
+        self.base_url = rds.hget(time_md5, 'base_url')
+        self.viewstate = rds.hget(time_md5, 'viewstate')
+
+        pickled = base64.decodestring(rds.hget(time_md5, 'cookies'))
+        self.cookies = pickle.loads(pickled)
+
+        self.yanzhengma = yanzhengma
+        self.xh = xh
+        self.pw = pw
+
+        # process links
+        self.login_url = self.base_url + "Default2.aspx"
+        self.code_url = self.base_url + 'CheckCode.aspx'
+
+        self.headers = {
+                'Referer':self.base_url,
+                'Host':self.base_url[7:21],
+                'User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686;\
+                        rv:18.0) Gecko/20100101 Firefox/18.0",
+                'Connection':'Keep-Alive'
+                }
+
+
+        # init post data
         data = {
             'Button1':'',
             'RadioButtonList1':"学生",
             "TextBox1":self.xh,
             'TextBox2':self.pw,
-            'TextBox3':yanzhengma,
-            '__VIEWSTATE':VIEWSTATE,
+            'TextBox3':self.yanzhengma,
+            '__VIEWSTATE':self.viewstate,
             'lbLanguage':'',
         }
 
-        _req = requests.post(url=self.login_url, data=data, cookies=self.cookies, headers=self.headers)
-        ret = _req.text
+        _req = requests.post(url=self.login_url, 
+                data=data,
+                cookies=self.cookies,
+                headers=self.headers)
 
-        return ret
+        self.cookies = _req.cookies
+        # succ page content(unicode)
+        self.text = _req.text
 
 
 
@@ -90,7 +130,7 @@ class ZF:
         仅用来抓取目的网页
         """
         url = self.base_url + search_item + ".aspx?xh=" + self.xh
-        _req = requests.get(url = url, headers = self.headers)
+        _req = requests.get(url = url, cookies=self.cookies, headers = self.headers)
         return _req.text
 
     def get_score(self):
