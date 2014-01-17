@@ -13,12 +13,13 @@ from web.contrib.template import render_jinja
 # addons
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
-from addons.zf import ZF#, get_json
+from addons.zfr import ZF#, get_json
 from addons.get_all_score import ALL_SCORE
 from addons.autocache import memorize
 from addons import config
 from addons.config import index_cache, debug_mode, sponsor, zheng_alert
 from addons.RedisStore import RedisStore
+from addons.utils import init_redis
 
 web.config.debug = debug_mode
 
@@ -78,24 +79,7 @@ xh_form = form.Form(
 )
 
 
-def get_index_form(time_md5):
-    index_form = '\
-            <table><tr><th><label for="xh">学号:</label></th><td>&nbsp;&nbsp;<input type="text" id="xh" name="xh" class="span3"/></td></tr>\
-            <tr><th><label for="pw">密码:</label></th><td>&nbsp;&nbsp;<input type="password" id="pw" name="pw" class="span3"/></td></tr>\
-            <tr><th><label for="number">验证码:</label></th>\
-            <td>&nbsp;&nbsp;<span><input type="text" id="verify" name="verify"/></span>&nbsp;<span><img style="position:absolute;" src="/static/pic/%s.gif" alt="" height="35" width="92"/></span></td>\
-                <td></td>\
-                </tr>\
-            <tr><th><tr><th><label for="Type">查询类型:</label></th><td>&nbsp;&nbsp;<select id="type" name="type">\
-                <option value="1">成绩查询</option>\
-                <option value="2">考试时间查询</option>\
-                <option value="3">课表查询</option></select></td></tr>\
-            <input type="hidden" value="%s" name="time_md5"/></table>' % (time_md5, time_md5)
-    return index_form
-
 # 首页索引页
-
-
 class index:
 
     @memorize(index_cache)
@@ -107,13 +91,16 @@ class index:
 class zheng:
 
     def GET(self):
+
         zf = ZF()
         viewstate, time_md5 = zf.pre_login()
         all_client[time_md5] = (zf, viewstate)
-        #form = get_index_form(time_md5)
-        from addons.utils import init_redis
+
+        session.time_md5 = time_md5
+
         r = init_redis()
         checkcode = "data:image/gif;base64,"+r.get('CheckCode_'+time_md5)
+
         return render.zheng(alert=zheng_alert, checkcode=checkcode)
 
     def POST(self):
@@ -122,9 +109,11 @@ class zheng:
         self.pw = content['pw']
         t = content['type']
         yanzhengma = content['verify']
-        time_md5 = content['time_md5']
+        time_md5 = session.time_md5
 
         try:
+            for i in all_client:
+                print all_client[i]
             value = all_client.pop(time_md5)
             zf = value[0]
             viewstate = value[1]
@@ -160,7 +149,6 @@ class zheng:
             return render.result(table=table, error=error)
 
 # cet
-
 
 class cet:
 
