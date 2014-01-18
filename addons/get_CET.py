@@ -97,13 +97,11 @@ class CET:
         ret['cet_score']=cet_score
         return ret
 
-    
-
-if __name__=='__main__':
-     num = raw_input("请输入你的学号: ")
-     cet = CET()
-     info =  cet.get_cet_dict(num)
-     for i in  range(info['total']):
-         print info['num'],info['name'],
-         print info['cet_num'][i],info['cet_time'][i],
-         print info['cet_type'][i],info['cet_score'][i]
+#if __name__=='__main__':
+#     num = raw_input("请输入你的学号: ")
+#     cet = CET()
+#     info =  cet.get_cet_dict(num)
+#     for i in  range(info['total']):
+#         print info['num'],info['name'],
+#         print info['cet_num'][i],info['cet_time'][i],
+#         print info['cet_type'][i],info['cet_score'][i]

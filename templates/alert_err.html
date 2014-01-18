@@ -1,4 +1,9 @@
 {% extends "base-search.html" %}
+
+{% block title %}
+  {{ error }}
+{% endblock %}
+
 {% block content %}
-<script type="text/javascript">alert("{{ error }}");top.location="{{ url }}"</script>
+  <script type="text/javascript">alert("{{ error }}");top.location="{{ url }}"</script>
 {% endblock %}

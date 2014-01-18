@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# 使用requests替换原来的urllib和urllib2
+#
+# 将每个用户的cookies缓存在redis中，
+# 替换以前的将对象保存在内存中
+#
 
 import re
 import base64
@@ -13,15 +19,12 @@ import requests
 from BeautifulSoup import BeautifulSoup
 
 import config
-from utils import init_redis
+from utils import init_redis, not_error_page
 from image import process_image_string
-
+from errors import PageError
 
 
 class ZF:
-
-    #def get_random(self):
-    #    return random
 
     def __init__(self):
 
@@ -59,41 +62,44 @@ class ZF:
         image_content=process_image_string(image_content)
         base64_image="data:image/gif;base64,"+image_content.encode('base64').replace('\n','')
 
+        # store in redis
         rds= init_redis()
-
         rds.hset(time_md5, 'checkcode', base64_image)
         rds.hset(time_md5, 'base_url', self.base_url)
         rds.hset(time_md5, 'viewstate', self.VIEWSTATE)
 
+        # pickle cookies
         pickled = pickle.dumps(_req1.cookies)
         rds.hset(time_md5, 'cookies', base64.encodestring(pickled))
 
-        rds.pexpire(time_md5, 200000) # expire milliseconds
+        # set expire time(milliseconds)
+        rds.pexpire(time_md5, 200000)
 
         return time_md5
 
 
 class Login:
 
-    def __init__(self, time_md5, xh, pw, yanzhengma):
+    def init_from_form(self, time_md5, post_content):
 
+        self.xh = post_content['xh']
+        self.pw = post_content['pw']
+        self.time_md5 = time_md5
+        self.verify = post_content['verify'].decode("utf-8").encode("gb2312")
+
+    def init_from_redis(self):
         # init datas
         rds= init_redis()
-
-        self.base_url = rds.hget(time_md5, 'base_url')
-        self.viewstate = rds.hget(time_md5, 'viewstate')
-
-        pickled = base64.decodestring(rds.hget(time_md5, 'cookies'))
+        self.base_url = rds.hget(self.time_md5, 'base_url')
+        self.viewstate = rds.hget(self.time_md5, 'viewstate')
+        pickled = base64.decodestring(rds.hget(self.time_md5, 'cookies'))
         self.cookies = pickle.loads(pickled)
+        rds.pexpire(self.time_md5, 200000) # 延时
 
-        self.yanzhengma = yanzhengma
-        self.xh = xh
-        self.pw = pw
-
+    def process_links(self):
         # process links
         self.login_url = self.base_url + "Default2.aspx"
         self.code_url = self.base_url + 'CheckCode.aspx'
-
         self.headers = {
                 'Referer':self.base_url,
                 'Host':self.base_url[7:21],
@@ -102,6 +108,11 @@ class Login:
                 'Connection':'Keep-Alive'
                 }
 
+    def login(self, time_md5, post_content):
+
+        self.init_from_form(time_md5, post_content)
+        self.init_from_redis()
+        self.process_links()
 
         # init post data
         data = {
@@ -109,20 +120,31 @@ class Login:
             'RadioButtonList1':"学生",
             "TextBox1":self.xh,
             'TextBox2':self.pw,
-            'TextBox3':self.yanzhengma,
+            'TextBox3':self.verify,
             '__VIEWSTATE':self.viewstate,
             'lbLanguage':'',
         }
 
-        _req = requests.post(url=self.login_url, 
+        _req = requests.post(
+                url=self.login_url,
                 data=data,
                 cookies=self.cookies,
                 headers=self.headers)
 
         self.cookies = _req.cookies
-        # succ page content(unicode)
-        self.text = _req.text
 
+        not_error_page(_req.text)
+
+
+    def init_after_login(self, time_md5, xh):
+        """初始化二次查找需要的数据
+        用户已经登录，从redis中获取cookies等数据
+        进行第二次抓取
+        """
+        self.xh = xh
+        self.time_md5=time_md5
+        self.init_from_redis()
+        self.process_links()
 
 
     def get_html(self, search_item):
@@ -131,7 +153,16 @@ class Login:
         """
         url = self.base_url + search_item + ".aspx?xh=" + self.xh
         _req = requests.get(url = url, cookies=self.cookies, headers = self.headers)
+
+        not_error_page(_req.text)
+
         return _req.text
+
+    #self.content_dict = {
+    #        'xscjcx_dq':'DataGrid1',  # 成绩
+    #        'xskbcx':'Table1',        # 课表
+    #        'xskscx':'DataGrid1',     # 考试时间
+    #        }
 
     def get_score(self):
         """

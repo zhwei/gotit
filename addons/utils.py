@@ -2,11 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import os
-import redis
 import logging
 import logging.handlers
 
+import redis
+
 import config
+from errors import PageError
+from addons.calc_GPA import GPA
+from addons.get_all_score import ALL_SCORE
 
 
 LEVELS = {
@@ -54,3 +58,25 @@ def init_log(log_name, level_name="error", fi=True):
 def init_redis():
     redis_server = redis.StrictRedis(host='localhost', port=6379, db=0)
     return redis_server
+
+
+def not_error_page(page):
+    """检查页面
+    检查页面是否有弹窗警告
+    """
+    import re
+    res = ">alert\(\'(.+)\'\)\;"
+    _m = re.search(res, page)
+    if _m:
+        raise PageError(_m.group(1))
+        #return _m.group(1)
+    return True
+
+def get_score_jidi(xh):
+
+    a = ALL_SCORE()
+    score = a.get_all_score(xh)
+    gpa = GPA(xh)
+    gpa.getscore_page()
+    jidi = gpa.get_gpa()["ave_score"]
+    return score, jidi
