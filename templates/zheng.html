@@ -2,9 +2,10 @@
 {% block title %}Got it--正方教务系统查询工具{% endblock %}
 
 {% block content %}
+
 <center><h1>正方教务系统查询工具</h1></center>
 <hr>
-<form name="main" method="post" accept-charset="utf-8" class="form-signin">
+<form name="main" method="post" accept-charset="utf-8" class="form-horizontal form-signin ">
   {% if alert %}
   <div class="alert alert-info">
     <p>{{ alert }}</p>
@@ -12,12 +13,44 @@
   {% endif %}
   <br>
 
-  {{ form }}
-
-  <center>
-    <button type="submit" class="btn btn-primary">查询</button>&nbsp;
-    <button type="reset" class="btn">重置</button>
-  </center>
+<table>
+  <tr>
+    <th>
+      <label for="xh">学号:</label>
+    </th>
+    <td><input type="text" id="xh" name="xh" class="span3"/></td>
+  </tr>
+  <tr>
+    <th><label for="pw">密码:</label></th>
+    <td><input type="password" id="pw" name="pw" class="span3"/></td>
+  </tr>
+  <tr>
+    <th><label for="number">验证码:</label></th>
+    <td><span><input type="text" id="verify" name="verify" style="width:50%; float:left;"/></span>&nbsp;
+      <span><img style="position:absolute; float:right;" src="{{ checkcode }}"/></span>
+    </td>
+  
+  </tr>
+  <tr>
+    <th>
+      <label for="Type">查询类型:</label>
+    </th>
+    <td>
+      <select id="type" name="type" class="span3">
+            <option value="1">成绩查询</option>
+            <option value="2">考试时间查询</option>
+            <option value="3">课表查询</option>
+      </select>
+    </td>
+  </tr>   
+</table>
+  <div class="clearfix"><br /></div>
+  <div class="control-group">
+    <center>
+      <button type="submit" class="btn btn-primary">查询</button>&nbsp;
+      <button type="reset" class="btn">重置</button>
+    </center>
+  </div>
 </form>
 
 {% endblock %}

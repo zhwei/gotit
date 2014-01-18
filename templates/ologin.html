@@ -1,0 +1,24 @@
+{% extends 'base-index.html' %}
+{% block title %}我们为你Got it{% endblock %}
+
+{% block nav %}
+<li class="active"><a href="/">首页</a></li>
+<li><a href="/notice.html">公告</a></li>
+<li><a href="/comment.html">留言</a></li>
+<li><a href="/donate.html">赞助</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+  <a class="btn btn-large btn-success" href="{{ auth_url }}">微博登录</a>
+
+  {% if error %}
+  <div class="info">
+    <p>{{ error }}</p>
+  </div>
+  {% endif %}
+</div>
+
+<hr />
+
+{% endblock %}

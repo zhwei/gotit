@@ -13,14 +13,18 @@ from web.contrib.template import render_jinja
 # addons
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
-from addons.zf import ZF#, get_json
+from addons.zfr import ZF, Login
 from addons.get_all_score import ALL_SCORE
 from addons.autocache import memorize
 from addons import config
 from addons.config import index_cache, debug_mode, sponsor, zheng_alert
+from addons.RedisStore import RedisStore
+from addons.utils import init_redis
+
 web.config.debug = debug_mode
 
 import apis
+import manage
 
 
 urls = (
@@ -29,6 +33,7 @@ urls = (
     '/score', 'score',
     '/cet', 'cet',
     '/api', apis.apis,
+    '/manage', manage.manage,
     '/contact.html', 'contact',
     '/notice.html', 'notice',
     '/help/gpa.html', 'help_gpa',
@@ -38,23 +43,21 @@ urls = (
     '/status', 'status',
 )
 
-# render = web.template.render('./template/') # your templates
-render = render_jinja('templates', encoding='utf-8')
-all_client = {}
+# main app
+app = web.application(urls, globals(),autoreload=False)
+
+
+# session
+if web.config.get('_session') is None:
+    session = web.session.Session(app, RedisStore(), {'count': 0})
+    web.config._session = session
+else:
+    session = web.config._session
+
+# render templates
+render = render_jinja('templates', encoding='utf-8',globals={'context':session})
 
 # forms
-# def get_form(viewstate):
-#    info_form = form.Form(
-#        form.Textbox("number", description="学号:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Password("password", description="密码:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Textbox("verify", description="验证码:",class_="span3",pre="&nbsp;&nbsp;"),
-#        form.Dropdown('Type',[('3', '本学期课表查询'),('1', '本学期成绩查询'), ('2', '考试时间查询'),('4', '平均学分绩点查询')],description="查询类型:",pre="&nbsp;&nbsp;"),
-#        form.Hidden('viewstate',value=viewstate),
-#        validators = [
-#            form.Validator('输入不合理!', lambda i:int(i.number) > 9)]
-#        )
-#    return info_form()
-
 cet_form = form.Form(
     form.Textbox(
         "zkzh",
@@ -69,6 +72,7 @@ cet_form = form.Form(
     validators=[
         form.Validator('输入不合理!', lambda i:int(i.zkzh) != 15)]
 )
+
 xh_form = form.Form(
     form.Textbox(
         "xh",
@@ -78,24 +82,7 @@ xh_form = form.Form(
 )
 
 
-def get_index_form(time_md5):
-    index_form = '\
-            <table><tr><th><label for="xh">学号:</label></th><td>&nbsp;&nbsp;<input type="text" id="xh" name="xh" class="span3"/></td></tr>\
-            <tr><th><label for="pw">密码:</label></th><td>&nbsp;&nbsp;<input type="password" id="pw" name="pw" class="span3"/></td></tr>\
-            <tr><th><label for="number">验证码:</label></th>\
-            <td>&nbsp;&nbsp;<span><input type="text" id="verify" name="verify"/></span>&nbsp;<span><img style="position:absolute;" src="/static/pic/%s.gif" alt="" height="35" width="92"/></span></td>\
-                <td></td>\
-                </tr>\
-            <tr><th><tr><th><label for="Type">查询类型:</label></th><td>&nbsp;&nbsp;<select id="type" name="type">\
-                <option value="1">成绩查询</option>\
-                <option value="2">考试时间查询</option>\
-                <option value="3">课表查询</option></select></td></tr>\
-            <input type="hidden" value="%s" name="time_md5"/></table>' % (time_md5, time_md5)
-    return index_form
-
 # 首页索引页
-
-
 class index:
 
     @memorize(index_cache)
@@ -107,38 +94,37 @@ class index:
 class zheng:
 
     def GET(self):
+
         zf = ZF()
-        viewstate, time_md5 = zf.pre_login()
-        all_client[time_md5] = (zf, viewstate)
-        form = get_index_form(time_md5)
-        return render.zheng(alert=zheng_alert, form=form)
+        time_md5 = zf.pre_login()
+        session.time_md5 = time_md5
+
+        r = init_redis()
+        checkcode = r.hget(time_md5, 'checkcode')
+
+        return render.zheng(alert=zheng_alert, checkcode=checkcode)
 
     def POST(self):
         content = web.input()
         self.xh = content['xh']
         self.pw = content['pw']
         t = content['type']
-        yanzhengma = content['verify']
-        time_md5 = content['time_md5']
+        yanzhengma = content['verify'].decode("utf-8").encode("gb2312")
+        time_md5 = session.time_md5
 
-        try:
-            value = all_client.pop(time_md5)
-            zf = value[0]
-            viewstate = value[1]
-        except KeyError:
-            return render.key_error()
+        zf = Login(time_md5, self.xh, self.pw, yanzhengma)
+        ret = zf.text
 
-        zf.set_user_info(self.xh, self.pw)
-        ret = zf.login(yanzhengma, viewstate)
-        if ret.find('欢迎您') != -1:
-            pass
-        elif ret.find('密码错误') != -1:
-            return render.pw_error()
-
-        elif ret.find('验证码不正确') != -1:
-            return render.recg_error()
-        else:
-            return render.ufo_error()
+        # deal with errors
+        import re
+        #regs = (
+        #        "\<script language=\'javascript\' defer\>alert\(\'(.+)\'\)\;\<\/script\>",
+        #        "\<script\>alert\(\'(.+)\'\)\;\<\/script\>",
+        #        )
+        res = ">alert\(\'(.+)\'\)\;"
+        _m = re.search(res, ret)
+        if _m:
+            return render.alert_err(error=_m.group(1), url='/zheng')
 
         if t == "1":
             table = zf.get_score()
@@ -148,16 +134,14 @@ class zheng:
             table = zf.get_kebiao()
         else:
             return render.input_error()
+
         if table:
-            error = None
-            return render.result(table=table, error=error)
+            return render.result(table=table)
         else:
-            table = None
             error = "can not find your index table"
-            return render.result(table=table, error=error)
+            return render.result(error=error)
 
 # cet
-
 
 class cet:
 
@@ -286,8 +270,13 @@ class ttest:
         return render.root()
 
 
-# for gunicorn
-application = web.application(urls, globals(), autoreload=False).wsgifunc()
 
-# just for test
-app = web.application(urls, globals(),autoreload=False)
+
+def session_hook():
+    """ share session with sub apps
+    """
+    web.ctx.session = session
+app.add_processor(web.loadhook(session_hook))
+
+# for gunicorn
+application = app.wsgifunc()
