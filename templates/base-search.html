@@ -72,31 +72,18 @@
       </div>
     </div>
 
-    <div id="container" class= "container"><br>
+    <div id="container" class= "container-fluid"><br>
 
       {% block content %}
 
       {% endblock %}
 
-      <div style="text-align:center;">
-        <script type="text/javascript">
-          document.write('<a style="display:none!important" id="tanx-a-mm_34979126_3463384_11269475"></a>');
-          tanx_s = document.createElement("script");
-          tanx_s.type = "text/javascript";
-          tanx_s.charset = "gbk";
-          tanx_s.id = "tanx-s-mm_34979126_3463384_11269475";
-          tanx_s.async = true;
-          tanx_s.src = "http://p.tanx.com/ex?i=mm_34979126_3463384_11269475";
-          tanx_h = document.getElementsByTagName("head")[0];
-          if(tanx_h)tanx_h.insertBefore(tanx_s,tanx_h.firstChild);
-          </script>
-        </div>
 
         <hr>
         {% include "footer.html" %}
 
       </div> <!-- /container -->
-      
+
       {% include "js.html" %}
 
       <!-- baidu sitecenter   -->
