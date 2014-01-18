@@ -7,31 +7,33 @@ sys.setdefaultencoding('utf-8')
 
 
 import web
-from web import form
 from web.contrib.template import render_jinja
 
 # addons
-from addons.calc_GPA import GPA
+from addons import get_old_cet, get_book
 from addons.get_CET import CET
 from addons.zfr import ZF, Login
-from addons.get_all_score import ALL_SCORE
 from addons.autocache import memorize
 from addons import config
 from addons.config import index_cache, debug_mode, sponsor, zheng_alert
 from addons.RedisStore import RedisStore
-from addons.utils import init_redis
+from addons.utils import init_redis, get_score_jidi
+from addons.errors import PageError
 
 web.config.debug = debug_mode
 
 import apis
 import manage
-
+from forms import cet_form, xh_form, login_form
 
 urls = (
     '/', 'index',
     '/zheng', 'zheng',
+    '/more/(.+)', 'more',
     '/score', 'score',
     '/cet', 'cet',
+    '/cet/old', 'cet_old',
+    '/libr', 'libr',
     '/api', apis.apis,
     '/manage', manage.manage,
     '/contact.html', 'contact',
@@ -49,37 +51,13 @@ app = web.application(urls, globals(),autoreload=False)
 
 # session
 if web.config.get('_session') is None:
-    session = web.session.Session(app, RedisStore(), {'count': 0})
+    session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})
     web.config._session = session
 else:
     session = web.config._session
 
 # render templates
 render = render_jinja('templates', encoding='utf-8',globals={'context':session})
-
-# forms
-cet_form = form.Form(
-    form.Textbox(
-        "zkzh",
-        description="准考证号:",
-        class_="span3",
-        pre="&nbsp;&nbsp;"),
-    form.Textbox(
-        "name",
-        description="姓名:",
-        class_="span3",
-        pre="&nbsp;&nbsp;"),
-    validators=[
-        form.Validator('输入不合理!', lambda i:int(i.zkzh) != 15)]
-)
-
-xh_form = form.Form(
-    form.Textbox(
-        "xh",
-        description="学号:",
-        class_="span3",
-        pre="&nbsp;&nbsp;")
-)
 
 
 # 首页索引页
@@ -97,8 +75,9 @@ class zheng:
 
         zf = ZF()
         time_md5 = zf.pre_login()
-        session.time_md5 = time_md5
+        session['time_md5'] = time_md5
 
+        # get checkcode
         r = init_redis()
         checkcode = r.hget(time_md5, 'checkcode')
 
@@ -106,40 +85,53 @@ class zheng:
 
     def POST(self):
         content = web.input()
-        self.xh = content['xh']
-        self.pw = content['pw']
+        session['xh'] = content['xh']
         t = content['type']
-        yanzhengma = content['verify'].decode("utf-8").encode("gb2312")
         time_md5 = session.time_md5
 
-        zf = Login(time_md5, self.xh, self.pw, yanzhengma)
-        ret = zf.text
+        try:
+            zf = Login()
+            zf.login(time_md5, content)
+            __dic = {
+                    '1': zf.get_score,
+                    '2': zf.get_kaoshi,
+                    '3': zf.get_kebiao,
+                    }
+            if t not in __dic.keys():
+                return render.alert_err(error='输入不合理', url='/zheng')
+            return render.result(table=__dic[t]())
+        except PageError, e:
+            return render.alert_err(error=e.value, url='/zheng')
 
-        # deal with errors
-        import re
-        #regs = (
-        #        "\<script language=\'javascript\' defer\>alert\(\'(.+)\'\)\;\<\/script\>",
-        #        "\<script\>alert\(\'(.+)\'\)\;\<\/script\>",
-        #        )
-        res = ">alert\(\'(.+)\'\)\;"
-        _m = re.search(res, ret)
-        if _m:
-            return render.alert_err(error=_m.group(1), url='/zheng')
+class more:
+    """连续查询 二次查询
+    """
+    def GET(self, t):
+        if session['xh'] is False:
+            raise web.seeother('/zheng')
+        try:
+            __dic1 = { # need xh
+                    'oldcet':get_old_cet,
+                    }
+            if t in __dic1.keys():
+                return render.result(table=__dic1[t](session['xh']))
 
-        if t == "1":
-            table = zf.get_score()
-        elif t == "2":
-            table = zf.get_kaoshi()
-        elif t == "3":
-            table = zf.get_kebiao()
-        else:
-            return render.input_error()
+            elif t=='score':
+                score, jidi=get_score_jidi(session['xh'])
+                return render.result(table=score, jidian=jidi)
 
-        if table:
-            return render.result(table=table)
-        else:
-            error = "can not find your index table"
-            return render.result(error=error)
+            zf = Login()
+            __dic = { # just call
+                    'zheng': zf.get_score,
+                    'kaoshi': zf.get_kaoshi,
+                    'kebiao': zf.get_kebiao,
+                    }
+            if t in __dic.keys():
+                zf.init_after_login(session['time_md5'], session['xh'])
+                return render.result(table=__dic[t]())
+            raise web.notfound()
+        except (AttributeError, TypeError):
+            raise web.seeother('/zheng')
 
 # cet
 
@@ -162,31 +154,63 @@ class cet:
             zkzh = form.d.zkzh
             name = form.d.name
             name = name.encode('utf-8')
-            items = [
-                "学校",
-                "姓名",
-                "阅读",
-                "写作",
-                "综合",
-                "准考证号",
-                "考试时间",
-                "总分",
-                "考试类别",
-                "听力"]
+            items = ["学校","姓名","阅读", "写作", "综合",
+                    "准考证号", "考试时间", "总分", "考试类别",
+                    "听力"]
             cet = CET()
             res = cet.get_last_cet_score(zkzh, name)
-            # s = ""
-            # for i in res.keys():
-            #    s = "%s%s\n%s\n"%(s,i,res[i])
-            # return s
             return render.result_dic(items=items, res=res)
+
+
+class cet_old:
+    """
+    往年cet成绩查询
+    """
+    @memorize(index_cache)
+    def GET(self):
+        form=xh_form
+        title='往年四六级成绩'
+        return render.normal_form(title=title, form=form)
+    def POST(self):
+        form = xh_form()
+        title='往年四六级成绩'
+        if not form.validates():
+            return render.normal_form(title=title, form=form)
+        else:
+            xh = form.d.xh
+            session['xh']=xh
+        table=get_old_cet(xh)
+        return render.result(table=table)
+
+
+class libr:
+    """
+    图书馆相关
+    """
+    @memorize(index_cache)
+    def GET(self):
+        form=login_form
+        title='图书馆借书查询'
+        return render.normal_form(title=title, form=form)
+
+    def POST(self):
+        form=login_form()
+        title='图书馆借书查询'
+        if not form.validates():
+            return render.normal_form(title=title,form=form)
+        else:
+            xh, pw=form.d.xh, form.d.pw
+            session['xh']=xh
+        table=get_book(xh,pw)
+        return render.result(table=table)
+
 
 # contact us
 
 class status:
 
     def GET(self):
-        return len(all_client.keys())
+        return 'status'
 
 
 class contact:
@@ -220,19 +244,10 @@ class score:
             return render.score(form=form)
         else:
             xh = form.d.xh
-            a = ALL_SCORE()
-            table = a.get_all_score(xh)
-            gpa = GPA(xh)
-            gpa.getscore_page()
-            # table = gpa.get_all_score()
-            jidian = gpa.get_gpa()["ave_score"]
+            score, jidi=get_score_jidi(xh)
 
-            if table:
-                return render.result(table=table, jidian=jidian)
-            else:
-                table = None
-                error = "can not get your score"
-            return render.result(table=table, error=error)
+            return render.result(table=score, jidian=jidi)
+
             # else:
             #    return "成绩查询源出错,请稍后再试!"
 
@@ -246,7 +261,6 @@ class help_gpa:
         return render.help_gpa()
 
 # 评论页面, 使用多说评论
-
 
 class comment:
 
@@ -271,11 +285,23 @@ class ttest:
 
 
 
-
 def session_hook():
     """ share session with sub apps
     """
     web.ctx.session = session
+
+def notfound():
+    """404
+    """
+    return web.notfound(render.notfound())
+
+def internalerror():
+    """500
+    """
+    return web.internalerror(render.internalerror())
+
+app.notfound = notfound
+app.internalerror = internalerror
 app.add_processor(web.loadhook(session_hook))
 
 # for gunicorn
