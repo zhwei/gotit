@@ -46,16 +46,17 @@ urls = (
 app = web.application(urls, globals(),autoreload=False)
 
 
+# session
 if web.config.get('_session') is None:
     session = web.session.Session(app, RedisStore(), {'count': 0})
     web.config._session = session
 else:
     session = web.config._session
 
-render = render_jinja('templates', encoding='utf-8', globals={'context':session})
+# render templates
+render = render_jinja('templates', encoding='utf-8',globals={'context':session})
 
-all_client = {}
-
+# forms
 cet_form = form.Form(
     form.Textbox(
         "zkzh",
@@ -70,6 +71,7 @@ cet_form = form.Form(
     validators=[
         form.Validator('输入不合理!', lambda i:int(i.zkzh) != 15)]
 )
+
 xh_form = form.Form(
     form.Textbox(
         "xh",
@@ -109,28 +111,19 @@ class zheng:
         yanzhengma = content['verify'].decode("utf-8").encode("gb2312")
         time_md5 = session.time_md5
 
-        #try:
-        #    value = all_client.pop(time_md5)
-        #    zf = value[0]
-        #    viewstate = value[1]
-        #except KeyError:
-        #    return render.key_error()
-
         zf = Login(time_md5, self.xh, self.pw, yanzhengma)
         ret = zf.text
 
-        #zf.set_user_info(self.xh, self.pw)
-        #ret = zf.login(yanzhengma, viewstate)
-
-        if ret.find('欢迎您') != -1:
-            pass
-        elif ret.find('密码错误') != -1:
-            return render.pw_error()
-
-        elif ret.find('验证码不正确') != -1:
-            return render.recg_error()
-        else:
-            return render.ufo_error()
+        # deal with errors
+        import re
+        #regs = (
+        #        "\<script language=\'javascript\' defer\>alert\(\'(.+)\'\)\;\<\/script\>",
+        #        "\<script\>alert\(\'(.+)\'\)\;\<\/script\>",
+        #        )
+        res = ">alert\(\'(.+)\'\)\;"
+        _m = re.search(res, ret)
+        if _m:
+            return render.alert_err(error=_m.group(1), url='/zheng')
 
         if t == "1":
             table = zf.get_score()
@@ -140,13 +133,12 @@ class zheng:
             table = zf.get_kebiao()
         else:
             return render.input_error()
+
         if table:
-            error = None
-            return render.result(table=table, error=error)
+            return render.result(table=table)
         else:
-            table = None
             error = "can not find your index table"
-            return render.result(table=table, error=error)
+            return render.result(error=error)
 
 # cet
 
