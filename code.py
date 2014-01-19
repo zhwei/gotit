@@ -4,6 +4,7 @@
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
+import logging
 
 import web
 from web.contrib.template import render_jinja
@@ -15,7 +16,7 @@ from addons.autocache import memorize
 from addons import config
 from addons.config import index_cache, debug_mode, sponsor, zheng_alert
 from addons.RedisStore import RedisStore
-from addons.utils import init_redis, get_score_jidi, init_log
+from addons.utils import init_redis, get_score_jidi#, init_log
 from addons import errors
 
 
@@ -59,7 +60,7 @@ else:
 # render templates
 render = render_jinja('templates', encoding='utf-8',globals={'context':session})
 
-logger = init_log('code.py')
+#logger = init_log('code.py')
 
 # 首页索引页
 class index:
@@ -92,8 +93,8 @@ class zheng:
         t = content['type']
         try:
             time_md5 = session['time_md5']
-        except AttributeError, e:
-            logger.error(e+str(content))
+        except (AttributeError, KeyError), e:
+            logging.error(e+str(content))
             raise web.seeother('/zheng')
 
         try:
@@ -253,7 +254,10 @@ class score:
             return render.score(form=form)
         else:
             xh = form.d.xh
-            score, jidi=get_score_jidi(xh)
+            try:
+                score, jidi=get_score_jidi(xh)
+            except errors.PageError, e:
+                return render.alert_err(error=e.value)
 
             return render.result(table=score, jidian=jidi)
 
