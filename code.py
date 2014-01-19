@@ -15,8 +15,9 @@ from addons.autocache import memorize
 from addons import config
 from addons.config import index_cache, debug_mode, sponsor, zheng_alert
 from addons.RedisStore import RedisStore
-from addons.utils import init_redis, get_score_jidi
+from addons.utils import init_redis, get_score_jidi, init_log
 from addons import errors
+
 
 #import apis
 import manage
@@ -58,6 +59,8 @@ else:
 # render templates
 render = render_jinja('templates', encoding='utf-8',globals={'context':session})
 
+logger = init_log('code.py')
+
 # 首页索引页
 class index:
 
@@ -87,7 +90,11 @@ class zheng:
         content = web.input()
         session['xh'] = content['xh']
         t = content['type']
-        time_md5 = session.time_md5
+        try:
+            time_md5 = session['time_md5']
+        except AttributeError, e:
+            logger.error(e+str(content))
+            raise web.seeother('/zheng')
 
         try:
             zf = Login()
