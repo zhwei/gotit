@@ -89,13 +89,13 @@ class zheng:
 
     def POST(self):
         content = web.input()
-        session['xh'] = content['xh']
-        t = content['type']
         try:
+            session['xh'] = content['xh']
+            t = content['type']
             time_md5 = session['time_md5']
         except (AttributeError, KeyError), e:
-            logging.error(e+str(content))
-            raise web.seeother('/zheng')
+            logging.error(str(content))
+            return render.alert_err(error='请检查您是否禁用cookies', url='/zheng')
 
         try:
             zf = Login()
@@ -140,7 +140,7 @@ class more:
                 zf.init_after_login(session['time_md5'], session['xh'])
                 return render.result(table=__dic[t]())
             raise web.notfound()
-        except (AttributeError, TypeError):
+        except (AttributeError, TypeError, KeyError):
             raise web.seeother('/zheng')
 
 # cet
@@ -254,6 +254,7 @@ class score:
             return render.score(form=form)
         else:
             xh = form.d.xh
+            session['xh']=xh
             try:
                 score, jidi=get_score_jidi(xh)
             except errors.PageError, e:
