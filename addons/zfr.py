@@ -19,41 +19,63 @@ import requests
 from BeautifulSoup import BeautifulSoup
 
 import config
+import errors
 from utils import init_redis, not_error_page
 from image import process_image_string
-from errors import PageError
 
+
+def process_links(base_url):
+    # process links
+    login_url = base_url + "Default2.aspx"
+    code_url = base_url + 'CheckCode.aspx'
+    headers = {
+            'Referer':base_url,
+            'Host':base_url[7:21],
+            'User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686;\
+                    rv:18.0) Gecko/20100101 Firefox/18.0",
+            'Connection':'Keep-Alive'
+            }
+    return login_url, code_url, headers
+
+def safe_get(*args, **kwargs):
+    try:
+        _req = requests.get(*args, **kwargs)
+        not_error_page(_req.text)
+    except requests.ConnectionError:
+        raise errors.ZfError('无法连接到正方教务系统')
+    return _req
+
+def safe_post(*args, **kwargs):
+    try:
+        _req = requests.post(*args, **kwargs)
+        not_error_page(_req.text)
+    except requests.ConnectionError:
+        raise errors.ZfError('无法连接到正方教务系统')
+    return _req
 
 class ZF:
 
     def __init__(self):
 
         if config.random:
-            with_random_url = requests.get(config.zf_url).url
+            with_random_url = safe_get(config.zf_url).url
             _random = with_random_url.split('/')[-2]
             self.base_url=config.zf_url+_random+'/'
         else:
             self.base_url = config.zf_url
-        self.login_url = self.base_url + "Default2.aspx"
-        self.code_url = self.base_url + 'CheckCode.aspx'
-        self.headers = {
-                'Referer':self.base_url,
-                'Host':self.base_url[7:21],
-                'User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686;\
-                        rv:18.0) Gecko/20100101 Firefox/18.0",
-                'Connection':'Keep-Alive'
-                }
+
+        self.login_url, self.code_url, self.headers = process_links(self.base_url)
 
     def pre_login(self):
 
         # get __VIEWSTATE
-        _req = requests.get(self.base_url, headers=self.headers)
+        _req = safe_get(self.base_url, headers=self.headers)
         _content = _req.content
         com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
         self.VIEWSTATE = com.findall(_content)[0]
 
         # get checkcode
-        _req1 = requests.get(self.code_url, cookies=_req.cookies, headers=self.headers)
+        _req1 = safe_get(self.code_url, cookies=_req.cookies, headers=self.headers)
 
         import time
         import md5
@@ -96,23 +118,11 @@ class Login:
         self.cookies = pickle.loads(pickled)
         rds.pexpire(self.time_md5, 200000) # 延时
 
-    def process_links(self):
-        # process links
-        self.login_url = self.base_url + "Default2.aspx"
-        self.code_url = self.base_url + 'CheckCode.aspx'
-        self.headers = {
-                'Referer':self.base_url,
-                'Host':self.base_url[7:21],
-                'User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686;\
-                        rv:18.0) Gecko/20100101 Firefox/18.0",
-                'Connection':'Keep-Alive'
-                }
-
     def login(self, time_md5, post_content):
 
         self.init_from_form(time_md5, post_content)
         self.init_from_redis()
-        self.process_links()
+        self.login_url, self.code_url, self.headers = process_links(self.base_url)
 
         # init post data
         data = {
@@ -125,7 +135,7 @@ class Login:
             'lbLanguage':'',
         }
 
-        _req = requests.post(
+        _req = safe_post(
                 url=self.login_url,
                 data=data,
                 cookies=self.cookies,
@@ -144,7 +154,7 @@ class Login:
         self.xh = xh
         self.time_md5=time_md5
         self.init_from_redis()
-        self.process_links()
+        self.login_url, self.code_url, self.headers = process_links(self.base_url)
 
 
     def get_html(self, search_item):
@@ -152,7 +162,7 @@ class Login:
         仅用来抓取目的网页
         """
         url = self.base_url + search_item + ".aspx?xh=" + self.xh
-        _req = requests.get(url = url, cookies=self.cookies, headers = self.headers)
+        _req = safe_get(url = url, cookies=self.cookies, headers = self.headers)
 
         not_error_page(_req.text)
 
@@ -190,10 +200,6 @@ class Login:
         soup = BeautifulSoup(html, fromEncoding='gbk')
         result = soup.find("table", {"id": "DataGrid1"}).contents
         return result
-
-
-
-
 
 
 

@@ -1,6 +1,6 @@
 {% extends "base-index.html" %}
 
-{% block title %}500-内部错误{% endblock %}
+{% block title %}{{ err }}{% endblock %}
 
 {% block nav %}
 <li><a href="/">首页</a></li>
@@ -11,9 +11,8 @@
 
 {% block content %}
 
-<div class='alert alert-danger'>
-<h1>500</h1>
-<p>糟糕！出问题了！！</p>
+<div class='alert alert-warning'>
+  <h1>{{ err }}</h1>
 </div>
 
 {% endblock %}
