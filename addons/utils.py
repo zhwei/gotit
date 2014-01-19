@@ -85,5 +85,6 @@ def get_score_jidi(xh):
     try:
         jidi = gpa.get_gpa()["ave_score"]
     except TypeError:
+        jidi = gpa.get_gpa()["ave_score"]
         logger.error(xh)
     return score, jidi
