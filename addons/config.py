@@ -35,8 +35,9 @@ sponsor = (
 )
 
 ## 正方 说明/警告
-zheng_alert = "能查询最新课表！"
+zheng_alert = "出现500错误的同学可以往admin@gotit.asia发一份学号吗，谢谢！"
 
+pwd = '/home/group/gotit/'
 
 ## 用户正方cookies过期时间
 # 毫秒
