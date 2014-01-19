@@ -57,12 +57,13 @@
           <p>查询更多：
             <a class="btn btn-primary" href='/more/zheng'>成绩</a>
             <a class="btn btn-info" href='/more/kebiao'>课表</a>
+            <a class="btn btn-default" href='/more/lastkebiao'>最新课表</a>
             <a class="btn btn-warning" href='/more/kaoshi'>考试时间</a>
             <a class="btn btn-success" href='/more/score'>绩点&总成绩</a>
             <a class="btn btn-default" href='/more/oldcet'>往年CET</a>
+            <a onclick=condensed() class='btn btn-default'>表格调整</a>
           </p>
           <hr />
-          <p>表格无法滑动请&nbsp;<a onclick=condensed() class='btn btn-default'>点击</a></p>
         </div>
 
         {% block content %}
@@ -74,8 +75,15 @@
       <script language="javascript" type="text/javascript">
       function condensed(){
         var a=document.getElementsByClassName('table-responsive');
-        for (var i=0; i<a.length; i++)
-          {a[i].className="table-condensed";}
+        if (a.length != 0){
+          for (var i=0; i<a.length; i++)
+            {a[i].className="table-condensed";}
+        }
+        if (a.length==0){
+          var b=document.getElementsByClassName('table-condensed');
+          for (var i=0; i<a.length; i++)
+            {a[i].className="table-responsive";}
+        }
       }
       </script>
       </body>

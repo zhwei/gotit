@@ -33,7 +33,12 @@ sponsor = (
 )
 
 ## 正方 说明/警告
-zheng_alert = ""
+zheng_alert = "能查询最新课表！"
+
+
+## 用户正方cookies过期时间
+# 毫秒
+COOKIES_TIME_OUT = 600000
 
 
 # 配置参数
@@ -48,10 +53,8 @@ random = True
 score_url = "http://210.44.176.116/cjcx/zcjcx_list.php"
 
 # 四六级成绩查询
-
 # POST地址
 cet_url = "http://www.chsi.com.cn/cet/query"
-
 # 是否使用bae查询
 baefetch = True
 
