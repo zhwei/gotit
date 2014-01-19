@@ -4,13 +4,16 @@ Got it
 
 [http://gotit.asia](http://gotit.asia)
 
-### 这里是`gunicorn`分支
-
-启动方式
+## 启动方式
 
     gunicorn code:application
 
-#### 依赖包
+## 依赖包
 
-+ web.py
-+ jinja2
+  `requirement.txt`
+
+
+## 其他服务
+
+  + redis
+  + mongodb

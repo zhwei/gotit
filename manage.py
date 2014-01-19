@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 import datetime
 
 import web
@@ -10,6 +11,7 @@ from web.contrib.template import render_jinja
 #import redis
 from bson import ObjectId
 from pymongo import Connection
+from pymongo.errors import ConnectionFailure
 from weibo import APIClient, APIError
 
 render = render_jinja('templates', encoding='utf-8')
@@ -22,8 +24,11 @@ CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK
 AUTH_URL=CLIENT.get_authorize_url()
 
 
-db = Connection(host='127.0.0.1',port=27017)['gotit']
-#db = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
+try:
+    db = Connection(host='127.0.0.1',port=27017)['gotit']
+except ConnectionFailure:
+    sys.stderr.write('Error: Can not Connect MongoDB')
+    sys.exit()
 
 urls = (
     '$', 'ologin',

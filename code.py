@@ -5,11 +5,9 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-
 import web
 from web.contrib.template import render_jinja
 
-# addons
 from addons import get_old_cet, get_book
 from addons.get_CET import CET
 from addons.zfr import ZF, Login
@@ -18,13 +16,14 @@ from addons import config
 from addons.config import index_cache, debug_mode, sponsor, zheng_alert
 from addons.RedisStore import RedisStore
 from addons.utils import init_redis, get_score_jidi
-from addons.errors import PageError
+from addons import errors
 
-web.config.debug = debug_mode
-
-import apis
+#import apis
 import manage
 from forms import cet_form, xh_form, login_form
+
+# debug mode
+web.config.debug = debug_mode
 
 urls = (
     '/', 'index',
@@ -34,7 +33,7 @@ urls = (
     '/cet', 'cet',
     '/cet/old', 'cet_old',
     '/libr', 'libr',
-    '/api', apis.apis,
+    #'/api', apis.apis,
     '/manage', manage.manage,
     '/contact.html', 'contact',
     '/notice.html', 'notice',
@@ -59,7 +58,6 @@ else:
 # render templates
 render = render_jinja('templates', encoding='utf-8',globals={'context':session})
 
-
 # 首页索引页
 class index:
 
@@ -73,10 +71,12 @@ class zheng:
 
     def GET(self):
 
-        zf = ZF()
-        time_md5 = zf.pre_login()
+        try:
+            zf = ZF()
+            time_md5 = zf.pre_login()
+        except errors.ZfError, e:
+            return render.serv_err(err=e.value)
         session['time_md5'] = time_md5
-
         # get checkcode
         r = init_redis()
         checkcode = r.hget(time_md5, 'checkcode')
@@ -100,7 +100,7 @@ class zheng:
             if t not in __dic.keys():
                 return render.alert_err(error='输入不合理', url='/zheng')
             return render.result(table=__dic[t]())
-        except PageError, e:
+        except errors.PageError, e:
             return render.alert_err(error=e.value, url='/zheng')
 
 class more:

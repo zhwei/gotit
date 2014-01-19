@@ -8,7 +8,7 @@ import logging.handlers
 import redis
 
 import config
-from errors import PageError
+import errors
 from addons.calc_GPA import GPA
 from addons.get_all_score import ALL_SCORE
 
@@ -68,8 +68,10 @@ def not_error_page(page):
     res = ">alert\(\'(.+)\'\)\;"
     _m = re.search(res, page)
     if _m:
-        raise PageError(_m.group(1))
+        raise errors.PageError(_m.group(1))
         #return _m.group(1)
+    if page.find('ERROR - 出错啦！') != -1:
+        raise errors.ZfError('正方教务系统不可用')
     return True
 
 def get_score_jidi(xh):

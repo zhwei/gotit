@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
+
 import web
 from web.session import Store
 
@@ -19,7 +21,11 @@ class RedisStore(Store):
 
     def __contains__(self, key):
         #"判定是否存在key"
-        return bool(self.db.exists(key))
+        try:
+            return bool(self.db.exists(key))
+        except redis.ConnectionError:
+            sys.stderr.write('Error: Can not Connect Redis')
+            sys.exit()
 
     def __getitem__(self, key):
 
