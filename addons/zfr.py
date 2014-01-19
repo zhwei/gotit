@@ -53,8 +53,16 @@ def safe_post(*args, **kwargs):
         raise errors.ZfError('无法连接到正方教务系统')
     return _req
 
-class ZF:
+def get_viewstate(page):
+    """get __VIEWSTATE
+    """
+    com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
+    return com.findall(page)[0]
 
+
+class ZF:
+    """ 处理用户第一次请求时的数据
+    """
     def __init__(self):
 
         if config.random:
@@ -70,9 +78,10 @@ class ZF:
 
         # get __VIEWSTATE
         _req = safe_get(self.base_url, headers=self.headers)
-        _content = _req.content
-        com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
-        self.VIEWSTATE = com.findall(_content)[0]
+        self.VIEWSTATE = get_viewstate(_req.text)
+        #_content = _req.content
+        #com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
+        #self.VIEWSTATE = com.findall(_content)[0]
 
         # get checkcode
         _req1 = safe_get(self.code_url, cookies=_req.cookies, headers=self.headers)
@@ -95,28 +104,34 @@ class ZF:
         rds.hset(time_md5, 'cookies', base64.encodestring(pickled))
 
         # set expire time(milliseconds)
-        rds.pexpire(time_md5, 200000)
+        rds.pexpire(time_md5, config.COOKIES_TIME_OUT)
 
         return time_md5
 
 
 class Login:
+    """ 用户登录
+    以及后续的查询操作
+    """
 
     def init_from_form(self, time_md5, post_content):
-
+        """ 在用户提交帐号密码的时候初始化对象的必要数据
+        """
         self.xh = post_content['xh']
         self.pw = post_content['pw']
         self.time_md5 = time_md5
         self.verify = post_content['verify'].decode("utf-8").encode("gb2312")
 
     def init_from_redis(self):
+        """ 用户后续查询时从redis获取数据
+        """
         # init datas
         rds= init_redis()
         self.base_url = rds.hget(self.time_md5, 'base_url')
         self.viewstate = rds.hget(self.time_md5, 'viewstate')
         pickled = base64.decodestring(rds.hget(self.time_md5, 'cookies'))
         self.cookies = pickle.loads(pickled)
-        rds.pexpire(self.time_md5, 200000) # 延时
+        rds.pexpire(self.time_md5, config.COOKIES_TIME_OUT) # 延时
 
     def login(self, time_md5, post_content):
 
@@ -168,12 +183,6 @@ class Login:
 
         return _req.text
 
-    #self.content_dict = {
-    #        'xscjcx_dq':'DataGrid1',  # 成绩
-    #        'xskbcx':'Table1',        # 课表
-    #        'xskscx':'DataGrid1',     # 考试时间
-    #        }
-
     def get_score(self):
         """
         查询当前学期成绩, 返回的内容为列表
@@ -201,6 +210,24 @@ class Login:
         result = soup.find("table", {"id": "DataGrid1"}).contents
         return result
 
+
+    def get_last_kebiao(self):
+        """二次提交
+        """
+        html = self.get_html("xskbcx")
+        viewstate = get_viewstate(html)
+        data = {
+                "__EVENTTARGET":"xqd",
+                "__EVENTARGUMENT":"",
+                "__VIEWSTATE":viewstate,
+                "xnd":'2013-2014',
+                "xqd":"2",
+                }
+        url = self.base_url + 'xskbcx' + ".aspx?xh=" + self.xh
+        _ret = requests.post(url=url, data=data,cookies=self.cookies, headers=self.headers)
+        soup = BeautifulSoup(_ret.text, fromEncoding='gbk')
+        result = soup.find("table", {"id": "Table1"}).contents
+        return result
 
 
 
