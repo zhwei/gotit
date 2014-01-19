@@ -210,6 +210,31 @@ class Login:
         result = soup.find("table", {"id": "DataGrid1"}).contents
         return result
 
+    def more_kebiao(self):
+        """ 其他学期课表
+        """
+        _com = re.compile('value="(\d{4}-\d{4})"')
+        html = self.get_html("xskbcx")
+        result = _com.findall(html)
+        return result
+
+    def years(self, url, year, xq):
+        """ 其他学期课表
+        """
+        html = self.get_html("xskbcx")
+        viewstate = get_viewstate(html)
+        data = {
+                "__EVENTTARGET":"xqd",
+                "__EVENTARGUMENT":"",
+                "__VIEWSTATE":viewstate,
+                "xnd": year,
+                "xqd": xq,
+                }
+        #url = self.base_url + 'xskbcx' + ".aspx?xh=" + self.xh
+        _ret = requests.post(url=url, data=data,cookies=self.cookies, headers=self.headers)
+        soup = BeautifulSoup(_ret.text, fromEncoding='gbk')
+        result = soup.find("table", {"id": "Table1"}).contents
+        return result
 
     def get_last_kebiao(self):
         """二次提交
@@ -220,7 +245,7 @@ class Login:
                 "__EVENTTARGET":"xqd",
                 "__EVENTARGUMENT":"",
                 "__VIEWSTATE":viewstate,
-                "xnd":'2013-2014',
+                "xnd":'2012-2013',
                 "xqd":"2",
                 }
         url = self.base_url + 'xskbcx' + ".aspx?xh=" + self.xh

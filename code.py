@@ -29,6 +29,7 @@ urls = (
     '/', 'index',
     '/zheng', 'zheng',
     '/more/(.+)', 'more',
+    '/years', 'years',
     '/score', 'score',
     '/cet', 'cet',
     '/cet/old', 'cet_old',
@@ -104,6 +105,8 @@ class zheng:
         except errors.PageError, e:
             return render.alert_err(error=e.value, url='/zheng')
 
+
+
 class more:
     """连续查询 二次查询
     """
@@ -120,7 +123,7 @@ class more:
             elif t=='score':
                 score, jidi=get_score_jidi(session['xh'])
                 return render.result(table=score, jidian=jidi)
-
+            #elif t=='morekb':
             zf = Login()
             __dic = { # just call
                     'zheng': zf.get_score,
@@ -134,6 +137,25 @@ class more:
             raise web.notfound()
         except (AttributeError, TypeError):
             raise web.seeother('/zheng')
+
+class years:
+
+    def GET(self):
+
+        try:
+            zf = Login()
+            zf.init_after_login(session['time_md5'], session['xh'])
+            years=zf.more_kebiao()
+            return render.years_result(years=years)
+        except (AttributeError, TypeError):
+            raise web.seeother('/zheng')
+
+    def POST(self):
+
+        zf = Login()
+        zf.init_after_login(session['time_md5'], session['xh'])
+        return 'ok'
+
 
 # cet
 
