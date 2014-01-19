@@ -62,6 +62,7 @@
             <a class="btn btn-default" href='/more/oldcet'>往年CET</a>
           </p>
           <hr />
+          <p>表格无法滑动请&nbsp;<a onclick=condensed() class='btn btn-default'>点击</a></p>
         </div>
 
         {% block content %}
@@ -70,5 +71,12 @@
         {% include "footer.html" %}
       </div> <!-- /container -->
       {% include "js.html" %}
+      <script language="javascript" type="text/javascript">
+      function condensed(){
+        var a=document.getElementsByClassName('table-responsive');
+        for (var i=0; i<a.length; i++)
+          {a[i].className="table-condensed";}
+      }
+      </script>
       </body>
     </html>
