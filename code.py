@@ -94,7 +94,7 @@ class zheng:
         try:
             time_md5 = session['time_md5']
         except (AttributeError, KeyError), e:
-            logging.error(e+str(content))
+            logging.error(str(content))
             raise web.seeother('/zheng')
 
         try:
