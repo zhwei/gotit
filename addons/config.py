@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 ## 正方 说明/警告
-zheng_alert = "出现500错误的同学可以往admin@gotit.asia发一份学号吗，谢谢！"
+zheng_alert = "浏览器禁用cookies会出现无法登录状况！"
 
-pwd = '/home/bak/apps/gotit/'
-#pwd = '/home/group/gotit/'
+#pwd = '/home/bak/apps/gotit/'
+pwd = '/home/group/gotit/'
 
 ## 用户正方cookies过期时间
 # 毫秒
