@@ -211,8 +211,15 @@ class libr:
         else:
             xh, pw=form.d.xh, form.d.pw
             session['xh']=xh
-        table=get_book(xh,pw)
-        return render.result(table=table)
+        try:
+            table=get_book(xh,pw)
+        except errors.PageError, e:
+            return render.alert_err(error=e.value, url='/libr')
+        try:
+            return render.result(table=table)
+        except TypeError:
+            logging.error('Templ '+form.d.xh+' '+form.d.pw)
+            return render.result(table=table)
 
 
 # contact us
