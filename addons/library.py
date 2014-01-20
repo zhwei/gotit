@@ -30,7 +30,7 @@ def login(number,pwd):
     req = urllib2.Request(url=login_url, data=data)
     login_ret = opener.open(req).read()
     if login_ret.find('密码错误') > 0:
-        return False
+        raise errors.PageError('对不起，密码错误，请查实！！') 
     elif login_ret.find('您尚未完成身份认证') > 0:
         raise errors.PageError('您尚未完成图书馆身份认证！') 
     elif login_ret.find("证件信息") > 0:
