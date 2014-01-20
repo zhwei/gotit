@@ -120,7 +120,10 @@ class Login:
         self.xh = post_content['xh']
         self.pw = post_content['pw']
         self.time_md5 = time_md5
-        self.verify = post_content['verify'].decode("utf-8").encode("gb2312")
+        try:
+            self.verify = post_content['verify'].decode("utf-8").encode("gb2312")
+        except UnicodeEncodeError:
+            raise errors.PageError('验证码错误')
 
     def init_from_redis(self):
         """ 用户后续查询时从redis获取数据

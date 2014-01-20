@@ -5,7 +5,10 @@ import re
 import urllib
 import urllib2
 import logging
+
 import config
+import errors
+
 class GPA:
     '''Calculator Grade Point Average'''
     __num = 0
@@ -90,8 +93,11 @@ class GPA:
             u'合格':60,
             u'不合格':0,
             u'优秀':95,
+            u'优':95,
+            u'良':84,
             u'良好':84,
             u'中等':73,
+            u'中':73,
             u'及格':62,
             u'不及格':0,
             u'缺考':0,
@@ -104,6 +110,7 @@ class GPA:
             u'作弊':0,
             u'取消':0,
             u'免修':60,
+            u'免考':60,
             '-':0,
             '':0
         }
@@ -189,7 +196,7 @@ class GPA:
         '''通过这个函数调用上面的函数'''
         self.__match_table()
         if self.__get_basic_info() == -1:
-            return -1
+            raise errors.PageError('没有该学号的成绩信息')
         self.__get_score_info()
         self.__calc_score()
         return GPA.__ret

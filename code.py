@@ -4,6 +4,7 @@
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
+import logging
 
 import web
 from web.contrib.template import render_jinja
@@ -15,8 +16,9 @@ from addons.autocache import memorize
 from addons import config
 from addons.config import index_cache, debug_mode, sponsor, zheng_alert
 from addons.RedisStore import RedisStore
-from addons.utils import init_redis, get_score_jidi
+from addons.utils import init_redis, get_score_jidi#, init_log
 from addons import errors
+
 
 #import apis
 import manage
@@ -59,10 +61,12 @@ else:
 # render templates
 render = render_jinja('templates', encoding='utf-8',globals={'context':session})
 
+#logger = init_log('code.py')
+
 # 首页索引页
 class index:
 
-    @memorize(index_cache)
+    #@memorize(index_cache)
     def GET(self):
         return render.index(alert=zheng_alert)
 
@@ -85,10 +89,18 @@ class zheng:
         return render.zheng(alert=zheng_alert, checkcode=checkcode)
 
     def POST(self):
-        content = web.input()
-        session['xh'] = content['xh']
-        t = content['type']
-        time_md5 = session.time_md5
+        try:
+            content = web.input()
+        except UnicodeDecodeError:
+            content = web.input()
+            logging.error('UnicodeDecodeError '+str(content))
+        try:
+            session['xh'] = content['xh']
+            t = content['type']
+            time_md5 = session['time_md5']
+        except (AttributeError, KeyError), e:
+            logging.error(str(content))
+            return render.alert_err(error='请检查您是否禁用cookie', url='/zheng')
 
         try:
             zf = Login()
@@ -121,7 +133,10 @@ class more:
                 return render.result(table=__dic1[t](session['xh']))
 
             elif t=='score':
-                score, jidi=get_score_jidi(session['xh'])
+                try:
+                    score, jidi=get_score_jidi(session['xh'])
+                except errors.PageError, e:
+                    return render.alert_err(error=e.value, url='/score')
                 return render.result(table=score, jidian=jidi)
             #elif t=='morekb':
             zf = Login()
@@ -135,7 +150,7 @@ class more:
                 zf.init_after_login(session['time_md5'], session['xh'])
                 return render.result(table=__dic[t]())
             raise web.notfound()
-        except (AttributeError, TypeError):
+        except (AttributeError, TypeError, KeyError):
             raise web.seeother('/zheng')
 
 class years:
@@ -225,7 +240,10 @@ class libr:
         else:
             xh, pw=form.d.xh, form.d.pw
             session['xh']=xh
-        table=get_book(xh,pw)
+        try:
+            table=get_book(xh,pw)
+        except errors.PageError, e:
+            return render.alert_err(error=e.value, url='/libr')
         return render.result(table=table)
 
 
@@ -268,7 +286,11 @@ class score:
             return render.score(form=form)
         else:
             xh = form.d.xh
-            score, jidi=get_score_jidi(xh)
+            session['xh']=xh
+            try:
+                score, jidi=get_score_jidi(xh)
+            except errors.PageError, e:
+                return render.alert_err(error=e.value)
 
             return render.result(table=score, jidian=jidi)
 
@@ -322,6 +344,7 @@ def notfound():
 def internalerror():
     """500
     """
+    web.setcookie('webpy_session_id','',-1)
     return web.internalerror(render.internalerror())
 
 app.notfound = notfound

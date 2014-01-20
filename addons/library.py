@@ -7,6 +7,8 @@ import urllib2
 import json
 import re
 
+import errors
+
 cookies = cookielib.LWPCookieJar()
 handlers = [
     urllib2.HTTPHandler(),
@@ -28,8 +30,10 @@ def login(number,pwd):
     req = urllib2.Request(url=login_url, data=data)
     login_ret = opener.open(req).read()
     if login_ret.find('密码错误') > 0:
-        return False
-    elif login_ret.find("注销") > 0:
+        raise errors.PageError('对不起，密码错误，请查实！！') 
+    elif login_ret.find('您尚未完成身份认证') > 0:
+        raise errors.PageError('您尚未完成图书馆身份认证！') 
+    elif login_ret.find("证件信息") > 0:
         return True
 
 def getbooklist_table():
@@ -37,6 +41,8 @@ def getbooklist_table():
     booklist_url = 'http://222.206.65.12/reader/book_lst.php'
     req = urllib2.Request(booklist_url)
     ret = opener.open(req).read()
+    if ret.find('您的该项记录为空！')>0:
+        return "您没有借书记录"
     patten = re.compile("<table.*?</table>",re.M|re.S)  
     book_table = patten.findall(ret)
     return book_table[0]
