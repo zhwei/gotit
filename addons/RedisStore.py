@@ -30,7 +30,7 @@ class RedisStore(Store):
 
     def __getitem__(self, key):
 
-        v = self.db.getset(SESSION_MARKUP+key, self.timeout)
+        v = self.db.getset(SESSION_MARKUP+key, 600)
         if v:
             return self.decode(v)
         else:
@@ -38,7 +38,7 @@ class RedisStore(Store):
 
     def __setitem__(self, key, value):
 
-        self.db.setex(SESSION_MARKUP+key, self.timeout, self.encode(value))
+        self.db.setex(SESSION_MARKUP+key, 600, self.encode(value))
 
     def __delitem__(self, key):
         self.db.delete(SESSION_MARKUP+key)

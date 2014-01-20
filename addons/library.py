@@ -42,10 +42,10 @@ def getbooklist_table():
     req = urllib2.Request(booklist_url)
     ret = opener.open(req).read()
     if ret.find('您的该项记录为空！')>0:
-        return ("您没有借书记录")
+        return "您没有借书记录"
     patten = re.compile("<table.*?</table>",re.M|re.S)  
     book_table = patten.findall(ret)
-    return book_table
+    return book_table[0]
 
 def getbooklist_json():
     '''获取图书列表(json格式)'''

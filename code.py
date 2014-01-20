@@ -65,7 +65,7 @@ render = render_jinja('templates', encoding='utf-8',globals={'context':session})
 # 首页索引页
 class index:
 
-    @memorize(index_cache)
+    #@memorize(index_cache)
     def GET(self):
         return render.index(alert=zheng_alert)
 
@@ -322,6 +322,7 @@ def notfound():
 def internalerror():
     """500
     """
+    web.setcookie('webpy_session_id','',-1)
     return web.internalerror(render.internalerror())
 
 app.notfound = notfound
