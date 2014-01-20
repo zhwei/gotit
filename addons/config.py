@@ -4,9 +4,6 @@
 ## 正方 说明/警告
 zheng_alert = "浏览器禁用cookies会出现无法登录状况！"
 
-#pwd = '/home/bak/apps/gotit/'
-pwd = '/home/group/gotit/'
-
 ## 用户正方cookies过期时间
 # 毫秒
 COOKIES_TIME_OUT = 600000

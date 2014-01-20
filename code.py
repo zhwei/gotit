@@ -126,7 +126,10 @@ class more:
                 return render.result(table=__dic1[t](session['xh']))
 
             elif t=='score':
-                score, jidi=get_score_jidi(session['xh'])
+                try:
+                    score, jidi=get_score_jidi(session['xh'])
+                except errors.PageError, e:
+                    return render.alert_err(error=e.value, url='/score')
                 return render.result(table=score, jidian=jidi)
 
             zf = Login()

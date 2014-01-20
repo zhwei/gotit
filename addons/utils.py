@@ -74,17 +74,11 @@ def not_error_page(page):
         raise errors.ZfError('正方教务系统不可用')
     return True
 
-logger = init_log('utils')
-
 def get_score_jidi(xh):
 
     a = ALL_SCORE()
     score = a.get_all_score(xh)
     gpa = GPA(xh)
     gpa.getscore_page()
-    try:
-        jidi = gpa.get_gpa()["ave_score"]
-    except TypeError:
-        jidi = gpa.get_gpa()["ave_score"]
-        logging.error(xh)
+    jidi = gpa.get_gpa()["ave_score"]
     return score, jidi
