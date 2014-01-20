@@ -88,7 +88,11 @@ class zheng:
         return render.zheng(alert=zheng_alert, checkcode=checkcode)
 
     def POST(self):
-        content = web.input()
+        try:
+            content = web.input()
+        except UnicodeDecodeError:
+            content = web.input()
+            logging.error('UnicodeDecodeError '+str(content))
         try:
             session['xh'] = content['xh']
             t = content['type']
