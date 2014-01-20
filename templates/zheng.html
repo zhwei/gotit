@@ -39,7 +39,15 @@
 
 {% block foot %}
 <script type="text/javascript">
-
   $('select').selectpicker();
+  
+  $(document).ready(function () {
+    document.cookie = "cookieid=1; expires=60";
+    var result = document.cookie.indexOf("cookieid=") != -1;
+    if (!result) {
+        alert("浏览器未启用cookie,会导致无法查询，请启用！");
+    }
+});
 </script>
 {% endblock %}
+

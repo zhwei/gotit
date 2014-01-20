@@ -95,7 +95,7 @@ class zheng:
             time_md5 = session['time_md5']
         except (AttributeError, KeyError), e:
             logging.error(str(content))
-            return render.alert_err(error='请检查您是否禁用cookies', url='/zheng')
+            return render.alert_err(error='请检查您是否禁用cookie', url='/zheng')
 
         try:
             zf = Login()

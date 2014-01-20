@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 ## 正方 说明/警告
-zheng_alert = "浏览器禁用cookies会出现无法登录状况！"
+zheng_alert = ""
 
 ## 用户正方cookies过期时间
 # 毫秒

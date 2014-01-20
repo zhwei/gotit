@@ -41,7 +41,7 @@ def getbooklist_table():
     booklist_url = 'http://222.206.65.12/reader/book_lst.php'
     req = urllib2.Request(booklist_url)
     ret = opener.open(req).read()
-    if ret.find('您的该项记录为空！'):
+    if ret.find('您的该项记录为空！')>0:
         return ("您没有借书记录")
     patten = re.compile("<table.*?</table>",re.M|re.S)  
     book_table = patten.findall(ret)
