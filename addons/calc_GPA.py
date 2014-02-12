@@ -6,6 +6,8 @@ import urllib
 import urllib2
 import logging
 
+import requests
+
 import config
 import errors
 
@@ -23,9 +25,11 @@ class GPA:
         '''获取成绩页面'''
         param = urllib.urlencode({'post_xuehao':GPA.__num})
         try:
-            self.page = urllib2.urlopen( url = config.score_url, data = param, timeout=5).read().decode('utf-8')
-        except urllib2.URLError:
-            return None
+            #self.page = urllib2.urlopen( url = config.score_url, data = param, timeout=5).read().decode('utf-8')
+            self.page = requests.get(url=config.score_url, data=param, timeout=0.05)
+        except requests.Timeout:
+            raise errors.RequestError('无法连接成绩查询系统')
+            #return None
 
     # 直接抓取表格内容并返回
     def get_all_score(self):

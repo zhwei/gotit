@@ -196,8 +196,11 @@ class cet_old:
         else:
             xh = form.d.xh
             session['xh']=xh
-        table=get_old_cet(xh)
-        return render.result(table=table)
+        try:
+            table=get_old_cet(xh)
+            return render.result(table=table)
+        except errors.RequestError, e:
+            return render.serv_err(err=e)
 
 
 class libr:
@@ -269,6 +272,8 @@ class score:
                 score, jidi=get_score_jidi(xh)
             except errors.PageError, e:
                 return render.alert_err(error=e.value)
+            except errors.RequestError, e:
+                return render.serv_err(err=e)
 
             return render.result(table=score, jidian=jidi)
 

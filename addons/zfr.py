@@ -100,7 +100,8 @@ class ZF:
         rds.hset(time_md5, 'viewstate', self.VIEWSTATE)
 
         # pickle cookies
-        pickled = pickle.dumps(_req1.cookies)
+        #pickled = pickle.dumps(_req1.cookies)
+        pickled = pickle.dumps(_req.cookies)
         rds.hset(time_md5, 'cookies', base64.encodestring(pickled))
 
         # set expire time(milliseconds)
@@ -159,7 +160,7 @@ class Login:
                 cookies=self.cookies,
                 headers=self.headers)
 
-        self.cookies = _req.cookies
+        #self.cookies = _req.cookies
 
         not_error_page(_req.text)
 
