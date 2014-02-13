@@ -134,6 +134,8 @@ class more:
                     score, jidi=get_score_jidi(session['xh'])
                 except errors.PageError, e:
                     return render.alert_err(error=e.value, url='/score')
+                except errors.RequestError, e:
+                    return render.serv_err(err=e)
                 return render.result(table=score, jidian=jidi)
 
             zf = Login()
