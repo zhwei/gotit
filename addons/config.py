@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 ## 正方 说明/警告
-zheng_alert = ""
+zheng_alert = "已恢复！"
 
 ## 用户正方cookies过期时间
 # 毫秒
