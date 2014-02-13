@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 #coding=utf-8
 import re
-import urllib
-import urllib2
-import logging
-from time import ctime
 import os
+import urllib
+import logging
+import urllib2
+from time import ctime
+
+import requests
+
+import errors
 import config
 DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -48,12 +52,15 @@ class CET:
 
     def get_cet_table(self,num):
         '''获取四六级成绩（直接返回一个表格）'''
-        param = urllib.urlencode({'post_xuehao':num})
-        page = urllib2.urlopen(
-            url = 'http://210.44.176.116/cjcx/stkcjcx_list.php',
-            data = param,
-            timeout=10
-            ).read()
+        param = {'post_xuehao':num}
+        try:
+            page = requests.post(
+                url = 'http://210.44.176.116/cjcx/stkcjcx_list.php',
+                data = param,
+                timeout=0.5
+                ).text
+        except requests.Timeout:
+            raise errors.RequestError('无法连接成绩查询系统！')
         patten = re.compile("</caption>(.*?)</table>",re.M|re.S)  
         #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为 
         return patten.findall(page)[1]
