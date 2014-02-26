@@ -1,27 +1,36 @@
 {% macro input(name, label, value="" , help_text="", type='text') -%}
-<label>{{ label }}</label><input name="{{ name }}" type="{{ type }}" value="{{ value }}"/>
-<span class="help-block">{{ help_text }}</span>
+<div class="form-group">
+  <label>{{ label }}</label>
+  <input name="{{ name }}" type="{{ type }}" value="{{ value }}" class='form-control'/>
+  <p class="help-block">{{ help_text }}</p>
+</div>
 {%- endmacro %}
 
-{%- macro textarea(name, label,placeholder='', help_text='',value='', rows=5, cols=100) -%}
-<label>{{ label }}</label>
-<textarea name="{{ name }}" rows="{{ rows }}" cols="{{ cols }}" placeholder="{{ placeholder }}">{{ value|e }}</textarea>
-<span class="help-block">{{ help_text }}</span>
+{%- macro textarea(name, label, id='', placeholder='', help_text='',value='', rows=5, cols=100) -%}
+<div class="form-group">
+  <label>{{ label }}</label>
+  <textarea name="{{ name }}" rows="{{ rows }}" cols="{{ cols }}" id="{{ id }}" class="form-control" placeholder="{{ placeholder }}">{{ value|e }}</textarea>
+  <p class="help-block">{{ help_text }}</p>
+</div>
 {%- endmacro %}
 
 {%- macro select(name, label, help_text='',default='', options=[]) -%}
-<label>{{ label }}</label>
-{% set value = value %}
-<select name="{{ name }}">
-  {% for oid, location in options %}
-  <option value="{{ oid }}" {% if oid == default %}selected{% endif %}>{{ location }}</option>
-  {% endfor %}
-</select>
-<span class="help-block">{{ help_text }}</span>
+<div class="form-group">
+  <label>{{ label }}</label>
+  {% set value = value %}
+  <select name="{{ name }}">
+    {% for oid, location in options %}
+    <option value="{{ oid }}" {% if oid == default %}selected{% endif %}>{{ location }}</option>
+    {% endfor %}
+  </select>
+  <p class="help-block">{{ help_text }}</p>
+</div>
 {%- endmacro %}
 
 {%- macro submit(value='提交') -%}
-<div class="btn-group">
-  <input type="submit" class="btn btn-primary" value="{{ value }}"/>
+<div class="form-group">
+  <div class="btn-group">
+    <input type="submit" class="btn btn-primary" value="{{ value }}"/>
+  </div>
 </div>
 {%- endmacro %}

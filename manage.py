@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
+import os
 import datetime
+import logging
 
 import web
 from web import ctx
@@ -10,30 +11,29 @@ from web.contrib.template import render_jinja
 
 #import redis
 from bson import ObjectId
-from pymongo import Connection
-from pymongo.errors import ConnectionFailure
 from weibo import APIClient, APIError
+
+from addons.utils import init_mongo, zipf2strio
 
 render = render_jinja('templates', encoding='utf-8')
 
 
 APP_KEY = '4001516920' # app key
 APP_SECRET = '44a4fb573339e30a901249978a1322b9' # app secret
-CALLBACK_URL = 'http://gotit.asia:8080/manage/callback' # callback url
+CALLBACK_URL = 'http://gotit.asia/manage/callback' # callback url
 CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
 AUTH_URL=CLIENT.get_authorize_url()
 
-
-try:
-    db = Connection(host='127.0.0.1',port=27017)['gotit']
-except ConnectionFailure:
-    sys.stderr.write('Error: Can not Connect MongoDB')
-    sys.exit()
+# init mongoDB
+db = init_mongo()
 
 urls = (
     '$', 'ologin',
     '/callback', 'callback',
     '/panel', 'panel',
+    '/backup/(.+)', 'backup',
+    '/backup', 'backup',
+    '/readlog/(.+)', 'readlog',
     '/o/(.+)/(.+)/(.+)', 'update',
     '/o/(.+)/(.+)', 'update',
 )
@@ -94,10 +94,55 @@ class panel:
 
         return render.panel(item=False)
 
+class readlog:
+
+    def readfile(self, line):
+        log_pwd = "/home/zhwei/a.txt"
+        with open(log_pwd) as fi:
+            all_lines = fi.readlines()
+            counts = len(all_lines)
+            for lno, li in enumerate(all_lines):
+                if lno >= counts-int(line)*50:
+                    yield li
+
+
+    def GET(self, line):
+
+        lines = self.readfile(line)
+        return render.panel(item=None, opera='readlog', lines=lines)
+
+
+class backup:
+    """ mongodb数据库的备份与恢复
+    """
+
+    def GET(self, label=None):
+
+        if label=='download':
+            # 备份mongodb数据库，打包成zip文件并返回下载
+            dt=datetime.datetime.now()
+            filename = '/tmp/gotit-backup-{}'.format(dt.strftime('%Y%m%d%H%M%S'))
+            os.system('mongodump -d gotit -o {}'.format(filename))
+            ret = zipf2strio(filename) # 打包写入StringIO对象
+            import shutil
+            shutil.rmtree(filename) # 删除备份文件夹
+
+            web.header('Content-Type','application/octet-stream')
+            web.header('Content-disposition', 'attachment; filename=%s.zip' % filename[5:])
+            return ret.getvalue()
+
+        return render.panel(item=None, opera='backup')
+
+    #def POST(self, label=None):
+
+    #    x = web.input(myfile={})
+    #    ret=web.debug(x['myfile'])
+    #    return ret
+
 
 class update:
 
-    item_list = ['donate', 'zheng', 'cet', 'notice']
+    item_list = ['donate', 'zheng', 'cet', 'notice', 'score']
     opera_list = ['cr', 'del', 'ls', 'info']
 
     def GET(self, opera, item, oid=None):
@@ -105,7 +150,7 @@ class update:
         if item in self.item_list and opera in self.opera_list:
 
             if opera == 'ls':
-                ls = db[item].find()
+                ls = db[item].find().sort("datetime",-1)
                 return render.panel(item=item, opera=opera, ls=ls)
 
         return render.panel(item=item, opera=opera, oid=oid)
@@ -120,7 +165,7 @@ class update:
                 if item == 'donate':
                     db.donate.insert({
                         'name':data['name'],
-                        'much':data['much'],
+                        'much':int(data['much']),
                         'datetime': datetime.datetime.now(),
                         })
                 else:
@@ -128,10 +173,9 @@ class update:
                         'content':data['content'],
                         'datetime': datetime.datetime.now(),
                         })
-
             elif opera == 'del':
                 db[item].remove({'_id':ObjectId(data['oid'])})
 
         raise web.seeother('/o/ls/'+item)
 
-manage.add_processor(web.loadhook(pre_request))
+#manage.add_processor(web.loadhook(pre_request))

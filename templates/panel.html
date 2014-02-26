@@ -9,7 +9,8 @@
     <meta name="author" content="">
 
     {% include "css.html" %}
-
+    <link rel="stylesheet" href="http://huacnlee.com/jquery.qeditor/css/jquery.qeditor.css" />
+    <link rel="stylesheet" href="/static/font-awesome.min.css" />
     <!-- Le styles -->
     <style>
       body {
@@ -18,6 +19,12 @@
       }
       .sidebar-nav {
         padding: 9px 0;
+      }
+      .qeditor_preview {
+        min-height: 500px;
+      } 
+      #editor {
+        height:500px;
       }
       @media (max-width: 980px) {
         /* Enable use of floated navbar text */
@@ -39,33 +46,35 @@
 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container-fluid">
-          <a class="brand" href="/">Gotit</a>
+        <div class="container">
+          <a class="navbar-brand" href="/">Gotit</a>
         </div>
       </div>
     </div>
 
-    <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
                 <div class="well sidebar-nav">
                     <ul class="nav nav-list">
                       {% if current_page %}
-                      <li class="active"><a href="#"><i class="icon-tag"></i>{{ current_page|e }}</a></li>
+                      <li class="active"><a href="#"><i class="glyphicon glyphicon-tag"></i>{{ current_page|e }}</a></li>
                       {% endif %}
                       {% set navigation_bar = [
-                            ('', '', '管理面板',''),
-                            ('/manage/o/ls/donate', 'lsdonate', '查看捐赠','cog'),
-                            ('/manage/o/ls/zheng', 'zheng', '查看正方公告','cog'),
-                            ('/manage/o/ls/cet', 'cet', '查看四六级公告','cog'),
-                            ('/manage/o/ls/notice', 'notice', '查看公告','cog'),
-                            ('/manage/o/ls/score', 'score', '查看成绩公告','cog'),
+                            ('/manage/panel', 'admin_index', '后台首页','th'),
+                            ('/manage/o/ls/notice', 'notice', '网站公告','send'),
+                            ('/manage/o/ls/donate', 'lsdonate', '捐赠者','usd'),
+                            ('/manage/o/ls/zheng', 'zheng', '正方公告','th-list'),
+                            ('/manage/o/ls/cet', 'cet', '四六级公告','headphones'),
+                            ('/manage/o/ls/score', 'score', '成绩公告','signal'),
+                            ('/manage/o/ls/score', 'score', '网站备份','cloud-upload'),
+                            ('/manage/o/ls/score', 'score', '网站日志','eye-open'),
                         ] -%}
                         {% set active_page = active_page|default('admin_index') -%}
                         {% for href, id, caption, icon in navigation_bar %}
                           <li {% if id == active_page %}class="active"{% elif href=='' %}class="nav-header"{% endif %}>
                             {% if href !='' %}
-                            <a href="{{ href|e }}"><i class="icon-{{ icon }}"></i>{{ caption|e }}</a>
+                            <a href="{{ href|e }}"><i class="glyphicon glyphicon-{{ icon }}"></i>&nbsp;{{ caption|e }}</a>
                             {% else %}
                                 {{ caption|e }}
                             {% endif %}
@@ -74,21 +83,25 @@
                     </ul>
                 </div>
             </div>
-            <div class="span9">
+            <div class="col-md-9">
 
 
             {% if item %}
 
               <legend>{{ opera }} - {{ item }}</legend> 
-              <p><a href="/manage/update/cr/{{ item }}" class='btn'>添加</a></p>
+              <p><a href="/manage/o/cr/{{ item }}" class='btn btn-default'><i class="glyphicon glyphicon-plus"></i>&nbsp;添加</a></p>
               {% if opera == 'cr' %}
-                <form action="" method="POST">
+                <form action="" method="POST" class="form-horizontal" role="form">
                     <fieldset>
                         {% if item == 'donate' %}
                           {{ form.input(name='name', label='捐赠人') }}
                           {{ form.input(name='much', label='金额') }}
                         {% else %}
-                          {{ form.textarea(name='content', label='内容') }}
+                            <div class="form-group">
+                              <label>内容</label>
+                              <textarea name="content" id="editor" class="form-control" placeholder="Enter your text .."></textarea>
+                              <p class="help-block"></p>
+                            </div>
                         {% endif %}
                     </fieldset>
                     {{ form.submit(value="提交") }}
@@ -101,28 +114,60 @@
                       {% if item == 'donate' %}
                       <td>{{ l.name }}</td>
                       <td>{{ l.much }}</td>
+                      <td>{{ l.datetime }}</td>
                       {% else %}
-                      <td style='word-break:break-all;'>{{ l.content }}</td>
+                        <td class='text-overflow'>{{ l.content }}</td>
+                        <td>{{ l.datetime }}</td>
                       {% endif %}
                       <td>
-                        <a href=""><i class='icon-edit'></i></a>
-                        <a href="/manage/o/del/{{ item }}/{{ l._id }}"><i class='icon-remove'></i></a>
+                        <a href="/manage/o/del/{{ item }}/{{ l._id }}" class="btn btn-default"><i class='glyphicon glyphicon-remove'></i>&nbsp;删除</a>
                       </td>
                     </tr>
                   {% endfor %}
                   </tbody>
                 </table>
               {% elif opera == 'del' %}
+              <div class="lead">
+                <br /><br />
                 <form method="post">
                   <p class='lead'>是否确认删除？</p>
                   <input type="hidden" name="oid" value="{{ oid }}"  />
                   <div class="clearfix"></div>
                   <div class="btn-group">
+                    <a onclick="location.href=document.referrer;" class="btn btn-default"><i class="glyphicon glyphicon-arrow-left"></i>&nbsp;返回</a>
+                  </div>
+                  <div class="btn-group">
                     <input type="submit" value="确认" class="btn btn-danger" />
                   </div>
                 </form>
+              </div>
               {% endif %}
 
+            {% elif opera == 'backup' %}
+            <h2 class="lead">Export or Import</h2>
+            <div>
+              <p class="lead">Export</p>
+              <p><a href="/manage/backup/download" class="btn btn-default"><i class="glyphicon glyphicon-cloud-download"></i>&nbsp;导出备份</a></p>
+<!--               <p class="lead">Import</p> -->
+<!--               <form method="post" action="">
+                <p><input type="file" name="myfile" /></p>
+                <p><button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-cloud-upload"></i>&nbsp;导入</button></p>
+              </form> -->
+            </div>
+
+            {% elif opera == 'readlog' %}
+            <h2 class="lead">网站日志</h2>
+            <p>
+              <a href="/manage/readlog/1" class='btn btn-default'>最后50行</a>
+              <a href="/manage/readlog/2" class='btn btn-default'>最后100行</a>
+              <a href="/manage/readlog/3" class='btn btn-default'>最后150行</a>
+              <a href="/manage/readlog/4" class='btn btn-default'>最后200行</a>
+            </p>
+            <div>
+              <pre>
+                {% for line in lines %}{{ line }}{% endfor %}
+              </pre>
+            </div>
             {% else %}
               <h2>welcome administrator</h2>
             {% endif %}
@@ -130,6 +175,15 @@
             </div>
         </div>
     </div> <!-- /container -->
+    <div id="footer">
+      <div class="container">
+        <p class="text-muted">Gotit@2014</p>
+      </div>
+    </div>
     {% include "js.html" %}
+    <script src="/static/jquery.qeditor.js"></script>
+    <script>
+    $("#editor").qeditor({});
+    </script>
   </body>
 </html>

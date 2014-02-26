@@ -2,9 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import os
+from os.path import join
 import sys
+import zipfile
 import logging
 import logging.handlers
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 
 import redis
 from pymongo import Connection
@@ -62,6 +68,24 @@ def init_redis():
     redis_server = redis.StrictRedis(host='localhost', port=6379, db=0)
     return redis_server
 
+def init_mongo():
+    """ 初始化MongoDB 
+    """
+    try:
+        db = Connection(host='127.0.0.1',port=27017)['gotit']
+    except ConnectionFailure:
+        sys.stderr.write('Error: Can not Connect MongoDB')
+        sys.exit()
+
+    return db
+
+def get_last_one_by_date(collection):
+
+    mongo = init_mongo()
+    li = mongo[collection].find().sort('datetime',-1)
+    ret = li[0]
+    return ret
+
 
 def not_error_page(page):
     """检查页面
@@ -91,12 +115,25 @@ def collect_checkcode(code):
     用于以后验证码识别
     写入MongoDB
     """
-    try:
-        db = Connection(host='127.0.0.1',port=27017)['gotit']
-    except ConnectionFailure:
-        sys.stderr.write('Error: Can not Connect MongoDB')
-        sys.exit()
+    db = init_mongo()
+
     db.checkcodes.insert({
         'code': code,
         })
     return True
+
+def zipf2strio(foldername, includeEmptyDIr=True):
+    empty_dirs = []
+    fi = StringIO.StringIO()
+    zip = zipfile.ZipFile(fi, 'w', zipfile.ZIP_DEFLATED)
+    for root, dirs, files in os.walk(foldername):
+        empty_dirs.extend([dir for dir in dirs if os.listdir(join(root, dir)) == []])
+        for name in files:
+            zip.write(join(root ,name))
+        if includeEmptyDIr:
+            for dir in empty_dirs:
+                zif = zipfile.ZipInfo(join(root, dir) + "/")
+                zip.writestr(zif, "")
+        empty_dirs = []
+    zip.close()
+    return fi

@@ -15,11 +15,10 @@ from addons.get_CET import CET
 from addons.zfr import ZF, Login
 from addons.autocache import memorize
 from addons import config
-from addons.config import (index_cache, debug_mode, 
-        sponsor, zheng_alert)
+from addons.config import (index_cache, debug_mode, zheng_alert)
 from addons.RedisStore import RedisStore
 from addons.utils import (init_redis, get_score_jidi, 
-        collect_checkcode)
+        collect_checkcode, init_mongo, get_last_one_by_date)
 from addons import errors
 
 
@@ -45,8 +44,6 @@ urls = (
     '/help/gpa.html', 'help_gpa',
     '/comment.html', 'comment',
     '/donate.html', 'donate',
-    '/root.txt', 'ttest',
-    '/status', 'status',
 )
 
 # main app
@@ -65,12 +62,15 @@ render = render_jinja('templates', encoding='utf-8',globals={'context':session})
 
 #logger = init_log('code.py')
 
+# init mongoDB
+mongo = init_mongo()
+
 # 首页索引页
 class index:
 
-    #@memorize(index_cache)
     def GET(self):
-        return render.index(alert=zheng_alert)
+        _alert=mongo.zheng.find_one()
+        return render.index(alert=_alert)
 
 
 # 成绩查询
@@ -87,8 +87,8 @@ class zheng:
         # get checkcode
         r = init_redis()
         checkcode = r.hget(time_md5, 'checkcode')
-
-        return render.zheng(alert=zheng_alert, checkcode=checkcode)
+        _alert=mongo.zheng.find_one()
+        return render.zheng(alert=_alert, checkcode=checkcode)
 
     def POST(self):
         try:
@@ -234,38 +234,13 @@ class libr:
         return render.result(table=table)
 
 
-# contact us
-
-class status:
-
-    def GET(self):
-        return 'status'
-
-
-class contact:
-
-    """contact us page"""
-    @memorize(index_cache)
-    def GET(self):
-        return render.contact()
-
-# notice
-
-
-class notice:
-
-    @memorize(index_cache)
-    def GET(self):
-        return render.notice()
-
-
 # 全部成绩
 class score:
 
-    @memorize(index_cache)
     def GET(self):
         form = xh_form()
-        return render.score(form=form)
+        alert=mongo.score.find_one()
+        return render.score(form=form, alert=alert)
 
     def POST(self):
         form = xh_form()
@@ -302,24 +277,33 @@ class comment:
     def GET(self):
         return render.comment()
 
-# 赞助页面
 
+class contact:
+
+    """contact us page"""
+    @memorize(index_cache)
+    def GET(self):
+        return render.contact()
+
+# notice
+
+class notice:
+
+    def GET(self):
+        news = mongo.notice.find().sort("datetime",-1)
+        return render.notice(news=news)
+
+
+# 赞助页面
 
 class donate:
 
     def GET(self):
+        sponsor = mongo.donate.find().sort("much",-1)
         return render.donate(sponsor=sponsor)
 
-# 阿里妈妈认证
 
-
-class ttest:
-
-    def GET(self):
-        return render.root()
-
-
-
+# web server
 def session_hook():
     """ share session with sub apps
     """

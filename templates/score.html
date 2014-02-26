@@ -5,9 +5,11 @@
     <center><h1>成绩查询系统</h1></center>
     <hr>
     <form name="main" method="post" accept-charset="utf-8" class="form-signin">
-      <div class="alert alert-success">
-      <p>本系统可查询全部学科成绩,包括第二专业和补考成绩以及平均学分绩点查询!</p>
+      {% if alert %}
+      <div class="alert alert-info">
+        {{ alert.content }}
       </div>
+      {% endif %}
       {% if not form.valid %}
         <p class="alert alert-danger">输入错误:</p>
       {% endif %}
