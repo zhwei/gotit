@@ -7,6 +7,7 @@ try:
     import cPickle as pickle
 except ImportError:
     import pickle
+import logging
 
 import web
 from web.session import Store
@@ -65,5 +66,10 @@ class RedisStore(Store):
         missing_padding = 4 - len(session_data) % 4
         if missing_padding:
             session_data += b'='* missing_padding
+
         pickled = base64.decodestring(session_data)
-        return pickle.loads(pickled)
+        try:
+            return pickle.loads(pickled)
+        except pickle.UnpicklingError:
+            logging.error('UnpicklingError: '+pickled)
+            return pickle.loads(pickled)

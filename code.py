@@ -8,6 +8,7 @@ import logging
 
 import web
 from web.contrib.template import render_jinja
+import requests
 
 from addons import get_old_cet, get_book
 from addons.get_CET import CET
@@ -134,8 +135,6 @@ class more:
                     score, jidi=get_score_jidi(session['xh'])
                 except errors.PageError, e:
                     return render.alert_err(error=e.value, url='/score')
-                except errors.RequestError, e:
-                    return render.serv_err(err=e)
                 return render.result(table=score, jidian=jidi)
 
             zf = Login()
@@ -149,8 +148,10 @@ class more:
                 zf.init_after_login(session['time_md5'], session['xh'])
                 return render.result(table=__dic[t]())
             raise web.notfound()
-        except (AttributeError, TypeError, KeyError):
+        except (AttributeError, TypeError, KeyError, requests.TooManyRedirects):
             raise web.seeother('/zheng')
+	except errors.RequestError, e:
+	    return render.serv_err(err=e)
 
 # cet
 
