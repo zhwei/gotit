@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import logging
 import logging.handlers
 
 import redis
+from pymongo import Connection
+from pymongo.errors import ConnectionFailure
 
 import config
 import errors
@@ -82,3 +85,18 @@ def get_score_jidi(xh):
     gpa.getscore_page()
     jidi = gpa.get_gpa()["ave_score"]
     return score, jidi
+
+def collect_checkcode(code):
+    """收集中文验证码字库
+    用于以后验证码识别
+    写入MongoDB
+    """
+    try:
+        db = Connection(host='127.0.0.1',port=27017)['gotit']
+    except ConnectionFailure:
+        sys.stderr.write('Error: Can not Connect MongoDB')
+        sys.exit()
+    db.checkcodes.insert({
+        'code': code,
+        })
+    return True

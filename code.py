@@ -15,9 +15,11 @@ from addons.get_CET import CET
 from addons.zfr import ZF, Login
 from addons.autocache import memorize
 from addons import config
-from addons.config import index_cache, debug_mode, sponsor, zheng_alert
+from addons.config import (index_cache, debug_mode, 
+        sponsor, zheng_alert)
 from addons.RedisStore import RedisStore
-from addons.utils import init_redis, get_score_jidi#, init_log
+from addons.utils import (init_redis, get_score_jidi, 
+        collect_checkcode)
 from addons import errors
 
 
@@ -98,6 +100,7 @@ class zheng:
             session['xh'] = content['xh']
             t = content['type']
             time_md5 = session['time_md5']
+            collect_checkcode(content.get('verify', ''))
         except (AttributeError, KeyError), e:
             logging.error(str(content))
             return render.alert_err(error='请检查您是否禁用cookie', url='/zheng')
