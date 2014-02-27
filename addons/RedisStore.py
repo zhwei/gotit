@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 import base64
 try:
     import cPickle as pickle
@@ -37,9 +41,9 @@ class RedisStore(Store):
 
     def __getitem__(self, key):
 
-        v = self.db.getset(SESSION_MARKUP+key, 600)
+        v = self.db.get(SESSION_MARKUP+key)
         if v:
-            #return self.decode(v)
+            self.db.expire(SESSION_MARKUP+key, 600)
             return self.decode(v)
         else:
             raise KeyError

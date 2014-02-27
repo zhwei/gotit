@@ -4,6 +4,9 @@
 import os
 import datetime
 import logging
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 import web
 from web import ctx
@@ -97,7 +100,7 @@ class panel:
 class readlog:
 
     def readfile(self, line):
-        log_pwd = "/home/zhwei/a.txt"
+        log_pwd = "/home/group/gotit/log/gotit2-stderr.log"
         with open(log_pwd) as fi:
             all_lines = fi.readlines()
             counts = len(all_lines)
@@ -122,11 +125,13 @@ class backup:
             # 备份mongodb数据库，打包成zip文件并返回下载
             dt=datetime.datetime.now()
             filename = '/tmp/gotit-backup-{}'.format(dt.strftime('%Y%m%d%H%M%S'))
-            os.system('mongodump -d gotit -o {}'.format(filename))
+            os.system('/home/group/.bin/mongodump -d gotit -o {}'.format(filename))
             ret = zipf2strio(filename) # 打包写入StringIO对象
-            import shutil
-            shutil.rmtree(filename) # 删除备份文件夹
-
+            try:
+                import shutil
+                shutil.rmtree(filename) # 删除备份文件夹
+            except OSError:
+                pass
             web.header('Content-Type','application/octet-stream')
             web.header('Content-disposition', 'attachment; filename=%s.zip' % filename[5:])
             return ret.getvalue()
@@ -165,7 +170,7 @@ class update:
                 if item == 'donate':
                     db.donate.insert({
                         'name':data['name'],
-                        'much':int(data['much']),
+                        'much':float(data['much']),
                         'datetime': datetime.datetime.now(),
                         })
                 else:
