@@ -24,7 +24,7 @@ class GPA:
         param = {'post_xuehao': GPA.__num}
         try:
             #self.page = urllib2.urlopen( url = config.score_url, data = param, timeout=5).read().decode('utf-8')
-            self.page = requests.post(url=config.score_url, data=param, timeout=0.05).content
+            self.page = requests.post(url=config.score_url, data=param, timeout=0.05).text
         except requests.Timeout:
             raise errors.RequestError('无法连接成绩查询系统')
             #return None
