@@ -9,8 +9,8 @@
     <meta name="author" content="">
 
     {% include "css.html" %}
-    <link rel="stylesheet" href="http://huacnlee.com/jquery.qeditor/css/jquery.qeditor.css" />
-    <link rel="stylesheet" href="/static/font-awesome.min.css" />
+    <link rel="stylesheet" href="http://gotit.qiniudn.com/jquery.qeditor.css" />
+    <link rel="stylesheet" href="http://gotit.qiniudn.com/font-awesome.min.css" />
     <!-- Le styles -->
     <style>
       body {
@@ -62,6 +62,8 @@
                       {% endif %}
                       {% set navigation_bar = [
                             ('/manage/panel', 'admin_index', '后台首页','th'),
+                            ('/manage/now', 'now', '负载状况','time'),
+                            ('/manage/analytics', 'analytics', '数据统计','hdd'),
                             ('/manage/o/ls/notice', 'notice', '网站公告','send'),
                             ('/manage/o/ls/donate', 'lsdonate', '捐赠者','usd'),
                             ('/manage/o/ls/zheng', 'zheng', '正方公告','th-list'),
@@ -168,6 +170,41 @@
                 {% for line in lines %}{{ line }}{% endfor %}
               </pre>
             </div>
+            {% elif opera == 'analytics' %}
+              <h2>数据统计</h2>
+              <table class="table table-hover">
+                <thead>
+                  <th>项目</th>
+                  <th>次数</th>
+                  <th>置零</th>
+                </thead>
+                <tr>
+                  <th>InternalError</th>
+                  <td><span class='label label-danger'>{{ times.internalerror }}</span></td>
+                  <td><a href="?zero=internalerror" class="btn btn-default">置零</a></td>
+                </tr>
+                <tr>
+                  <th>验证码</th>
+                  <td><span class='label label-danger'>{{ times.checkcode }}</span></td>
+                  <td></td>
+                </tr>
+              </table>
+            {% elif opera == 'now' %}
+              <h2>负载状况</h2>
+              <table class="table table-hover">
+                <thead>
+                  <th>项目</th>
+                  <th>数目</th>
+                </thead>
+                <tr>
+                  <th>SESSION</th>
+                  <td><span class='label label-primary'>{{ data.session }}</span></td>
+                </tr>
+                <tr>
+                  <th>用户</th>
+                  <td><span class='label label-primary'>{{ data.user}}</span></td>
+                </tr>
+              </table>
             {% else %}
               <h2>welcome administrator</h2>
             {% endif %}
@@ -181,9 +218,11 @@
       </div>
     </div>
     {% include "js.html" %}
-    <script src="/static/jquery.qeditor.js"></script>
-    <script>
-    $("#editor").qeditor({});
-    </script>
+    {% if item %}
+      <script src="http://gotit.qiniudn.com/jquery.qeditor.js"></script>
+      <script>
+      $("#editor").qeditor({});
+      </script>
+    {% endif %}
   </body>
 </html>

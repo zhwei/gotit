@@ -3,7 +3,6 @@
 
 import os
 from os.path import join
-import sys
 import zipfile
 import logging
 import logging.handlers
@@ -12,9 +11,6 @@ try:
 except ImportError:
     import StringIO
 
-import redis
-from pymongo import Connection
-from pymongo.errors import ConnectionFailure
 
 import config
 import errors
@@ -62,31 +58,6 @@ def init_log(log_name, level_name="error", fi=True):
 
     return logger
 
-
-
-def init_redis():
-    redis_server = redis.StrictRedis(host='localhost', port=6379, db=0)
-    return redis_server
-
-def init_mongo():
-    """ 初始化MongoDB 
-    """
-    try:
-        db = Connection(host='127.0.0.1',port=27017)['gotit']
-    except ConnectionFailure:
-        sys.stderr.write('Error: Can not Connect MongoDB')
-        sys.exit()
-
-    return db
-
-def get_last_one_by_date(collection):
-
-    mongo = init_mongo()
-    li = mongo[collection].find().sort('datetime',-1)
-    ret = li[0]
-    return ret
-
-
 def not_error_page(page):
     """检查页面
     检查页面是否有弹窗警告
@@ -102,7 +73,8 @@ def not_error_page(page):
     return True
 
 def get_score_jidi(xh):
-
+    """返回学分绩点
+    """
     a = ALL_SCORE()
     score = a.get_all_score(xh)
     gpa = GPA(xh)
@@ -110,19 +82,10 @@ def get_score_jidi(xh):
     jidi = gpa.get_gpa()["ave_score"]
     return score, jidi
 
-def collect_checkcode(code):
-    """收集中文验证码字库
-    用于以后验证码识别
-    写入MongoDB
-    """
-    db = init_mongo()
-
-    db.checkcodes.insert({
-        'code': code,
-        })
-    return True
 
 def zipf2strio(foldername, includeEmptyDIr=True):
+    """ 压缩目录, 压缩包写入StringIO 并返回
+    """
     empty_dirs = []
     fi = StringIO.StringIO()
     zip = zipfile.ZipFile(fi, 'w', zipfile.ZIP_DEFLATED)

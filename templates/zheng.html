@@ -17,7 +17,7 @@
     <p><input type="password" id="pw" name="pw" class="form-control" placeholder="密码"/></p>
     <p>
       <input type="text" id="verify" name="verify" class="form-control" placeholder="验证码" style="width:50%; float:left;"/>
-      <img style="" src="{{ checkcode }}" alt=""/>
+      <img style="cursor: pointer;" onClick="reloadcode()" src="/zheng/checkcode.gif" id='checkcode' alt="验证码" />
     </p>
     <p>
       <select id="type" name="type" class="selectpicker">
@@ -39,7 +39,6 @@
 {% block foot %}
 <script type="text/javascript">
   $('select').selectpicker();
-  
   $(document).ready(function () {
     document.cookie = "cookieid=1; expires=60";
     var result = document.cookie.indexOf("cookieid=") != -1;
@@ -47,6 +46,11 @@
         alert("浏览器未启用cookie,会导致无法查询，请启用！");
     }
 });
+function reloadcode()
+  {
+    var verify=document.getElementById('checkcode');
+      verify.src=verify.src+'?';
+  }
 </script>
 {% endblock %}
 

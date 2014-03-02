@@ -3,7 +3,6 @@
 
 import os
 import datetime
-import logging
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -16,7 +15,9 @@ from web.contrib.template import render_jinja
 from bson import ObjectId
 from weibo import APIClient, APIError
 
-from addons.utils import init_mongo, zipf2strio
+from addons import mongo2s
+from addons import redis2s
+from addons.utils import zipf2strio
 
 render = render_jinja('templates', encoding='utf-8')
 
@@ -28,12 +29,14 @@ CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK
 AUTH_URL=CLIENT.get_authorize_url()
 
 # init mongoDB
-db = init_mongo()
+db = mongo2s.init_mongo()
 
 urls = (
     '$', 'ologin',
     '/callback', 'callback',
     '/panel', 'panel',
+    '/now', 'now',
+    '/analytics', 'analytics',
     '/backup/(.+)', 'backup',
     '/backup', 'backup',
     '/readlog/(.+)', 'readlog',
@@ -92,12 +95,48 @@ def pre_request():
 
 
 class panel:
+    """ 后台面板首页
+    """
 
     def GET(self):
 
         return render.panel(item=False)
 
+class now:
+
+    def GET(self):
+
+
+        data = {
+                'session': redis2s.get_count('SESSION*'),
+                'user': redis2s.get_count('user*'),
+                }
+
+        return render.panel(item=False, opera='now', data=data)
+
+class analytics:
+    """ 数据统计
+    """
+
+    def GET(self):
+        try:
+            data = web.input(_method='GET')
+            li = ('internalerror', 'checkcode')
+            if data.zero in li: mongo2s.set_zero(data.zero)
+            raise web.seeother('analytics')
+        except AttributeError:
+            pass
+        coll = db.analytics
+        times = {
+                'internalerror': coll.find_one({'item':'internalerror'})['times'],
+                'checkcode': db.checkcodes.count(),
+                }
+        return render.panel(item=None, opera='analytics',
+                            times=times)
+
 class readlog:
+    """ 查看网站日志
+    """
 
     def readfile(self, line):
         log_pwd = "/home/group/gotit/log/gotit2-stderr.log"

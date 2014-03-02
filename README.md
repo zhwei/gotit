@@ -1,6 +1,6 @@
 Got it
 =========
-校内信息查询平台  
+校内信息查询平台
 
 [http://gotit.asia](http://gotit.asia)
 
@@ -8,9 +8,9 @@ Got it
 
     gunicorn code:application
 
-## 依赖包
+## 安装依赖包
 
-  `requirement.txt`
+  pip install -r `requirement.txt`
 
 
 ## 其他服务
