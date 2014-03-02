@@ -67,8 +67,8 @@
                             ('/manage/o/ls/zheng', 'zheng', '正方公告','th-list'),
                             ('/manage/o/ls/cet', 'cet', '四六级公告','headphones'),
                             ('/manage/o/ls/score', 'score', '成绩公告','signal'),
-                            ('/manage/o/ls/score', 'score', '网站备份','cloud-upload'),
-                            ('/manage/o/ls/score', 'score', '网站日志','eye-open'),
+                            ('/manage/backup', 'score', '网站备份','cloud-upload'),
+                            ('/manage/readlog/1', 'score', '网站日志','eye-open'),
                         ] -%}
                         {% set active_page = active_page|default('admin_index') -%}
                         {% for href, id, caption, icon in navigation_bar %}
