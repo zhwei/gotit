@@ -2,8 +2,6 @@
 #coding=utf-8
 #学分基点=∑(课程成绩*课程学分)/应修学分
 import re
-import urllib
-import urllib2
 import logging
 
 import requests
@@ -23,10 +21,10 @@ class GPA:
 
     def getscore_page(self):
         '''获取成绩页面'''
-        param = urllib.urlencode({'post_xuehao':GPA.__num})
+        param = {'post_xuehao': GPA.__num}
         try:
             #self.page = urllib2.urlopen( url = config.score_url, data = param, timeout=5).read().decode('utf-8')
-            self.page = requests.get(url=config.score_url, data=param, timeout=0.05)
+            self.page = requests.post(url=config.score_url, data=param, timeout=0.05).content
         except requests.Timeout:
             raise errors.RequestError('无法连接成绩查询系统')
             #return None
@@ -200,7 +198,7 @@ class GPA:
         '''通过这个函数调用上面的函数'''
         self.__match_table()
         if self.__get_basic_info() == -1:
-            raise errors.PageError('没有该学号的成绩信息')
+            raise errors.PageError('没有该学号的成绩信息11')
         self.__get_score_info()
         self.__calc_score()
         return GPA.__ret
