@@ -20,9 +20,11 @@ from BeautifulSoup import BeautifulSoup
 
 import config
 import errors
-from utils import init_redis, not_error_page
-from image import process_image_string
+import image
+import redis2s
+from utils import not_error_page
 
+rds= redis2s.init_redis()
 
 def process_links(base_url):
     # process links
@@ -83,18 +85,19 @@ class ZF:
         #com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
         #self.VIEWSTATE = com.findall(_content)[0]
 
-        # get checkcode
-        _req1 = safe_get(self.code_url, cookies=_req.cookies, headers=self.headers)
-
+        # create time_md5
         import time
         import md5
-        image_content = _req1.content
         time_md5 = 'user_'+md5.md5(str(time.time())).hexdigest()
-        image_content=process_image_string(image_content)
+
+        # get checkcode
+        #checkcode=self.get_checkcode(time_md5)
+        _req1 = safe_get(self.code_url, cookies=_req.cookies, headers=self.headers)
+        image_content = _req1.content
+        image_content=image.process_image_string(image_content)
         base64_image="data:image/gif;base64,"+image_content.encode('base64').replace('\n','')
 
         # store in redis
-        rds= init_redis()
         rds.hset(time_md5, 'checkcode', base64_image)
         rds.hset(time_md5, 'base_url', self.base_url)
         rds.hset(time_md5, 'viewstate', self.VIEWSTATE)
@@ -108,6 +111,17 @@ class ZF:
         rds.pexpire(time_md5, config.COOKIES_TIME_OUT)
 
         return time_md5
+
+    def get_checkcode(self, time_md5):
+
+        pickled = base64.decodestring(rds.hget(time_md5, 'cookies'))
+        self.cookies = pickle.loads(pickled)
+        rds.pexpire(time_md5, config.COOKIES_TIME_OUT) # 延时
+        # get checkcode
+        _req1 = safe_get(self.code_url, cookies=self.cookies, headers=self.headers)
+        image_content = _req1.content
+        img=image.process_image_string(image_content)
+        return img
 
 
 class Login:
@@ -130,7 +144,6 @@ class Login:
         """ 用户后续查询时从redis获取数据
         """
         # init datas
-        rds= init_redis()
         self.base_url = rds.hget(self.time_md5, 'base_url')
         self.viewstate = rds.hget(self.time_md5, 'viewstate')
         pickled = base64.decodestring(rds.hget(self.time_md5, 'cookies'))

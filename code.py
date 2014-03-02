@@ -10,21 +10,21 @@ import web
 from web.contrib.template import render_jinja
 import requests
 
-from addons import get_old_cet, get_book
+from addons import config
+from addons import errors
+from addons import redis2s
+from addons import mongo2s
 from addons.get_CET import CET
 from addons.zfr import ZF, Login
 from addons.autocache import memorize
-from addons import config
-from addons.config import (index_cache, debug_mode, zheng_alert)
+from addons import get_old_cet, get_book
 from addons.RedisStore import RedisStore
-from addons.utils import (init_redis, get_score_jidi, 
-        collect_checkcode, init_mongo, get_last_one_by_date)
-from addons import errors
-
-
-#import apis
-import manage
 from forms import cet_form, xh_form, login_form
+from addons.config import index_cache, debug_mode
+from addons.utils import get_score_jidi
+
+import apis
+import manage
 
 # debug mode
 web.config.debug = debug_mode
@@ -32,6 +32,7 @@ web.config.debug = debug_mode
 urls = (
     '/', 'index',
     '/zheng', 'zheng',
+    '/zheng/checkcode.gif', 'checkcode',
     '/more/(.+)', 'more',
     '/score', 'score',
     '/cet', 'cet',
@@ -60,10 +61,11 @@ else:
 # render templates
 render = render_jinja('templates', encoding='utf-8',globals={'context':session})
 
-#logger = init_log('code.py')
 
 # init mongoDB
-mongo = init_mongo()
+mongo = mongo2s.init_mongo()
+# init redis
+rds = redis2s.init_redis()
 
 # 首页索引页
 class index:
@@ -85,22 +87,18 @@ class zheng:
             return render.serv_err(err=e.value)
         session['time_md5'] = time_md5
         # get checkcode
-        r = init_redis()
-        checkcode = r.hget(time_md5, 'checkcode')
+        checkcode = rds.hget(time_md5, 'checkcode')
         _alert=mongo.zheng.find_one()
         return render.zheng(alert=_alert, checkcode=checkcode)
 
     def POST(self):
-        try:
-            content = web.input()
-        except UnicodeDecodeError:
-            content = web.input()
-            logging.error('UnicodeDecodeError '+str(content))
+        content = web.input()
         try:
             session['xh'] = content['xh']
             t = content['type']
             time_md5 = session['time_md5']
-            collect_checkcode(content.get('verify', ''))
+            # 收集验证码
+            mongo2s.collect_checkcode(content.get('verify', ''))
         except (AttributeError, KeyError), e:
             logging.error(str(content))
             return render.alert_err(error='请检查您是否禁用cookie', url='/zheng')
@@ -119,6 +117,21 @@ class zheng:
             return render.result(table=__dic[t]())
         except errors.PageError, e:
             return render.alert_err(error=e.value, url='/zheng')
+
+class checkcode:
+    """验证码链接
+    """
+    def GET(self):
+        try:
+            time_md5 = web.input(_method='get').time_md5
+        except AttributeError:
+            time_md5=session['time_md5']
+        except KeyError:
+            return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
+        web.header('Content-Type','images/gif')
+        zf = ZF()
+        image_content = zf.get_checkcode(time_md5)
+        return image_content
 
 class more:
     """连续查询 二次查询
@@ -153,8 +166,8 @@ class more:
             raise web.notfound()
         except (AttributeError, TypeError, KeyError, requests.TooManyRedirects):
             raise web.seeother('/zheng')
-	except errors.RequestError, e:
-	    return render.serv_err(err=e)
+        except errors.RequestError, e:
+            return render.serv_err(err=e)
 
 # cet
 
@@ -318,6 +331,7 @@ def internalerror():
     """500
     """
     web.setcookie('webpy_session_id','',-1)
+    mongo2s.mcount('internalerror')
     return web.internalerror(render.internalerror())
 
 app.notfound = notfound
