@@ -183,4 +183,4 @@ class update:
 
         raise web.seeother('/o/ls/'+item)
 
-#manage.add_processor(web.loadhook(pre_request))
+manage.add_processor(web.loadhook(pre_request))
