@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-import datetime
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-import hashlib
-import lxml
-import time
+
 import os
-import urllib2,json
+import datetime
+import hashlib
+import time
+import json
 from lxml import etree
+
+import requests
 import web
 from web import ctx
 from web.contrib.template import render_jinja
@@ -27,35 +28,30 @@ render = render_jinja('templates', encoding='utf-8')
 db = mongo2s.init_mongo()
 
 urls = (
-    '/weixin', 'WeixinInterface',
-)
+        '/weixin', 'WeixinInterface',
+        )
 
 weixin = web.application(urls, locals())
 
 
-class w_index:
-
-    def GET(self):
-        return 'ok'
-
 def reply_text(toUser, fromUser, createTime, content):
     """返回xml文本信息"""
-    text = """<xml>
-<ToUserName><![CDATA[{0}]]></ToUserName>
-<FromUserName><![CDATA[{1}]]></FromUserName>
-<CreateTime>{2}</CreateTime>
-<MsgType><![CDATA[text]]></MsgType>
-<Content><![CDATA[{3}]]></Content>
-</xml>
-""".format(toUser, fromUser, createTime, content)
+    text = """
+    <xml>
+    <ToUserName><![CDATA[{0}]]></ToUserName>
+    <FromUserName><![CDATA[{1}]]></FromUserName>
+    <CreateTime>{2}</CreateTime>
+    <MsgType><![CDATA[text]]></MsgType>
+    <Content><![CDATA[{3}]]></Content>
+    </xml>
+    """.format(toUser, fromUser, createTime, content)
     return text
 
-class WeixinInterface:
+def process_msg(msg):
 
-    #def __init__(self):
-    #    self.app_root = os.path.dirname(__file__)
-    #    self.templates_root = os.path.join(self.app_root, 'templates')
-    #    self.render = web.template.render(self.templates_root)
+    pass
+
+class WeixinInterface:
 
     def GET(self):
         #获取输入参数
@@ -78,12 +74,57 @@ class WeixinInterface:
         if hashcode == signature:
             return echostr
 
-    def POST(self):        
+    def test_func():
+        return 1
+
+    def event_sub(xml):
+        #mscontent = xml.find("Event").text
+        return "欢迎注册"
+
+    def event_unsub(xml):
+
+        return "欢迎再来"
+
+    def text_help(content=None):
+
+        return """1. 你好\n2.显示帮助\n"""
+
+    def text_repeat(content):
+
+        return content
+
+
+    event_dict={
+        "subscribe":event_sub,
+        "unsubscribe":event_unsub
+    }
+
+    text_dict={
+        "default": text_help,
+        "help": text_help,
+        "repeat": text_repeat,
+    }
+
+    def POST(self):
+        """响应微信
+        """
         str_xml = web.data() #获得post来的数据
         xml = etree.fromstring(str_xml)#进行XML解析
-        content=xml.find("Content").text#获得用户所输入的内容
         msgType=xml.find("MsgType").text
         fromUser=xml.find("FromUserName").text
         toUser=xml.find("ToUserName").text
-        MsgId=xml.find("MsgId").text
-        return reply_text(fromUser,toUser,int(time.time()), u"您刚才说的是：{},id is {}".format(content, MsgId))
+        # MsgId=xml.find("MsgId").text
+        if msgType == "event":
+            mscontent = xml.find("Event").text
+            replayText = self.event_dict.get(mscontent, self.text_help)(xml)
+        elif msgType == "text":
+            content =xml.find("Content").text
+            try:
+                _r = self.text_dict[content]
+                if callable(_r):
+                    replayText = _r(content)
+                elif _r is str:
+                    replayText = _r
+            except KeyError:
+                replayText = self.text_dict['repeat'](content)
+        return reply_text(fromUser, toUser, int(time.time()), "{}-{}".format(fromUser, replayText))

@@ -13,7 +13,6 @@ from addons.calc_GPA import GPA
 from addons.zfr import ZF, Login
 from addons.kb_json import KBJSON
 from addons import errors
-from addons import utils
 
 render = render_jinja('templates', encoding='utf-8')
 
@@ -50,7 +49,6 @@ class api_kb:
         zheng = ZF(_xh, _pw, 'xskbcx')
         json_object = zheng.get_json('xskbcx')
         return json_object
-
 
 
 class api_zheng:
@@ -110,6 +108,9 @@ class api_zheng:
                 table = zf.get_kebiao()
                 k = KBJSON(table)
                 json_object = k.get_json()
+            elif t == "4":
+                table = zf.get_last_score()
+                json_object = self.__score_get_json(table)
             else:
                 return json_err("can not find your t")
 

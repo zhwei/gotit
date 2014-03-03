@@ -23,7 +23,7 @@ from forms import cet_form, xh_form, login_form
 from addons.config import index_cache, debug_mode
 from addons.utils import get_score_jidi
 
-#import apis
+import apis
 import manage
 import weix
 
@@ -39,7 +39,7 @@ urls = (
     '/cet', 'cet',
     '/cet/old', 'cet_old',
     '/libr', 'libr',
-    #'/api', apis.apis,
+    '/api', apis.apis,
     '/weixin', weix.weixin,
     '/manage', manage.manage,
     '/contact.html', 'contact',
