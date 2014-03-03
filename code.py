@@ -23,7 +23,7 @@ from forms import cet_form, xh_form, login_form
 from addons.config import index_cache, debug_mode
 from addons.utils import get_score_jidi
 
-import apis
+#import apis
 import manage
 
 # debug mode
@@ -115,7 +115,7 @@ class zheng:
                     }
             if t not in __dic.keys():
                 return render.alert_err(error='输入不合理', url='/zheng')
-            return render.result(table=__dic[t]())
+            return render.result(tables=__dic[t]())
         except errors.PageError, e:
             return render.alert_err(error=e.value, url='/zheng')
 
@@ -164,7 +164,7 @@ class more:
                     }
             if t in __dic.keys():
                 zf.init_after_login(session['time_md5'], session['xh'])
-                return render.result(table=__dic[t]())
+                return render.result(tables=__dic[t]())
             raise web.notfound()
         except (AttributeError, TypeError, KeyError, requests.TooManyRedirects):
             raise web.seeother('/zheng')
