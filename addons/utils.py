@@ -15,7 +15,6 @@ except ImportError:
 import config
 import errors
 from addons.calc_GPA import GPA
-from addons.get_all_score import ALL_SCORE
 
 
 LEVELS = {
@@ -75,10 +74,9 @@ def not_error_page(page):
 def get_score_jidi(xh):
     """返回学分绩点
     """
-    a = ALL_SCORE()
-    score = a.get_all_score(xh)
     gpa = GPA(xh)
     gpa.getscore_page()
+    score = gpa.get_all_score()
     jidi = gpa.get_gpa()["ave_score"]
     return score, jidi
 

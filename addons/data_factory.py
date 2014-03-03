@@ -4,13 +4,16 @@
 import re
 import json
 
-# just for test
-#import pickle
-#inp = open('kbb.list')
-#kb = pickle.load(inp)
+class Base(object):
+
+    def __json_err(content):
+        """用于生成json error内容"""
+        dic = {'error': content}
+        json_object = json.dumps(dic)
+        return json_object
 
 
-class KBJSON:
+class KbJson(Base):
 
     """
     用于生成课表json, 输出为字典列表，需要传入课表html列表，
@@ -30,13 +33,6 @@ class KBJSON:
     def __init__(self, kb_html_list):
 
         self.kb_html_list = kb_html_list
-
-    def __json_err(content):
-        """用于生成json error内容"""
-        dic = {'error': content}
-        json_object = json.dumps(dic)
-        return json_object
-
 
     def __create_course_dict(self, tu_course):
         '''
@@ -59,9 +55,6 @@ class KBJSON:
             "weekTo": "12 "
         }
         '''
-
-
-
         try:
             odd = re.compile(self.odd_re).findall(tu_course[1])[0].encode('utf-8')
             if odd == '双':
@@ -96,6 +89,44 @@ class KBJSON:
         except ValueError:
             return False
 
+    def get_list(self):
+
+        #from itertools import product
+        #for li, co_re, in product(self.kb_html_list, self.course_re):
+        #    pass
+        #    parm = re.compile(co_re)
+        #    re_result = parm.findall(str(li).decode('utf-8'))
+        #    for res in re_result:
+        #        try:
+        #            course_dict = self.__create_course_dict(res)
+        #        except IndexError:
+        #            pass
+
+        #        if course_dict:
+        #            self.list_course.append(course_dict)
+        #        else:
+        #            return self.__json_err('some lession error, please contact admin')
+
+        for li in self.kb_html_list:
+
+            for co_re in self.course_re:
+                parm = re.compile(co_re)
+                re_result = parm.findall(str(li).decode('utf-8'))
+
+                for res in re_result:
+                    try:
+                        course_dict = self.__create_course_dict(res)
+                    except IndexError:
+                        pass
+                    else:
+                        if course_dict:
+                            self.list_course.append(course_dict)
+                        else:
+                            return self.__json_err('some lession error, please contact admin')
+
+        return self.list_course
+
+
     def get_json(self):
 
         for li in self.kb_html_list:
@@ -122,9 +153,15 @@ class KBJSON:
 
 
 
+def get_score_dict(score_table):
+    """
+    成绩正则匹配为python字典
+    """
+    score_re = re.compile('<td>.*</td><td>.</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td>')
+    _rst = score_re.findall(str(score_table).decode('utf-8'))
+    _dic = {key:value for key, value in _rst}
+    return _dic
 
-#k = KbJson(kb)
-#print k.get_json()
 
 
 

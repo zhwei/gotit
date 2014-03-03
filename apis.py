@@ -11,9 +11,8 @@ from web.contrib.template import render_jinja
 from addons.get_CET import CET
 from addons.calc_GPA import GPA
 from addons.zfr import ZF, Login
-from addons.kb_json import KBJSON
+from addons.data_factory import KbJson, get_score_dict
 from addons import errors
-from addons import utils
 
 render = render_jinja('templates', encoding='utf-8')
 
@@ -68,18 +67,18 @@ class api_zheng:
         json_object = json.dumps(dic)
         return json_object
 
-    def __score_get_json(self, table):
-        """
-        成绩正则匹配为json格式
-        """
-        score_re = re.compile('<td>.*</td><td>.</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td>')
-        result = score_re.findall(str(table).decode('utf-8'))
-        dic = {}
-        for i in result:
-            (key,value) = i
-            dic[key] = value
-        json_object = json.dumps(dic)
-        return json_object
+    #def __score_get_json(self, table):
+    #    """
+    #    成绩正则匹配为json格式
+    #    """
+    #    score_re = re.compile('<td>.*</td><td>.</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td>')
+    #    result = score_re.findall(str(table).decode('utf-8'))
+    #    dic = {}
+    #    for i in result:
+    #        (key,value) = i
+    #        dic[key] = value
+    #    json_object = json.dumps(dic)
+    #    return json_object
 
     def __kb_get_json(self, table):
         pass
@@ -101,14 +100,14 @@ class api_zheng:
             #return render.result(table=__dic[t]())
 
             if t == "1":
-                table = zf.get_score()
-                json_object = self.__score_get_json(table)
+                _dic=get_score_dict(zf.get_score())
+                json_object = json.dumps(_dic)
             elif t == "2":
                 return json_err("please contact admin")
                 #table = zf.get_kaoshi()
             elif t == "3":
                 table = zf.get_kebiao()
-                k = KBJSON(table)
+                k = KbJson(table)
                 json_object = k.get_json()
             else:
                 return json_err("can not find your t")
