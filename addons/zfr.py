@@ -207,7 +207,7 @@ class Login:
         html = self.get_html("xscjcx_dq")
         soup = BeautifulSoup(html, fromEncoding='gbk')
         result = soup.find("table", {"id": "DataGrid1"}).contents
-        return result
+        return (result, )
 
     def get_kebiao(self):
         """
@@ -216,7 +216,8 @@ class Login:
         html = self.get_html("xskbcx")
         soup = BeautifulSoup(html, fromEncoding='gbk')
         result = soup.find("table", {"id": "Table1"}).contents
-        return result
+        ret2 = soup.find("table", {"id": "Table3"}).contents
+        return (result, ret2)
 
     def get_kaoshi(self):
         """
@@ -225,7 +226,7 @@ class Login:
         html = self.get_html("xskscx")
         soup = BeautifulSoup(html, fromEncoding='gbk')
         result = soup.find("table", {"id": "DataGrid1"}).contents
-        return result
+        return (result,)
 
 
     def get_last_kebiao(self):
@@ -238,36 +239,31 @@ class Login:
                 "__EVENTARGUMENT":"",
                 "__VIEWSTATE":viewstate,
                 "xnd":'2013-2014',
-                "xqd":"2",
+                "xqd":"1",
                 }
         url = self.base_url + 'xskbcx' + ".aspx?xh=" + self.xh
         _ret = requests.post(url=url, data=data,cookies=self.cookies, headers=self.headers)
         soup = BeautifulSoup(_ret.text, fromEncoding='gbk')
-        result = soup.find("table", {"id": "Table1"}).contents
-        return result
+        ret1 = soup.find("table", {"id": "Table1"}).contents
+        ret3 = soup.find("table", {"id": "Table3"}).contents
+        return (ret1, ret3)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#zf = ZF()
-#v, t = zf.pre_login()
-#y = raw_input('yanzhengma>')
-#zf.set_user_info('1111051046', 'zhejiushimima')
-#print zf.login(y, v)
+    def get_last_score(self):
+        """二次提交
+        """
+        html = self.get_html("xscjcx_dq")
+        viewstate = get_viewstate(html)
+        data = {
+                "__EVENTTARGET":"",
+                "__EVENTARGUMENT":"",
+                "__VIEWSTATE":viewstate,
+                "ddlxn":'2013-2014',
+                "ddlxq":"1",
+                "btnCx":" 查  询 ",
+                }
+        url = self.base_url + 'xscjcx_dq' + ".aspx?xh=" + self.xh
+        _ret = requests.post(url=url, data=data,cookies=self.cookies, headers=self.headers)
+        soup = BeautifulSoup(_ret.text, fromEncoding='gbk')
+        result = soup.find("table", {"id": "DataGrid1"}).contents
+        return (result, )

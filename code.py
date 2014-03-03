@@ -23,7 +23,7 @@ from forms import cet_form, xh_form, login_form
 from addons.config import index_cache, debug_mode
 from addons.utils import get_score_jidi
 
-import apis
+#import apis
 import manage
 import weix
 
@@ -33,7 +33,7 @@ web.config.debug = debug_mode
 urls = (
     '/', 'index',
     '/zheng', 'zheng',
-    '/zheng/checkcode.gif', 'checkcode',
+    '/zheng/checkcode', 'checkcode',
     '/more/(.+)', 'more',
     '/score', 'score',
     '/cet', 'cet',
@@ -88,10 +88,10 @@ class zheng:
         except errors.ZfError, e:
             return render.serv_err(err=e.value)
         session['time_md5'] = time_md5
-        # get checkcode
-        checkcode = rds.hget(time_md5, 'checkcode')
+        # get alert
         _alert=mongo.zheng.find_one()
-        return render.zheng(alert=_alert, checkcode=checkcode)
+        import time
+        return render.zheng(alert=_alert, ctime=str(time.time()))
 
     def POST(self):
         content = web.input()
@@ -113,10 +113,11 @@ class zheng:
                     '2': zf.get_kaoshi,
                     '3': zf.get_kebiao,
                     '4': zf.get_last_kebiao,
+                    '5': zf.get_last_score,
                     }
             if t not in __dic.keys():
                 return render.alert_err(error='输入不合理', url='/zheng')
-            return render.result(table=__dic[t]())
+            return render.result(tables=__dic[t]())
         except errors.PageError, e:
             return render.alert_err(error=e.value, url='/zheng')
 
@@ -130,9 +131,7 @@ class checkcode:
             time_md5=session['time_md5']
         except KeyError:
             return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
-        web.header('Cache-Control','private')
-        web.header('Connection','close')
-        web.header('Content-Type','images/gif')
+        web.header('Content-Type','image/gif')
         zf = ZF()
         image_content = zf.get_checkcode(time_md5)
         return image_content
@@ -163,10 +162,11 @@ class more:
                     'kaoshi': zf.get_kaoshi,
                     'kebiao': zf.get_kebiao,
                     'lastkebiao': zf.get_last_kebiao,
+                    'lastscore': zf.get_last_score,
                     }
             if t in __dic.keys():
                 zf.init_after_login(session['time_md5'], session['xh'])
-                return render.result(table=__dic[t]())
+                return render.result(tables=__dic[t]())
             raise web.notfound()
         except (AttributeError, TypeError, KeyError, requests.TooManyRedirects):
             raise web.seeother('/zheng')
