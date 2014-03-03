@@ -32,7 +32,7 @@ web.config.debug = debug_mode
 urls = (
     '/', 'index',
     '/zheng', 'zheng',
-    '/zheng/checkcode.gif', 'checkcode',
+    '/zheng/checkcode', 'checkcode',
     '/more/(.+)', 'more',
     '/score', 'score',
     '/cet', 'cet',
@@ -86,10 +86,10 @@ class zheng:
         except errors.ZfError, e:
             return render.serv_err(err=e.value)
         session['time_md5'] = time_md5
-        # get checkcode
-        checkcode = rds.hget(time_md5, 'checkcode')
+        # get alert
         _alert=mongo.zheng.find_one()
-        return render.zheng(alert=_alert, checkcode=checkcode)
+        import time
+        return render.zheng(alert=_alert, ctime=str(time.time()))
 
     def POST(self):
         content = web.input()
@@ -129,7 +129,7 @@ class checkcode:
             time_md5=session['time_md5']
         except KeyError:
             return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
-        web.header('Content-Type','images/gif')
+        web.header('Content-Type','image/gif')
         zf = ZF()
         image_content = zf.get_checkcode(time_md5)
         return image_content
