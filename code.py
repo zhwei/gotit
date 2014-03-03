@@ -111,6 +111,7 @@ class zheng:
                     '2': zf.get_kaoshi,
                     '3': zf.get_kebiao,
                     '4': zf.get_last_kebiao,
+                    '5': zf.get_last_score,
                     }
             if t not in __dic.keys():
                 return render.alert_err(error='输入不合理', url='/zheng')
@@ -159,6 +160,7 @@ class more:
                     'kaoshi': zf.get_kaoshi,
                     'kebiao': zf.get_kebiao,
                     'lastkebiao': zf.get_last_kebiao,
+                    'lastscore': zf.get_last_score,
                     }
             if t in __dic.keys():
                 zf.init_after_login(session['time_md5'], session['xh'])

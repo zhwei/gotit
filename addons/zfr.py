@@ -247,6 +247,27 @@ class Login:
         return result
 
 
+    def get_last_score(self):
+        """二次提交
+        """
+        html = self.get_html("xscjcx_dq")
+        viewstate = get_viewstate(html)
+        data = {
+                "__EVENTTARGET":"",
+                "__EVENTARGUMENT":"",
+                "__VIEWSTATE":viewstate,
+                "ddlxn":'2013-2014',
+                "ddlxq":"1",
+                "btnCx":" 查  询 ",
+                }
+        url = self.base_url + 'xscjcx_dq' + ".aspx?xh=" + self.xh
+        _ret = requests.post(url=url, data=data,cookies=self.cookies, headers=self.headers)
+        soup = BeautifulSoup(_ret.text, fromEncoding='gbk')
+        result = soup.find("table", {"id": "DataGrid1"}).contents
+        return result
+
+
+
 
 
 

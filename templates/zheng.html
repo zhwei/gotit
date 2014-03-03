@@ -17,13 +17,15 @@
     <p><input type="password" id="pw" name="pw" class="form-control" placeholder="密码"/></p>
     <p>
       <input type="text" id="verify" name="verify" class="form-control" placeholder="验证码" style="width:50%; float:left;"/>
-      <img style="cursor: pointer;" onClick="reloadcode()" src="/zheng/checkcode.gif" id='checkcode' alt="验证码" />
+      <!-- <img style="cursor: pointer;" onClick="reloadcode()" src="/zheng/checkcode.gif" id='checkcode' alt="验证码" /> -->
+      <img src="{{ checkcode }}" class="img-responsive" id='checkcode' alt="验证码" />
     </p>
     <p>
       <select id="type" name="type" class="selectpicker">
-        <option value="3">课表查询</option>
         <option value="1">成绩查询</option>
         <option value="2">考试时间查询</option>
+        <option value="3">课表查询</option>
+        <option value="5" selected>上学期成绩</option>
       </select>
     </p>
     <br>
