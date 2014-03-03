@@ -130,6 +130,8 @@ class checkcode:
             time_md5=session['time_md5']
         except KeyError:
             return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
+        web.header('Cache-Control','private')
+        web.header('Connection','close')
         web.header('Content-Type','images/gif')
         zf = ZF()
         image_content = zf.get_checkcode(time_md5)
