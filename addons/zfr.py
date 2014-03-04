@@ -258,8 +258,8 @@ class Login:
                 "__EVENTTARGET":"",
                 "__EVENTARGUMENT":"",
                 "__VIEWSTATE":viewstate,
-                "ddlxn":"1991-1992",
-                "ddlxq":"",
+                "ddlxn":"2013-2014",
+                "ddlxq":"1",
                 "btnCx":" 查  询 ",
                 }
         url = self.base_url + 'xscjcx_dq' + ".aspx?xh=" + self.xh

@@ -39,7 +39,7 @@ urls = (
     '/cet', 'cet',
     '/cet/old', 'cet_old',
     '/libr', 'libr',
-    '/api', apis.apis,
+    #'/api', apis.apis,
     '/weixin', weix.weixin,
     '/manage', manage.manage,
     '/contact.html', 'contact',

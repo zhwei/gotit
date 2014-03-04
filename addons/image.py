@@ -24,9 +24,8 @@ def process_image(image):
             c = im.getpixel((i,j))
             if c < 220:
                 draw.point((i,j),255)
-
-    # im.save(pwd)
-    return im
+    region = im.crop((24,0,92,30))   # 裁剪图片(x1, y1, x2, y2)
+    return region
 
 def process_image_string(image):
     """
