@@ -165,7 +165,7 @@ class ProcessMsg(object):
         if ret == "": ret = "暂无\n"
         return ret
 
-    def zf(self, init=True, fast=False):
+    def zf_process(self, init=True, fast=False):
         _tu = {
                 'xh':'学号',
                 'pw':'密码',
@@ -174,7 +174,7 @@ class ProcessMsg(object):
         if init:
             """引导输入学号等信息"""
             st = rds.hget(self.fromUser, 'status')
-            if st in (None,) or self.content == '11':
+            if st not in ('xh','pw','verify') or self.content == '11':
                 rds.hset(self.fromUser, 'status', 'xh')
                 return self.replay_text('请输入学号:\n(q.退出查询状态)')
             if st == 'xh':
@@ -364,9 +364,10 @@ class WeixinInterface(BaseMsg, ProcessMsg):
                 return self.replay_text('已清空用户信息,退出查询过程.\n{}'.format(self.text_help()))
             # 引导查询操作
             elif _s in ('logged',) and self.content != '11':
-                return self.zf(init=False)
+                return self.zf_process(init=False)
             elif self.content in ('1', '11')  or _s in ('xh', 'pw', 'verify',):
-                return self.zf(init=True)
+                print 'test'
+                return self.zf_process(init=True)
             # 快速指令查询
             elif self.content in ('2'):
                 return self.fast_zf(init=True)
