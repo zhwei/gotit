@@ -1,0 +1,77 @@
+{% extends 'base-index.html' %}
+{% block title %}我们为你Got it{% endblock %}
+
+
+{% block nav %}
+<li class="active"><a href="/">首页</a></li>
+<li><a href="/notice.html">公告</a></li>
+<li><a href="/comment.html">留言</a></li>
+<li><a href="/donate.html">赞助</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+  <p><a class="btn btn-large btn-success" href="">Got It</a></p>
+  <p class="lead">微信公众账号上线了！！！</p>
+  <p><a href="/weixin" class="btn btn-primary btn-lg">点击抢鲜试用！</a></p>
+</div>
+
+<hr>
+
+<div class="row marketing">
+  <div class="col-lg-6">
+    <div class="well" onclick="location.href='/zheng';" style="cursor:pointer;">
+
+      <h4><a href="/zheng">本学期课表 成绩 考试时间</a></h4>
+      <p>查询本学期课表 成绩以及考试时间.</p>
+      {% if alert %}
+      <div class="alert alert-info">
+        <p>{{ alert.content }}</p>
+      </div>
+      {% endif %}
+    </div>
+    <div class="well" onclick="location.href='/cet';" style="cursor:pointer;">
+      <h4><a href="/cet">四六级成绩查询</a></h4>
+      <p>最新四六级成绩查询.</p>
+    </div>
+
+    <div class="well" onclick="location.href='/libr';" style="cursor:pointer;">
+      <h4><a href="/libr">图书馆借书查询</a></h4>
+      <p>在图书馆借了那些书，超期了没有？</p>
+    </div>
+
+    <div class="well" onclick="location.href='/404';" style="cursor:pointer;">
+      <h4><a href="/404">公益404页面</a></h4>
+      <p></p>
+    </div>
+
+  </div>
+
+  <div class="col-lg-6">
+    <div class="well" onclick="location.href='/weixin';" style="cursor:pointer;">
+      <h4><a href="/weixin">微信公众账号</a></h4>
+      <p>微信公众账号，成绩查询，方便快捷！</p>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="well" onclick="location.href='/score';" style="cursor:pointer;">
+      <h4><a href="/score">总成绩 学分绩点</a></h4>
+      <p>查询入学以来所有成绩,包括第二专业和补考成绩以及平均学分绩点.</p>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+
+    <div class="well" onclick="location.href='/cet/old';" style="cursor:pointer;">
+      <h4><a href="/cet/old">往年四六级成绩</a></h4>
+      <p>往年四六级成绩查询，看看你的战绩！</p>
+    </div>
+    <div class="well" onclick="location.href='/donate.html#names';" style="cursor:pointer;">
+      <h4><a href="/donate.html#names">网站赞助者名单</a></h4>
+      <p>您的每一分钱都会让<strong>Gotit</strong>做得更好!</p>
+    </div>    
+  </div>
+</div>
+{% endblock %}
+

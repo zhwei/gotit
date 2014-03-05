@@ -318,10 +318,18 @@ class ProcessMsg(object):
 
 
 urls = (
+        '$', 'WeixinIndex',
         '/weixin', 'WeixinInterface',
         )
 
 weixin = web.application(urls, locals())
+
+class WeixinIndex:
+
+    def GET(self):
+        from web.contrib.template import render_jinja
+        render = render_jinja('templates', encoding='utf-8')
+        return render.weixin()
 
 class WeixinInterface(BaseMsg, ProcessMsg):
 
