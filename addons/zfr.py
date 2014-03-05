@@ -132,8 +132,8 @@ class Login:
     def init_from_form(self, time_md5, post_content):
         """ 在用户提交帐号密码的时候初始化对象的必要数据
         """
-        self.xh = post_content['xh']
-        self.pw = post_content['pw']
+        self.xh = post_content.get('xh')
+        self.pw = post_content.get('pw')
         self.time_md5 = time_md5
         try:
             self.verify = post_content['verify'].decode("utf-8").encode("gb2312")
