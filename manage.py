@@ -24,7 +24,7 @@ render = render_jinja('templates', encoding='utf-8')
 
 APP_KEY = '4001516920' # app key
 APP_SECRET = '44a4fb573339e30a901249978a1322b9' # app secret
-CALLBACK_URL = 'http://gotit.asia/manage/callback' # callback url
+CALLBACK_URL = 'http://wt.gotit.asia/manage/callback' # callback url
 CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
 AUTH_URL=CLIENT.get_authorize_url()
 
@@ -186,7 +186,7 @@ class backup:
 
 class update:
 
-    item_list = ['donate', 'zheng', 'cet', 'notice', 'score']
+    item_list = ['donate', 'zheng', 'cet', 'notice', 'score', 'wxcomment']
     opera_list = ['cr', 'del', 'ls', 'info']
 
     def GET(self, opera, item, oid=None):

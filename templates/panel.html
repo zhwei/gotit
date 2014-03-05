@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-
     {% include "css.html" %}
     <link rel="stylesheet" href="http://gotit.qiniudn.com/jquery.qeditor.css" />
     <link rel="stylesheet" href="http://gotit.qiniudn.com/font-awesome.min.css" />
@@ -65,12 +64,13 @@
                             ('/manage/now', 'now', '负载状况','time'),
                             ('/manage/analytics', 'analytics', '数据统计','hdd'),
                             ('/manage/o/ls/notice', 'notice', '网站公告','send'),
+                            ('/manage/o/ls/wxcomment', 'wxcomment', '微信留言','thumbs-up'),
                             ('/manage/o/ls/donate', 'lsdonate', '捐赠者','usd'),
                             ('/manage/o/ls/zheng', 'zheng', '正方公告','th-list'),
                             ('/manage/o/ls/cet', 'cet', '四六级公告','headphones'),
                             ('/manage/o/ls/score', 'score', '成绩公告','signal'),
-                            ('/manage/backup', 'score', '网站备份','cloud-upload'),
-                            ('/manage/readlog/1', 'score', '网站日志','eye-open'),
+                            ('/manage/backup', 'backup', '网站备份','cloud-upload'),
+                            ('/manage/readlog/1', 'log', '网站日志','eye-open'),
                         ] -%}
                         {% set active_page = active_page|default('admin_index') -%}
                         {% for href, id, caption, icon in navigation_bar %}
@@ -117,6 +117,10 @@
                       <td>{{ l.name }}</td>
                       <td>{{ l.much }}</td>
                       <td>{{ l.datetime }}</td>
+                      {% elif item == 'wxcomment' %}
+                        <td class='text-overflow'>{{ l.content }}</td>
+                        <td>{{ l.datetime }}</td>
+			<td><span class="label label-primary" title="{{ l.user }}"><i class="glyphicon glyphicon-user"></i></span></td>
                       {% else %}
                         <td class='text-overflow'>{{ l.content }}</td>
                         <td>{{ l.datetime }}</td>

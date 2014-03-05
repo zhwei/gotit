@@ -45,7 +45,9 @@ INDEX_HELP_TEXT = \
 0.显示此帮助菜单
 q.删除用户信息
 - - -
-000.打赏我们"""
+666.建议or留言
+999.官网链接(更多功能)
+000.赞助我们"""
 
 LOGGED_HELP_TEXT = \
 """输入下面序号查询相关内容:
@@ -68,7 +70,7 @@ FAST_ZF_HELP = \
 0.显示此帮助菜单
 q.删除用户信息
 - - -
-000.打赏我们"""
+000.赞助我们"""
 
 class BaseMsg(object):
     """基本信息操作"""
@@ -274,7 +276,7 @@ class ProcessMsg(object):
                 ret = "前缀错误\n{}".format(FAST_ZF_HELP)
             except errors.PageError, e:
                 ret = e.value
-            ret += FAST_ZF_HELP
+            ret += "- - - \n {}".format(FAST_ZF_HELP)
             return self.replay_text(ret)
 
     def cet_jidi(self, xh=False):
@@ -290,6 +292,30 @@ class ProcessMsg(object):
         _t = rds.hget(self.fromUser, 'status')
         ret = _dic[_t](xh)
         return self.replay_text(ret)
+
+    def comment(self, init=True):
+        """留言"""
+        if init:
+            rds.hset(self.fromUser, 'status', 'comment')
+            text = "格式: ly#<内容>\n谢谢支持！"
+            return self.replay_text(text)
+        if self.content.startswith('ly#') is False: 
+            rds.hset(self.fromUser, 'status', None)
+            return self.replay_text("格式错误, 留言结束,谢谢支持。")
+        _data = {
+                'user': self.fromUser,
+                'content': self.content[3:],
+                'datetime': datetime.datetime.now(),
+                }
+        db.wxcomment.insert(_data)
+        rds.hset(self.fromUser, 'status', None)
+        return self.replay_text("提交成功，谢谢您的支持！")
+
+    def clear_user(self):
+        # 清空用户状态
+        rds.delete(self.fromUser)
+        return self.replay_text('已清空用户信息,退出查询过程.\n{}'.format(self.text_help()))
+
 
 urls = (
         '/weixin', 'WeixinInterface',
@@ -324,13 +350,6 @@ class WeixinInterface(BaseMsg, ProcessMsg):
         "subscribe": "欢迎使用Gotit微信服务，您的支持是我们最大的动力！\n"+INDEX_HELP_TEXT,
         "unsubscribe": "See you !"
     }
-    # 基本文本响应信息
-    text_dict={
-        "help": INDEX_HELP_TEXT,
-        "000": "谢谢您的支持！\nhttps://me.alipay.com/zhweifcx",
-        "auth": "zhwei http://zhangweide.cn",
-        "py": "I love python",
-    }
 
     def POST(self):
         """响应微信
@@ -346,38 +365,43 @@ class WeixinInterface(BaseMsg, ProcessMsg):
             replayText = self.event_dict.get(mscontent, self.text_help())
         elif msgType == "text":
             self.content =xml.find("Content").text
-            # 基本信息处理
+            # 基本文本响应信息
+            text_dict={
+                "help": INDEX_HELP_TEXT,
+                "000": "谢谢您的支持！\nhttps://me.alipay.com/zhweifcx",
+                "999": "欢迎使用Gotit！\nhttp://gotit.asia/",
+                "666": self.comment,
+                "q": self.clear_user,
+                "auth": "zhwei\nhttp://zhangweide.cn",
+                "py": "I love python",
+            }
             try:
-                _r = self.text_dict[self.content]
-                if callable(_r):
-                    replayText = _r(self.content)
+                _r = text_dict[self.content]
+                if callable(_r): return _r()
                 elif isinstance(_r, str):
-                    replayText = _r
-                return self.replay_text(replayText)
+                    return self.replay_text(_r)
             except KeyError:
                 pass
             # 获取用户状态
             _s = rds.hget(self.fromUser, 'status')
-            # 清空用户状态
-            if self.content == "q":
-                rds.delete(self.fromUser)
-                return self.replay_text('已清空用户信息,退出查询过程.\n{}'.format(self.text_help()))
             # 引导查询操作
-            elif _s in ('logged',) and self.content != '11':
+            if _s in ('logged',) and self.content != '11':
                 return self.zf_process(init=False)
             elif self.content in ('1', '11')  or _s in ('xh', 'pw', 'verify',):
-                print 'test'
                 return self.zf_process(init=True)
             # 快速指令查询
-            elif self.content in ('2'):
-                return self.fast_zf(init=True)
+            elif self.content in ('2',):
+                return self.fast_zf()
             elif str(_s).startswith('fast'):
                 return self.fast_zf(init=False)
             # gpa and old cet
-            elif self.content in ('3', '4'):
+            elif self.content in ('3', '4'): 
                 return self.cet_jidi()
-            elif _s in ('3', '4'):
+            elif _s in ('3', '4'): 
                 return self.cet_jidi(self.content)
+            # comment
+            elif _s == 'comment':
+                return self.comment(False)
 
         replayText = self.text_help()
         return self.replay_text(replayText)
