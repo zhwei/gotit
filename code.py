@@ -97,10 +97,7 @@ class zheng:
             session['xh'] = content['xh']
             t = content['type']
             time_md5 = session['time_md5']
-            # 收集验证码
-            mongo2s.collect_checkcode(content.get('verify', ''))
         except (AttributeError, KeyError), e:
-            logging.error(str(content))
             return render.alert_err(error='请检查您是否禁用cookie', url='/zheng')
 
         try:
@@ -126,9 +123,10 @@ class checkcode:
         try:
             time_md5 = web.input(_method='get').time_md5
         except AttributeError:
-            time_md5=session['time_md5']
-        except KeyError:
-            return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
+            try:
+                time_md5=session['time_md5']
+            except KeyError:
+                return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
         web.header('Content-Type','image/gif')
         zf = ZF()
         image_content = zf.get_checkcode(time_md5)
@@ -170,6 +168,8 @@ class more:
             raise web.seeother('/zheng')
         except errors.RequestError, e:
             return render.serv_err(err=e)
+        except errors.PageError, e:
+            return render.alert_err(error=e.value, url='/score')
 
 # cet
 
