@@ -23,6 +23,7 @@ import errors
 import image
 import redis2s
 from utils import not_error_page
+import mongo2s
 
 rds= redis2s.init_redis()
 
@@ -136,6 +137,8 @@ class Login:
         self.pw = post_content.get('pw')
         self.time_md5 = time_md5
         try:
+            # collect checkcode
+            mongo2s.collect_checkcode(post_content.get('verify', ''))
             self.verify = post_content['verify'].decode("utf-8").encode("gb2312")
         except UnicodeEncodeError:
             raise errors.PageError('验证码错误')
@@ -155,7 +158,6 @@ class Login:
         self.init_from_form(time_md5, post_content)
         self.init_from_redis()
         self.login_url, self.code_url, self.headers = process_links(self.base_url)
-
         # init post data
         data = {
             'Button1':'',
