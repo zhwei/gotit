@@ -12,7 +12,8 @@
 {% block content %}
 <div class="jumbotron">
   <p><a class="btn btn-large btn-success" href="">Got It</a></p>
-  <p class="lead">预祝同学们寒假开心，新年快乐！</p>
+  <p class="lead">微信公众账号上线了！！！</p>
+  <p><a href="/weixin" class="btn btn-primary btn-lg">点击抢鲜试用！</a></p>
 </div>
 
 <hr>
@@ -47,11 +48,19 @@
   </div>
 
   <div class="col-lg-6">
+    <div class="well" onclick="location.href='/weixin';" style="cursor:pointer;">
+      <h4><a href="/weixin">微信公众账号</a></h4>
+      <p>微信公众账号，成绩查询，方便快捷！</p>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
     <div class="well" onclick="location.href='/score';" style="cursor:pointer;">
       <h4><a href="/score">总成绩 学分绩点</a></h4>
       <p>查询入学以来所有成绩,包括第二专业和补考成绩以及平均学分绩点.</p>
     </div>
   </div>
+
   <div class="col-lg-6">
 
     <div class="well" onclick="location.href='/cet/old';" style="cursor:pointer;">

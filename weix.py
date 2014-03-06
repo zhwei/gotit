@@ -276,6 +276,7 @@ class ProcessMsg(object):
                 ret = "前缀错误\n{}".format(FAST_ZF_HELP)
             except errors.PageError, e:
                 ret = e.value
+            rds.hset(self.fromUser, 'status', None)
             ret += "- - - \n {}".format(FAST_ZF_HELP)
             return self.replay_text(ret)
 
@@ -291,6 +292,7 @@ class ProcessMsg(object):
                 }
         _t = rds.hget(self.fromUser, 'status')
         ret = _dic[_t](xh)
+        rds.hset(self.fromUser, 'status', None)
         return self.replay_text(ret)
 
     def comment(self, init=True):
