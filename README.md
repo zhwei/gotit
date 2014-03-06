@@ -20,9 +20,8 @@ Got it
 
 ## 安装依赖包
 
-  pip install -r `requirement.txt`
-
-  apt-get install python-lxml
+    pip install -r `requirement.txt`
+    apt-get install python-lxml
 
 
 ## 需要的其他服务
