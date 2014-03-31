@@ -8,6 +8,9 @@ import hashlib
 import pickle
 from functools import wraps
 
+from redis2s import init_redis
+rds = init_redis()
+
 _cache = {}
 
 def _is_obsolete(entry, duration):
@@ -39,6 +42,24 @@ def memorize(duration = -1):
                 'value' : result,
                 'time'  : time.time()
             }
+            return result
+        return __memoize
+    return _memoize
+
+def redis_cache(duration = -1, key=None):
+    '''cache in redis'''
+    def _memoize(function):
+        @wraps(function) # 自动复制函数信息
+        def __memoize(*args, **kw):
+            #是否已缓存？
+            if key in _cache:
+                #是否过期？
+                if _is_obsolete(_cache[key], duration) is False:
+                    return rds.get(key)
+            # 运行函数
+            result = function(*args, **kw)
+            # set to redis
+            rds.set(key, result)
             return result
         return __memoize
     return _memoize
