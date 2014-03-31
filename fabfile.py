@@ -65,6 +65,4 @@ def deploy(do='app'):
     with cd(PROJECT_HOME):
 
         git_pull(DEPLOY_BARNCH)
-        install_require()
-
         restart_project(PROJECT_NAME_IN_SUPERVISOR)
