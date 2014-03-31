@@ -74,7 +74,8 @@ class index:
 
     def GET(self):
         _alert=mongo.zheng.find_one()
-        return render.index(alert=_alert)
+        jumbotron = mongo.jumbotron.find_one()
+        return render.index(alert=_alert, jumbotron=jumbotron)
 
 
 # 成绩查询

@@ -186,7 +186,7 @@ class backup:
 
 class update:
 
-    item_list = ['donate', 'zheng', 'cet', 'notice', 'score', 'wxcomment']
+    item_list = ['donate', 'zheng', 'cet', 'notice', 'score', 'wxcomment', 'jumbotron']
     opera_list = ['cr', 'del', 'ls', 'info']
 
     def GET(self, opera, item, oid=None):
@@ -222,4 +222,4 @@ class update:
 
         raise web.seeother('/o/ls/'+item)
 
-manage.add_processor(web.loadhook(pre_request))
+# manage.add_processor(web.loadhook(pre_request))

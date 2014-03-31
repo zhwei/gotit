@@ -13,7 +13,7 @@ PROJECT_HOME = '/home/group/gotit'
 ## project name in supervisor
 PROJECT_NAME_IN_SUPERVISOR = 'gotit'
 ## default deploy branch
-DEPLOY_BARNCH = 'zhwei'
+DEPLOY_BARNCH = '2.0-stable'
 
 def put_sshkey():
     """push ssh key to server

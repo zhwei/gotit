@@ -12,7 +12,9 @@
 {% block content %}
 <div class="jumbotron">
   <p><a class="btn btn-large btn-success" href="">Got It</a></p>
-  <p class="lead">天天好心情!</p>
+  <div class="text-center">
+    {{ jumbotron.content|default("<p class='lead text-success'>天天有个好心情!</p>", True) }}
+  </div>
 </div>
 
 <hr>
@@ -69,8 +71,7 @@
     <div class="well" onclick="location.href='/donate.html#names';" style="cursor:pointer;">
       <h4><a href="/donate.html#names">网站赞助者名单</a></h4>
       <p>您的每一分钱都会让<strong>Gotit</strong>做得更好!</p>
-    </div>    
+    </div>
   </div>
 </div>
 {% endblock %}
-
