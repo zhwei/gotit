@@ -19,8 +19,12 @@ def put_sshkey():
     """push ssh key to server
     """
     with cd('/tmp'):
-        put('id_rsa.pub.master', 'id_rsa.pub.master')
+        put('~/.ssh/id_rsa.pub', 'id_rsa.pub.master')
+        print(green('Put Successfully !!'))
         run('cat id_rsa.pub.master >> ~/.ssh/authorized_keys')
+        print(green('Cat Successfully !!'))
+        run('rm id_rsa.pub.master')
+        print(green('rm Successfully !!'))
 
 # git
 
