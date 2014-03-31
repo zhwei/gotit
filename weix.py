@@ -112,8 +112,8 @@ class BaseMsg(object):
             <item>
                 <Title><![CDATA[请输入验证码({5}.重新获取)]]></Title> 
                 <Description><![CDATA[{4}r 重新获取验证码\nPS:距离远一点能看的更清楚\nq.退出查询状态]]></Description>
-                <PicUrl><![CDATA[http://wt.gotit.asia/zheng/checkcode?r={2}&time_md5={3}]]></PicUrl>
-                <Url><![CDATA[http://wt.gotit.asia/zheng/checkcode?r={2}&time_md5={3}]]></Url>
+                <PicUrl><![CDATA[http://gotit.asia/zheng/checkcode?r={2}&time_md5={3}]]></PicUrl>
+                <Url><![CDATA[http://gotit.asia/zheng/checkcode?r={2}&time_md5={3}]]></Url>
             </item>
         </Articles>
         </xml> """.format(self.fromUser, self.toUser, int(time.time()), time_md5, content, r)
@@ -291,15 +291,18 @@ class ProcessMsg(object):
                 '4': self.get_old_cet,
                 }
         _t = rds.hget(self.fromUser, 'status')
-        ret = _dic[_t](xh)
-        rds.hset(self.fromUser, 'status', None)
+        try:
+            ret = _dic[_t](xh)
+            rds.hset(self.fromUser, 'status', None)
+        except errors.RequestError, e:
+            ret = e.value
         return self.replay_text(ret)
 
     def comment(self, init=True):
         """留言"""
         if init:
             rds.hset(self.fromUser, 'status', 'comment')
-            text = "格式: ly#<内容>\n谢谢支持！"
+            text = "格式: ly#内容\n谢谢支持！"
             return self.replay_text(text)
         if self.content.startswith('ly#') is False: 
             rds.hset(self.fromUser, 'status', None)

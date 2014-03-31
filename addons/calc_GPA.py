@@ -200,7 +200,7 @@ class GPA:
         '''通过这个函数调用上面的函数'''
         self.__match_table()
         if self.__get_basic_info() == -1:
-            raise errors.PageError('没有该学号的成绩信息11')
+            raise errors.PageError('没有该学号的成绩信息')
         self.__get_score_info()
         self.__calc_score()
         return GPA.__ret
