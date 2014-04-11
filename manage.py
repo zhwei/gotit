@@ -28,8 +28,12 @@ CALLBACK_URL = 'http://gotit.asia/manage/callback' # callback url
 CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
 AUTH_URL=CLIENT.get_authorize_url()
 
+# 公告前缀(redis中的键前缀)
+SINGLE_HEAD = 'single_'
+
 # init mongoDB
 db = mongo2s.init_mongo()
+rds = redis2s.init_redis()
 
 urls = (
     '$', 'ologin',
@@ -42,6 +46,8 @@ urls = (
     '/readlog/(.+)', 'readlog',
     '/o/(.+)/(.+)/(.+)', 'update',
     '/o/(.+)/(.+)', 'update',
+    '/2/(.+)/(.+)', 'single',
+    '/2/(.+)', 'single',
 )
 
 manage = web.application(urls, locals())
@@ -222,4 +228,45 @@ class update:
 
         raise web.seeother('/o/ls/'+item)
 
-manage.add_processor(web.loadhook(pre_request))
+
+
+class single:
+
+    opera_list = ['cr', 'del', 'info']
+
+    def GET(self, opera, item=None):
+        if opera in self.opera_list:
+            if opera == 'info':
+
+                def get_kv():
+                    for key in rds.keys(SINGLE_HEAD+"*"):
+                        print key
+                        yield (key[7:], rds.get(key))
+
+                return render.panel2(single_list=get_kv(), opera=opera)
+        return render.panel2(item=item, opera=opera)
+
+    def POST(self, opera, item, oid=None):
+
+        data = web.input()
+
+        if opera in self.opera_list:
+
+            if opera == 'cr' :
+                if item == 'donate':
+                    db.donate.insert({
+                        'name':data['name'],
+                        'much':float(data['much']),
+                        'datetime': datetime.datetime.now(),
+                        })
+                else:
+                    db[item].insert({
+                        'content':data['content'],
+                        'datetime': datetime.datetime.now(),
+                        })
+            elif opera == 'del':
+                db[item].remove({'_id':ObjectId(data['oid'])})
+
+        raise web.seeother('/o/ls/'+item)
+
+# manage.add_processor(web.loadhook(pre_request))

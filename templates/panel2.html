@@ -89,10 +89,9 @@
             <div class="col-md-9">
 
 
-            {% if item %}
+            {% if opera %}
 
-              <legend>{{ opera }} - {{ item }}</legend> 
-              <p><a href="/manage/o/cr/{{ item }}" class='btn btn-default'><i class="glyphicon glyphicon-plus"></i>&nbsp;添加</a></p>
+              <legend>{{ opera }} - {{ item }}</legend>
               {% if opera == 'cr' %}
                 <form action="" method="POST" class="form-horizontal" role="form">
                     <fieldset>
@@ -109,27 +108,23 @@
                     </fieldset>
                     {{ form.submit(value="提交") }}
                 </form>
-              {% elif opera == 'ls' %}
+              {% elif opera == 'info' %}
                 <table class='table table-hover'>
+                <thead><tr class="active">
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Do</th>
+                </tr></thead>
                   <tbody>
-                  {% for l in ls %}
-                    <tr>
-                      {% if item == 'donate' %}
-                      <td>{{ l.name }}</td>
-                      <td>{{ l.much }}</td>
-                      <td>{{ l.datetime }}</td>
-                      {% elif item == 'wxcomment' %}
-                        <td class='text-overflow'>{{ l.content }}</td>
-                        <td>{{ l.datetime }}</td>
-			<td><span class="label label-primary" title="{{ l.user }}"><i class="glyphicon glyphicon-user"></i></span></td>
-                      {% else %}
-                        <td class='text-overflow'>{{ l.content }}</td>
-                        <td>{{ l.datetime }}</td>
-                      {% endif %}
-                      <td>
-                        <a href="/manage/o/del/{{ item }}/{{ l._id }}" class="btn btn-default"><i class='glyphicon glyphicon-remove'></i>&nbsp;删除</a>
-                      </td>
-                    </tr>
+                  {% for single in single_list %}
+                      <tr>
+                          <th>{{ single[0] }}</th>
+                          <td>{{ single[1] }}</td>
+                          <td>
+                              <a class="btn btn-default btn-mini" href=""><i class="glyphicon glyphicon-edit"></i></a>
+                              <a class="btn btn-default btn-mini" href=""><i class="glyphicon glyphicon-remove"></i></a>
+                          </td>
+                      </tr>
                   {% endfor %}
                   </tbody>
                 </table>
@@ -149,67 +144,6 @@
                 </form>
               </div>
               {% endif %}
-
-            {% elif opera == 'backup' %}
-            <h2 class="lead">Export or Import</h2>
-            <div>
-              <p class="lead">Export</p>
-              <p><a href="/manage/backup/download" class="btn btn-default"><i class="glyphicon glyphicon-cloud-download"></i>&nbsp;导出备份</a></p>
-<!--               <p class="lead">Import</p> -->
-<!--               <form method="post" action="">
-                <p><input type="file" name="myfile" /></p>
-                <p><button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-cloud-upload"></i>&nbsp;导入</button></p>
-              </form> -->
-            </div>
-
-            {% elif opera == 'readlog' %}
-            <h2 class="lead">网站日志</h2>
-            <p>
-              <a href="/manage/readlog/1" class='btn btn-default'>最后50行</a>
-              <a href="/manage/readlog/2" class='btn btn-default'>最后100行</a>
-              <a href="/manage/readlog/3" class='btn btn-default'>最后150行</a>
-              <a href="/manage/readlog/4" class='btn btn-default'>最后200行</a>
-            </p>
-            <div>
-              <pre>
-                {% for line in lines %}{{ line }}{% endfor %}
-              </pre>
-            </div>
-            {% elif opera == 'analytics' %}
-              <h2>数据统计</h2>
-              <table class="table table-hover">
-                <thead>
-                  <th>项目</th>
-                  <th>次数</th>
-                  <th>置零</th>
-                </thead>
-                <tr>
-                  <th>InternalError</th>
-                  <td><span class='label label-danger'>{{ times.internalerror }}</span></td>
-                  <td><a href="?zero=internalerror" class="btn btn-default">置零</a></td>
-                </tr>
-                <tr>
-                  <th>验证码</th>
-                  <td><span class='label label-danger'>{{ times.checkcode }}</span></td>
-                  <td></td>
-                </tr>
-              </table>
-            {% elif opera == 'now' %}
-              <h2>负载状况</h2>
-              <table class="table table-hover">
-                <thead>
-                  <th>项目</th>
-                  <th>数目</th>
-                </thead>
-                <tr>
-                  <th>SESSION</th>
-                  <td><span class='label label-primary'>{{ data.session }}</span></td>
-                </tr>
-                <tr>
-                  <th>用户</th>
-                  <td><span class='label label-primary'>{{ data.user}}</span></td>
-                </tr>
-              </table>
             {% else %}
               <h2>welcome administrator</h2>
             {% endif %}

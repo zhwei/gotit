@@ -8,6 +8,7 @@ import logging
 
 import web
 from web.contrib.template import render_jinja
+from jinja2.exceptions import UndefinedError
 import requests
 
 from addons import config
@@ -75,7 +76,10 @@ class index:
     def GET(self):
         _alert=mongo.zheng.find_one()
         jumbotron = mongo.jumbotron.find_one()
-        return render.index(alert=_alert, jumbotron=jumbotron)
+        try:
+            return render.index(alert=_alert, jumbotron=jumbotron)
+        except UndefinedError:
+            return render.index(alert=_alert)
 
 
 # 成绩查询

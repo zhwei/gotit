@@ -13,6 +13,21 @@ rds = init_redis()
 
 _cache = {}
 
+def redis_cache(duration = -1, key=None):
+    '''
+    cache in redis
+    duration: 过期时间, -1 为永不过期
+    '''
+    def _mem(function):
+        @wraps(function) # 自动复制函数信息
+        def __mem(*args, **kw):
+            rds.get(key)
+            result = function(*args, **kw)
+            rds.set(key, result)
+            return result
+        return __mem
+    return _mem
+
 def _is_obsolete(entry, duration):
     '''是否过期'''
     if duration == -1: #永不过期
@@ -22,7 +37,7 @@ def _is_obsolete(entry, duration):
 def _compute_key(function, args,kw):
     '''序列化并求其哈希值'''
     key = pickle.dumps((function.func_name,args,kw))
-    return hashlib.sha1(key).hexdigest() 
+    return hashlib.sha1(key).hexdigest()
 
 def memorize(duration = -1):
     '''自动缓存'''
@@ -46,20 +61,4 @@ def memorize(duration = -1):
         return __memoize
     return _memoize
 
-def redis_cache(duration = -1, key=None):
-    '''cache in redis'''
-    def _memoize(function):
-        @wraps(function) # 自动复制函数信息
-        def __memoize(*args, **kw):
-            #是否已缓存？
-            if key in _cache:
-                #是否过期？
-                if _is_obsolete(_cache[key], duration) is False:
-                    return rds.get(key)
-            # 运行函数
-            result = function(*args, **kw)
-            # set to redis
-            rds.set(key, result)
-            return result
-        return __memoize
-    return _memoize
+
