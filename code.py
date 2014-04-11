@@ -13,16 +13,16 @@ import requests
 
 from addons import config
 from addons import errors
-from addons import redis2s
+from addons.redis2s import rds
 from addons import mongo2s
 from addons.get_CET import CET
 from addons.zfr import ZF, Login
-from addons.autocache import memorize
+from addons.autocache import memorize, redis_memoize
 from addons import get_old_cet, get_book
 from addons.RedisStore import RedisStore
-from forms import cet_form, xh_form, login_form
 from addons.config import index_cache, debug_mode
 from addons.utils import get_score_jidi
+from forms import cet_form, xh_form, login_form
 
 #import apis
 import manage
@@ -67,20 +67,19 @@ render = render_jinja('templates', encoding='utf-8',globals={'context':session})
 
 # init mongoDB
 mongo = mongo2s.init_mongo()
-# init redis
-rds = redis2s.init_redis()
 
 # 首页索引页
 class index:
 
+    @redis_memoize('index', 100)
     def GET(self):
-        _alert=mongo.zheng.find_one()
-        jumbotron = mongo.jumbotron.find_one()
-        try:
-            return render.index(alert=_alert, jumbotron=jumbotron)
-        except UndefinedError:
-            return render.index(alert=_alert)
 
+        zheng_alert = rds.get('SINGLE_zheng')
+        score_alert = rds.get('SINGLE_score')
+        index_show = rds.get('SINGLE_index')
+
+        return render.index(zheng_alert=zheng_alert, index_show=index_show,
+                            score_alert=score_alert)
 
 # 成绩查询
 class zheng:
@@ -94,7 +93,7 @@ class zheng:
             return render.serv_err(err=e.value)
         session['time_md5'] = time_md5
         # get alert
-        _alert=mongo.zheng.find_one()
+        _alert=rds.get('SINGLE_zheng')
         import time
         return render.zheng(alert=_alert, ctime=str(time.time()))
 
@@ -182,7 +181,7 @@ class more:
 
 class cet:
 
-    @memorize(index_cache)
+    @redis_memoize('cet')
     def GET(self):
         form = cet_form()
         if config.baefetch:
@@ -211,7 +210,7 @@ class cet_old:
     """
     往年cet成绩查询
     """
-    @memorize(index_cache)
+    @redis_memoize('cet_old')
     def GET(self):
         form=xh_form
         title='往年四六级成绩'
@@ -235,7 +234,7 @@ class libr:
     """
     图书馆相关
     """
-    @memorize(index_cache)
+    @redis_memoize('libr')
     def GET(self):
         form=login_form
         title='图书馆借书查询'
@@ -259,9 +258,10 @@ class libr:
 # 全部成绩
 class score:
 
+    @redis_memoize('score', 100)
     def GET(self):
         form = xh_form()
-        alert=mongo.score.find_one()
+        alert=rds.get('SINGLE_score')
         return render.score(form=form, alert=alert)
 
     def POST(self):
@@ -288,7 +288,7 @@ class score:
 
 class help_gpa:
 
-    @memorize(index_cache)
+    @redis_memoize('help_gpa')
     def GET(self):
         return render.help_gpa()
 
@@ -296,6 +296,7 @@ class help_gpa:
 
 class comment:
 
+    @redis_memoize('comment')
     def GET(self):
         return render.comment()
 
@@ -303,14 +304,14 @@ class comment:
 class contact:
 
     """contact us page"""
-    @memorize(index_cache)
+    @redis_memoize('contanct')
     def GET(self):
         return render.contact()
 
 # notice
 
 class notice:
-
+    @redis_memoize('notice')
     def GET(self):
         news = mongo.notice.find().sort("datetime",-1)
         return render.notice(news=news)
@@ -320,6 +321,7 @@ class notice:
 
 class donate:
 
+    @redis_memoize('donate')
     def GET(self):
         sponsor = mongo.donate.find().sort("much",-1)
         return render.donate(sponsor=sponsor)

@@ -7,7 +7,7 @@
     <form name="main" method="post" accept-charset="utf-8" class="form-signin">
       {% if alert %}
       <div class="alert alert-info">
-        {{ alert.content }}
+        {{ alert }}
       </div>
       {% endif %}
       {% if not form.valid %}
@@ -17,12 +17,12 @@
       {% for d in form.inputs %}
         <input type="{{ d.get_type() }}" id="{{ d.id }}" name="{{ d.name }}" class="form-control" placeholder="{{ d.description }}" {% if loop.first %}autofocus{%endif%}/>
       {% endfor %}
-      
+
       <br>
       <center>
         <button type="submit" class="btn btn-primary">查询</button>&nbsp;
         <button type="reset" class="btn">重置</button>
       </center>
     </form>
-  
+
 {% endblock %}

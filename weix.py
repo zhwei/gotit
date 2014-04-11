@@ -23,6 +23,7 @@ from addons import errors
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
 from addons.data_factory import get_score_dict
+from addons.autocache import redis_memoize
 
 # init redis
 rds = redis2s.init_redis()
@@ -341,6 +342,7 @@ class WeixinIndex:
 
 class WeixinInterface(BaseMsg, ProcessMsg):
 
+    @redis_memoize('weixin')
     def GET(self):
         #获取输入参数
         try:

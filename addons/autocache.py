@@ -5,28 +5,46 @@
 
 import time
 import hashlib
-import pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 from functools import wraps
 
-from redis2s import init_redis
-rds = init_redis()
+from redis2s import rds
 
 _cache = {}
 
-def redis_cache(duration = -1, key=None):
-    '''
-    cache in redis
-    duration: 过期时间, -1 为永不过期
-    '''
-    def _mem(function):
-        @wraps(function) # 自动复制函数信息
-        def __mem(*args, **kw):
-            rds.get(key)
-            result = function(*args, **kw)
-            rds.set(key, result)
-            return result
-        return __mem
-    return _mem
+from hashlib import sha1
+from redis import Redis
+
+def redis_memoize(cache_name, ttl=-1):
+    """
+    """
+
+    cache_name = "cache_" + cache_name
+
+    def _decorator(function):
+
+        def __memoize(*args, **kwargs):
+            key = 'value'
+            if rds.hexists(cache_name, key):
+                return pickle.loads(rds.hget(cache_name, key))
+            else:
+                value = function(*args, **kwargs)
+                rds.hset(cache_name, key, pickle.dumps(value))
+                if ttl != -1:
+                    rds.expire(cache_name, ttl)
+                return value
+        return __memoize
+    return _decorator
+
+def expire_redis_cache(cache_name):
+
+    rds.delete("cache_" + cache_name)
+
+    return True
+
 
 def _is_obsolete(entry, duration):
     '''是否过期'''

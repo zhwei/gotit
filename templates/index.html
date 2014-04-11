@@ -13,7 +13,7 @@
 <div class="jumbotron">
   <p><a class="btn btn-large btn-success" href="">Got It</a></p>
   <div class="text-center">
-    {{ jumbotron.content|default("<p class='lead text-success'>天天有个好心情!</p>", True) }}
+    {{ index_show | default("<p class='lead text-success'>天天有个好心情!</p>", True) }}
   </div>
 </div>
 
@@ -25,9 +25,9 @@
 
       <h4><a href="/zheng">本学期课表 成绩 考试时间</a></h4>
       <p>查询本学期课表 成绩以及考试时间.</p>
-      {% if alert %}
+      {% if zheng_alert %}
       <div class="alert alert-info">
-        <p>{{ alert.content }}</p>
+        <p>{{ zheng_alert }}</p>
       </div>
       {% endif %}
     </div>
@@ -59,6 +59,11 @@
     <div class="well" onclick="location.href='/score';" style="cursor:pointer;">
       <h4><a href="/score">总成绩 学分绩点</a></h4>
       <p>查询入学以来所有成绩,包括第二专业和补考成绩以及平均学分绩点.</p>
+      {% if score_alert %}
+      <div class="alert alert-info">
+        <p>{{ score_alert }}</p>
+      </div>
+      {% endif %}
     </div>
   </div>
 

@@ -19,6 +19,8 @@ from addons import mongo2s
 from addons import redis2s
 from addons.redis2s import rds
 from addons.utils import zipf2strio
+from addons.autocache import expire_redis_cache
+# from addons.config import SINGLE_HEAD
 
 render = render_jinja('templates', encoding='utf-8')
 
@@ -30,8 +32,10 @@ CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK
 AUTH_URL=CLIENT.get_authorize_url()
 
 # 公告前缀(redis中的键前缀)
-SINGLE_HEAD = 'single_'
+SINGLE_HEAD = "SINGLE_"
+
 ADMIN_WEIBO_ID = int(rds.get('admin_weibo_id'))
+
 
 # init mongoDB
 db = mongo2s.init_mongo()
@@ -52,8 +56,8 @@ urls = (
     '/o/(.+)/(.+)/(.+)', 'update',
     '/o/(.+)/(.+)', 'update',
 
-    '/2/(.+)/(.+)', 'single',
-    '/2/(.+)', 'single',
+    '/single/(.+)/(.+)', 'single',
+    '/single/(.+)', 'single',
 
     '/de/(.+)/(.+)/(.+)', 'DetailError',
     '/de/(.+)/(.+)', 'DetailError',
@@ -211,8 +215,8 @@ class backup:
 
 class update:
 
-    item_list = ['donate', 'zheng', 'cet', 'notice', 'score', 'wxcomment', 'jumbotron']
-    opera_list = ['cr', 'del', 'ls', 'info']
+    item_list = ['donate', 'notice', 'wxcomment',]
+    opera_list = ['cr', 'del', 'ls']
 
     def GET(self, opera, item, oid=None):
 
@@ -237,11 +241,13 @@ class update:
                         'much':float(data['much']),
                         'datetime': datetime.datetime.now(),
                         })
+                    expire_redis_cache('donate')
                 else:
                     db[item].insert({
                         'content':data['content'],
                         'datetime': datetime.datetime.now(),
                         })
+                    expire_redis_cache('notice')
             elif opera == 'del':
                 db[item].remove({'_id':ObjectId(data['oid'])})
 
@@ -250,6 +256,9 @@ class update:
 
 
 class single:
+    """ 用于处理网站首页等位置的警告或提示信息
+    存储在redis中, 简单键值对
+    """
 
     opera_list = ['cr', 'del', 'info']
 
@@ -272,20 +281,16 @@ class single:
         if opera in self.opera_list:
 
             if opera == 'cr' :
-                if item == 'donate':
-                    db.donate.insert({
-                        'name':data['name'],
-                        'much':float(data['much']),
-                        'datetime': datetime.datetime.now(),
-                        })
-                else:
-                    key = SINGLE_HEAD + data['key']
-                    rds.set(key, data['content'])
+
+                key = SINGLE_HEAD + data['key']
+                rds.set(key, data['content'])
+
+                expire_redis_cache(data['key'])
 
             elif opera == 'del':
                 rds.delete(SINGLE_HEAD + item)
 
-        raise web.seeother('/2/info')
+        raise web.seeother('/single/info')
 
 
 class DetailError:

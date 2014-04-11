@@ -1,169 +1,66 @@
-{% import 'form.html' as form %}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>管理界面</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    {% include "css.html" %}
-    <link rel="stylesheet" href="http://gotit.qiniudn.com/jquery.qeditor.css" />
-    <link rel="stylesheet" href="http://gotit.qiniudn.com/font-awesome.min.css" />
-    <!-- Le styles -->
-    <style>
-      body {
-        padding-top: 60px;
-        padding-bottom: 40px;
-      }
-      .sidebar-nav {
-        padding: 9px 0;
-      }
-      .qeditor_preview {
-        min-height: 100px;
-      }
-      #editor {
-        height:100px;
-      }
-      @media (max-width: 980px) {
-        /* Enable use of floated navbar text */
-        .navbar-text.pull-right {
-          float: none;
-          padding-left: 5px;
-          padding-right: 5px;
-        }
-      }
-    </style>
+{% extends "base-panel.html" %}
 
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="/static/js/html5shiv.js"></script>
-    <![endif]-->
-  </head>
+{% block content %}
 
-  <body>
+  {% if opera %}
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="navbar-brand" href="/">Gotit</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="well sidebar-nav">
-                    <ul class="nav nav-list">
-                      {% if current_page %}
-                      <li class="active"><a href="#"><i class="glyphicon glyphicon-tag"></i>{{ current_page|e }}</a></li>
-                      {% endif %}
-                      {% set navigation_bar = [
-                            ('/manage/panel', 'admin_index', '后台首页','th'),
-                            ('/manage/now', 'now', '负载状况','time'),
-                            ('/manage/analytics', 'analytics', '数据统计','hdd'),
-                            ('/manage/o/ls/jumbotron', 'jumbotron', '首页公告','heart'),
-                            ('/manage/o/ls/notice', 'notice', '网站公告','send'),
-                            ('/manage/o/ls/wxcomment', 'wxcomment', '微信留言','thumbs-up'),
-                            ('/manage/o/ls/donate', 'lsdonate', '捐赠者','usd'),
-                            ('/manage/o/ls/zheng', 'zheng', '正方公告','th-list'),
-                            ('/manage/o/ls/cet', 'cet', '四六级公告','headphones'),
-                            ('/manage/o/ls/score', 'score', '成绩公告','signal'),
-                            ('/manage/backup', 'backup', '网站备份','cloud-upload'),
-                            ('/manage/readlog/1', 'log', '网站日志','eye-open'),
-                        ] -%}
-                        {% set active_page = active_page|default('admin_index') -%}
-                        {% for href, id, caption, icon in navigation_bar %}
-                          <li {% if id == active_page %}class="active"{% elif href=='' %}class="nav-header"{% endif %}>
-                            {% if href !='' %}
-                            <a href="{{ href|e }}"><i class="glyphicon glyphicon-{{ icon }}"></i>&nbsp;{{ caption|e }}</a>
-                            {% else %}
-                                {{ caption|e }}
-                            {% endif %}
-                          </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-9">
-
-
-            {% if opera %}
-
-              <legend>{{ opera }} - {{ item }}</legend>
-              {% if opera == 'cr' %}
-                <form action="" method="POST" class="form-horizontal" role="form">
-                    <fieldset>
-                        {% if item == 'donate' %}
-                          {{ form.input(name='name', label='捐赠人') }}
-                          {{ form.input(name='much', label='金额') }}
-                        {% else %}
-                            <div class="form-group">
-                              <label>内容</label>
-                              <p><input type="text" name="key" class='form-control' placeholder="The Key" /></p>
-                              <p><textarea name="content" id="editor" class="form-control" placeholder="Enter your text .."></textarea></p>
-                              <p class="help-block"></p>
-                            </div>
-                        {% endif %}
-                    </fieldset>
-                    {{ form.submit(value="提交") }}
-                </form>
-              {% elif opera == 'info' %}
-                <p><a href="/manage/2/cr" class='btn btn-default'>Create</a></p>
-                <table class='table table-hover'>
-                <thead><tr class="active">
-                    <th>Title</th>
-                    <th>Content</th>
-                    <th>Do</th>
-                </tr></thead>
-                  <tbody>
-                  {% for single in single_list %}
-                      <tr>
-                          <th>{{ single[0] }}</th>
-                          <td>{{ single[1] }}</td>
-                          <td>
-                              <a class="btn btn-default btn-mini" href=""><i class="glyphicon glyphicon-edit"></i></a>
-                              <a class="btn btn-default btn-mini" href="/manage/2/del/{{ single[0] }}"><i class="glyphicon glyphicon-remove"></i></a>
-                          </td>
-                      </tr>
-                  {% endfor %}
-                  </tbody>
-                </table>
-              {% elif opera == 'del' %}
-              <div class="lead">
-                <br /><br />
-                <form method="post">
-                  <p class='lead'>是否确认删除？</p>
-                  <input type="hidden" name="oid" value="{{ oid }}"  />
-                  <div class="clearfix"></div>
-                  <div class="btn-group">
-                    <a onclick="location.href=document.referrer;" class="btn btn-default"><i class="glyphicon glyphicon-arrow-left"></i>&nbsp;返回</a>
+    <legend>{{ opera }} - {{ item }}</legend>
+    {% if opera == 'cr' %}
+      <form action="" method="POST" class="form-horizontal" role="form">
+          <fieldset>
+              {% if item == 'donate' %}
+                {{ form.input(name='name', label='捐赠人') }}
+                {{ form.input(name='much', label='金额') }}
+              {% else %}
+                  <div class="form-group">
+                    <label>内容</label>
+                    <p><input type="text" name="key" class='form-control' placeholder="The Key" /></p>
+                    <p><textarea name="content" id="editor" class="form-control" placeholder="Enter your text .."></textarea></p>
+                    <p class="help-block"></p>
                   </div>
-                  <div class="btn-group">
-                    <input type="submit" value="确认" class="btn btn-danger" />
-                  </div>
-                </form>
-              </div>
               {% endif %}
-            {% else %}
-              <h2>welcome administrator</h2>
-            {% endif %}
-
-            </div>
+          </fieldset>
+          {{ form.submit(value="提交") }}
+      </form>
+    {% elif opera == 'info' %}
+      <p><a href="/manage/single/cr" class='btn btn-default'>Create</a></p>
+      <table class='table table-hover'>
+      <thead><tr class="active">
+          <th>Title</th>
+          <th>Content</th>
+          <th>Do</th>
+      </tr></thead>
+        <tbody>
+        {% for single in single_list %}
+            <tr>
+                <th>{{ single[0] }}</th>
+                <td>{{ single[1] }}</td>
+                <td>
+                    <a class="btn btn-default btn-mini" href=""><i class="glyphicon glyphicon-edit"></i></a>
+                    <a class="btn btn-default btn-mini" href="/manage/single/del/{{ single[0] }}"><i class="glyphicon glyphicon-remove"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% elif opera == 'del' %}
+    <div class="lead">
+      <br /><br />
+      <form method="post">
+        <p class='lead'>是否确认删除？</p>
+        <input type="hidden" name="oid" value="{{ oid }}"  />
+        <div class="clearfix"></div>
+        <div class="btn-group">
+          <a onclick="location.href=document.referrer;" class="btn btn-default"><i class="glyphicon glyphicon-arrow-left"></i>&nbsp;返回</a>
         </div>
-    </div> <!-- /container -->
-    <div id="footer">
-      <div class="container">
-        <p class="text-muted">Gotit@2014</p>
-      </div>
+        <div class="btn-group">
+          <input type="submit" value="确认" class="btn btn-danger" />
+        </div>
+      </form>
     </div>
-    {% include "js.html" %}
-    {% if item %}
-      <script src="http://gotit.qiniudn.com/jquery.qeditor.js"></script>
-      <script>
-      $("#editor").qeditor({});
-      </script>
     {% endif %}
-  </body>
-</html>
+  {% else %}
+    <h2>welcome administrator</h2>
+  {% endif %}
+
+{% endblock %}
