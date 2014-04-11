@@ -16,7 +16,7 @@ from bson import ObjectId
 from weibo import APIClient, APIError
 
 from addons import mongo2s
-from addons import redis2s
+from addons.redis2s import rds
 from addons.utils import zipf2strio
 
 render = render_jinja('templates', encoding='utf-8')
@@ -37,11 +37,19 @@ urls = (
     '/panel', 'panel',
     '/now', 'now',
     '/analytics', 'analytics',
+
     '/backup/(.+)', 'backup',
     '/backup', 'backup',
+
     '/readlog/(.+)', 'readlog',
+
     '/o/(.+)/(.+)/(.+)', 'update',
     '/o/(.+)/(.+)', 'update',
+
+    '/de/(.+)/(.+)/(.+)', 'DetailError',
+    '/de/(.+)/(.+)', 'DetailError',
+    '/de/(.+)', 'DetailError',
+    '/de', 'DetailError',
 )
 
 manage = web.application(urls, locals())
@@ -50,6 +58,8 @@ manage = web.application(urls, locals())
 class ologin:
 
     def GET(self):
+        if ctx.session.uid == 2674044833:
+            raise web.seeother('panel')
         return render.ologin(auth_url=AUTH_URL)
 
 
@@ -221,5 +231,30 @@ class update:
                 db[item].remove({'_id':ObjectId(data['oid'])})
 
         raise web.seeother('/o/ls/'+item)
+
+
+class DetailError:
+    """查看redis中保存的hash错误
+    """
+
+    def GET(self, key=None, hkey=None, do=None):
+
+        content = None
+        key_list = None
+
+        if do == "del":
+            rds.hdel(key, hkey)
+            raise web.seeother("/de/{}".format(key))
+
+        if hkey:
+            content = rds.hget(key, hkey)
+        elif key:
+            key_list = rds.hkeys(key)
+        else:
+            key_list = rds.keys("error_*")
+
+        return render.panel(item=False, opera='detail_error',
+            key=key, hkey=hkey, key_list=key_list, content=content)
+
 
 manage.add_processor(web.loadhook(pre_request))

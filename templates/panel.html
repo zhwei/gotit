@@ -21,7 +21,7 @@
       }
       .qeditor_preview {
         min-height: 500px;
-      } 
+      }
       #editor {
         height:500px;
       }
@@ -43,55 +43,50 @@
 
   <body>
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
+    <nav class="navbar navbar-inverse navbar-fixed-top bs-navbar" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
           <a class="navbar-brand" href="/">Gotit</a>
         </div>
-      </div>
-    </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav">
+              <li><a href="/manage/panel">后台首页</a></li>
+              <li ><a href="/manage/now"><i class="glyphicon glyphicon-time"></i>负载状况</a></li>
+              <li ><a href="/manage/analytics"><i class="glyphicon glyphicon-hdd"></i>数据统计</a></li>
+              <li ><a href="/manage/o/ls/wxcomment"><i class="glyphicon glyphicon-thumbs-up"></i>微信留言</a></li>
+              <li ><a href="/manage/o/ls/donate"><i class="glyphicon glyphicon-usd"></i>捐赠者</a></li>
+
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">公告<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                <li ><a href="/manage/o/ls/notice"><i class="glyphicon glyphicon-send"></i>&nbsp;网站公告</a></li>
+                <li ><a href="/manage/o/ls/jumbotron"><i class="glyphicon glyphicon-heart"></i>&nbsp;首页公告</a></li>
+                <li ><a href="/manage/o/ls/zheng"><i class="glyphicon glyphicon-th-list"></i>&nbsp;正方公告</a></li>
+                <li ><a href="/manage/o/ls/cet"><i class="glyphicon glyphicon-headphones"></i>&nbsp;四六级公告</a></li>
+                <li ><a href="/manage/o/ls/score"><i class="glyphicon glyphicon-signal"></i>&nbsp;成绩公告</a></li>
+                </ul>
+              </li>
+              <li ><a href="/manage/backup"><i class="glyphicon glyphicon-cloud-upload"></i>网站备份</a></li>
+              <li ><a href="/manage/readlog/1"><i class="glyphicon glyphicon-eye-open"></i>网站日志</a></li>
+              <li ><a href="/manage/de"><i class="glyphicon glyphicon-eye-close"></i>DetailError</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+          </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+
 
     <div class="container">
         <div class="row">
-            <div class="col-md-3">
-                <div class="well sidebar-nav">
-                    <ul class="nav nav-list">
-                      {% if current_page %}
-                      <li class="active"><a href="#"><i class="glyphicon glyphicon-tag"></i>{{ current_page|e }}</a></li>
-                      {% endif %}
-                      {% set navigation_bar = [
-                            ('/manage/panel', 'admin_index', '后台首页','th'),
-                            ('/manage/now', 'now', '负载状况','time'),
-                            ('/manage/analytics', 'analytics', '数据统计','hdd'),
-                            ('/manage/o/ls/jumbotron', 'jumbotron', '首页公告','heart'),
-                            ('/manage/o/ls/notice', 'notice', '网站公告','send'),
-                            ('/manage/o/ls/wxcomment', 'wxcomment', '微信留言','thumbs-up'),
-                            ('/manage/o/ls/donate', 'lsdonate', '捐赠者','usd'),
-                            ('/manage/o/ls/zheng', 'zheng', '正方公告','th-list'),
-                            ('/manage/o/ls/cet', 'cet', '四六级公告','headphones'),
-                            ('/manage/o/ls/score', 'score', '成绩公告','signal'),
-                            ('/manage/backup', 'backup', '网站备份','cloud-upload'),
-                            ('/manage/readlog/1', 'log', '网站日志','eye-open'),
-                        ] -%}
-                        {% set active_page = active_page|default('admin_index') -%}
-                        {% for href, id, caption, icon in navigation_bar %}
-                          <li {% if id == active_page %}class="active"{% elif href=='' %}class="nav-header"{% endif %}>
-                            {% if href !='' %}
-                            <a href="{{ href|e }}"><i class="glyphicon glyphicon-{{ icon }}"></i>&nbsp;{{ caption|e }}</a>
-                            {% else %}
-                                {{ caption|e }}
-                            {% endif %}
-                          </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-9">
-
-
             {% if item %}
 
-              <legend>{{ opera }} - {{ item }}</legend> 
+              <legend>{{ opera }} - {{ item }}</legend>
               <p><a href="/manage/o/cr/{{ item }}" class='btn btn-default'><i class="glyphicon glyphicon-plus"></i>&nbsp;添加</a></p>
               {% if opera == 'cr' %}
                 <form action="" method="POST" class="form-horizontal" role="form">
@@ -210,11 +205,37 @@
                   <td><span class='label label-primary'>{{ data.user}}</span></td>
                 </tr>
               </table>
+            {% elif opera == 'detail_error' %}
+            <h2>Detail Errors</h2>
+            <hr>
+            {% if hkey %}
+            <p><a href="{{ hkey }}/del" class="btn btn-default">Delete</a></p>
+            {% endif %}
+              {% if key_list and not hkey %}
+                  <ul>
+                  {% for per in key_list %}
+                    <li><a href="{% if key %}/manage/de/{{ key }}/{{ per }}{% else %}/manage/de/{{ per }}{% endif %}">{{ per }}</a></li>
+                  {% endfor %}
+                  </ul>
+              {% endif %}
+              {% if hkey %}
+                <div>
+                  {{ content }}
+                </div>
+              {% endif %}
             {% else %}
               <h2>welcome administrator</h2>
+                <br>
+                <br>
+                <br>
+                <div class="col-md-3">
+                  <a class="btn btn-default btn-block" href="/manage/o/ls/notice"><i class="glyphicon glyphicon-send"></i>&nbsp;网站公告</a>
+                  <a class="btn btn-default btn-block" href="/manage/o/ls/zheng"><i class="glyphicon glyphicon-th-list"></i>&nbsp;正方公告</a>
+                  <a class="btn btn-default btn-block" href="/manage/o/ls/cet"><i class="glyphicon glyphicon-headphones"></i>&nbsp;四六级公告</a>
+                  <a class="btn btn-default btn-block" href="/manage/o/ls/score"><i class="glyphicon glyphicon-signal"></i>&nbsp;成绩公告</a>
+                </div>
             {% endif %}
 
-            </div>
         </div>
     </div> <!-- /container -->
     <div id="footer">

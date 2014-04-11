@@ -129,7 +129,7 @@ class GPA:
             except:
                 logging.error("cannot change %s into number"%text)
                 # store the error pages in redis
-                rds.hset('score_error_page', self.__num, self.page)
+                rds.hset('error_score_page', self.__num, self.page)
                 return -1
 
     def __calc_score(self):
