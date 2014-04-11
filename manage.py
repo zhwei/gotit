@@ -16,6 +16,7 @@ from bson import ObjectId
 from weibo import APIClient, APIError
 
 from addons import mongo2s
+from addons import redis2s
 from addons.redis2s import rds
 from addons.utils import zipf2strio
 
@@ -62,7 +63,7 @@ class ologin:
     def GET(self):
         try:
             if ctx.session.uid == ADMIN_WEIBO_ID:
-                raise web.seeother('/manage/panel')
+                raise web.seeother('../manage/panel')
         except AttributeError:
             pass
         return render.ologin(auth_url=AUTH_URL)
