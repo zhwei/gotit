@@ -22,11 +22,13 @@ from addons.utils import zipf2strio
 render = render_jinja('templates', encoding='utf-8')
 
 
-APP_KEY = '4001516920' # app key
-APP_SECRET = '44a4fb573339e30a901249978a1322b9' # app secret
+APP_KEY = rds.get('weibo_app_key') # app key
+APP_SECRET = rds.get('weibo_app_secret') # app secret
 CALLBACK_URL = 'http://gotit.asia/manage/callback' # callback url
 CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
 AUTH_URL=CLIENT.get_authorize_url()
+
+ADMIN_WEIBO_ID = int(rds.get('admin_weibo_id'))
 
 # init mongoDB
 db = mongo2s.init_mongo()
@@ -59,8 +61,8 @@ class ologin:
 
     def GET(self):
         try:
-            if ctx.session.uid == 2674044833:
-                raise web.seeother('panel')
+            if ctx.session.uid == ADMIN_WEIBO_ID:
+                raise web.seeother('/manage/panel')
         except AttributeError:
             pass
         return render.ologin(auth_url=AUTH_URL)
@@ -85,7 +87,7 @@ class callback:
 
         try:
             uid = CLIENT.account.get_uid.get()['uid']
-            if uid != 2674044833:
+            if uid != ADMIN_WEIBO_ID:
                 return render.ologin(auth_url=AUTH_URL, error='欢迎尝试')
             ctx.session['uid'] = uid
         except APIError:
@@ -101,7 +103,7 @@ def pre_request():
 
     if web.ctx.path not in ['', '/callback']:
         try:
-            if ctx.session.uid != 2674044833:
+            if ctx.session.uid != ADMIN_WEIBO_ID:
                 raise web.seeother('../manage')
         except AttributeError:
             raise web.seeother('../manage')

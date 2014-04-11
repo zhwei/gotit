@@ -11,7 +11,8 @@ stop.sh
 restart.sh
 start.sh
 .idea/*
- 
+initial_data.py
+
 
 # C extensions
 *.so
