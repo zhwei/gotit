@@ -17,19 +17,21 @@ from weibo import APIClient, APIError
 
 from addons import mongo2s
 from addons import redis2s
+from addons.redis2s import rds
 from addons.utils import zipf2strio
 
 render = render_jinja('templates', encoding='utf-8')
 
 
-APP_KEY = '4001516920' # app key
-APP_SECRET = '44a4fb573339e30a901249978a1322b9' # app secret
+APP_KEY = rds.get('weibo_app_key') # app key
+APP_SECRET = rds.get('weibo_app_secret') # app secret
 CALLBACK_URL = 'http://gotit.asia/manage/callback' # callback url
 CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
 AUTH_URL=CLIENT.get_authorize_url()
 
 # 公告前缀(redis中的键前缀)
 SINGLE_HEAD = 'single_'
+ADMIN_WEIBO_ID = int(rds.get('admin_weibo_id'))
 
 # init mongoDB
 db = mongo2s.init_mongo()
@@ -41,13 +43,22 @@ urls = (
     '/panel', 'panel',
     '/now', 'now',
     '/analytics', 'analytics',
+
     '/backup/(.+)', 'backup',
     '/backup', 'backup',
+
     '/readlog/(.+)', 'readlog',
+
     '/o/(.+)/(.+)/(.+)', 'update',
     '/o/(.+)/(.+)', 'update',
+
     '/2/(.+)/(.+)', 'single',
     '/2/(.+)', 'single',
+
+    '/de/(.+)/(.+)/(.+)', 'DetailError',
+    '/de/(.+)/(.+)', 'DetailError',
+    '/de/(.+)', 'DetailError',
+    '/de', 'DetailError',
 )
 
 manage = web.application(urls, locals())
@@ -56,6 +67,11 @@ manage = web.application(urls, locals())
 class ologin:
 
     def GET(self):
+        try:
+            if ctx.session.uid == ADMIN_WEIBO_ID:
+                raise web.seeother('../manage/panel')
+        except AttributeError:
+            pass
         return render.ologin(auth_url=AUTH_URL)
 
 
@@ -78,7 +94,7 @@ class callback:
 
         try:
             uid = CLIENT.account.get_uid.get()['uid']
-            if uid != 2674044833:
+            if uid != ADMIN_WEIBO_ID:
                 return render.ologin(auth_url=AUTH_URL, error='欢迎尝试')
             ctx.session['uid'] = uid
         except APIError:
@@ -94,7 +110,7 @@ def pre_request():
 
     if web.ctx.path not in ['', '/callback']:
         try:
-            if ctx.session.uid != 2674044833:
+            if ctx.session.uid != ADMIN_WEIBO_ID:
                 raise web.seeother('../manage')
         except AttributeError:
             raise web.seeother('../manage')
@@ -145,7 +161,8 @@ class readlog:
     """
 
     def readfile(self, line):
-        log_pwd = "/home/group/gotit/log/gotit2-stderr.log"
+        # log_pwd = "/home/group/gotit/log/gotit2-stderr.log"
+        log_pwd = rds.get('log_file_path')
         with open(log_pwd) as fi:
             all_lines = fi.readlines()
             counts = len(all_lines)
@@ -167,10 +184,12 @@ class backup:
     def GET(self, label=None):
 
         if label=='download':
+
+            mongoexport_path = rds.get('mongoexport_path')
             # 备份mongodb数据库，打包成zip文件并返回下载
             dt=datetime.datetime.now()
             filename = '/tmp/gotit-backup-{}'.format(dt.strftime('%Y%m%d%H%M%S'))
-            os.system('/home/group/.bin/mongodump -d gotit -o {}'.format(filename))
+            os.system('{} -d gotit -o {}'.format(mongoexport_path, filename))
             ret = zipf2strio(filename) # 打包写入StringIO对象
             try:
                 import shutil
@@ -267,5 +286,30 @@ class single:
                 rds.delete(SINGLE_HEAD + item)
 
         raise web.seeother('/2/info')
+
+
+class DetailError:
+    """查看redis中保存的hash错误
+    """
+
+    def GET(self, key=None, hkey=None, do=None):
+
+        content = None
+        key_list = None
+
+        if do == "del":
+            rds.hdel(key, hkey)
+            raise web.seeother("/de/{}".format(key))
+
+        if hkey:
+            content = rds.hget(key, hkey)
+        elif key:
+            key_list = rds.hkeys(key)
+        else:
+            key_list = rds.keys("error_*")
+
+        return render.panel(item=False, opera='detail_error',
+            key=key, hkey=hkey, key_list=key_list, content=content)
+
 
 # manage.add_processor(web.loadhook(pre_request))

@@ -8,6 +8,7 @@ import requests
 
 import config
 import errors
+from redis2s import rds
 
 class GPA:
     '''Calculator Grade Point Average'''
@@ -33,8 +34,8 @@ class GPA:
     def get_all_score(self):
         '''获取全部成绩（直接返回一个表格）'''
         page = self.page.encode('utf-8')
-        patten = re.compile('<span class="style3">成绩信息</span>(.*?)</table>',re.M|re.S)  
-        #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为 
+        patten = re.compile('<span class="style3">成绩信息</span>(.*?)</table>',re.M|re.S)
+        #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为
         return patten.findall(page)
 
 
@@ -123,12 +124,14 @@ class GPA:
             return num
         except:
             try:
-                num = float(text)   
+                num = float(text)
                 return num
             except:
                 logging.error("cannot change %s into number"%text)
+                # store the error pages in redis
+                rds.hset('error_score_page', self.__num, self.page)
                 return -1
-    
+
     def __calc_score(self):
         '''计算平均学分基点'''
         not_accept=[]       #没有通过
