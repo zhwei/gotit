@@ -58,8 +58,11 @@ manage = web.application(urls, locals())
 class ologin:
 
     def GET(self):
-        if ctx.session.uid == 2674044833:
-            raise web.seeother('panel')
+        try:
+            if ctx.session.uid == 2674044833:
+                raise web.seeother('panel')
+        except AttributeError:
+            pass
         return render.ologin(auth_url=AUTH_URL)
 
 
@@ -149,7 +152,8 @@ class readlog:
     """
 
     def readfile(self, line):
-        log_pwd = "/home/group/gotit/log/gotit2-stderr.log"
+        # log_pwd = "/home/group/gotit/log/gotit2-stderr.log"
+        log_pwd = rds.get('log_file_path')
         with open(log_pwd) as fi:
             all_lines = fi.readlines()
             counts = len(all_lines)
@@ -171,10 +175,12 @@ class backup:
     def GET(self, label=None):
 
         if label=='download':
+
+            mongoexport_path = rds.get('mongoexport_path')
             # 备份mongodb数据库，打包成zip文件并返回下载
             dt=datetime.datetime.now()
             filename = '/tmp/gotit-backup-{}'.format(dt.strftime('%Y%m%d%H%M%S'))
-            os.system('/home/group/.bin/mongodump -d gotit -o {}'.format(filename))
+            os.system('{} -d gotit -o {}'.format(mongoexport_path, filename))
             ret = zipf2strio(filename) # 打包写入StringIO对象
             try:
                 import shutil
