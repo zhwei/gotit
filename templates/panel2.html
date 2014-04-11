@@ -20,10 +20,10 @@
         padding: 9px 0;
       }
       .qeditor_preview {
-        min-height: 300px;
-      } 
+        min-height: 100px;
+      }
       #editor {
-        height:300px;
+        height:100px;
       }
       @media (max-width: 980px) {
         /* Enable use of floated navbar text */
@@ -101,7 +101,8 @@
                         {% else %}
                             <div class="form-group">
                               <label>内容</label>
-                              <textarea name="content" id="editor" class="form-control" placeholder="Enter your text .."></textarea>
+                              <p><input type="text" name="key" class='form-control' placeholder="The Key" /></p>
+                              <p><textarea name="content" id="editor" class="form-control" placeholder="Enter your text .."></textarea></p>
                               <p class="help-block"></p>
                             </div>
                         {% endif %}
@@ -109,6 +110,7 @@
                     {{ form.submit(value="提交") }}
                 </form>
               {% elif opera == 'info' %}
+                <p><a href="/manage/2/cr" class='btn btn-default'>Create</a></p>
                 <table class='table table-hover'>
                 <thead><tr class="active">
                     <th>Title</th>
@@ -122,7 +124,7 @@
                           <td>{{ single[1] }}</td>
                           <td>
                               <a class="btn btn-default btn-mini" href=""><i class="glyphicon glyphicon-edit"></i></a>
-                              <a class="btn btn-default btn-mini" href=""><i class="glyphicon glyphicon-remove"></i></a>
+                              <a class="btn btn-default btn-mini" href="/manage/2/del/{{ single[0] }}"><i class="glyphicon glyphicon-remove"></i></a>
                           </td>
                       </tr>
                   {% endfor %}

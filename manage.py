@@ -240,13 +240,13 @@ class single:
 
                 def get_kv():
                     for key in rds.keys(SINGLE_HEAD+"*"):
-                        print key
                         yield (key[7:], rds.get(key))
 
                 return render.panel2(single_list=get_kv(), opera=opera)
+
         return render.panel2(item=item, opera=opera)
 
-    def POST(self, opera, item, oid=None):
+    def POST(self, opera, item=None, key=None):
 
         data = web.input()
 
@@ -260,13 +260,12 @@ class single:
                         'datetime': datetime.datetime.now(),
                         })
                 else:
-                    db[item].insert({
-                        'content':data['content'],
-                        'datetime': datetime.datetime.now(),
-                        })
-            elif opera == 'del':
-                db[item].remove({'_id':ObjectId(data['oid'])})
+                    key = SINGLE_HEAD + data['key']
+                    rds.set(key, data['content'])
 
-        raise web.seeother('/o/ls/'+item)
+            elif opera == 'del':
+                rds.delete(SINGLE_HEAD + item)
+
+        raise web.seeother('/2/info')
 
 # manage.add_processor(web.loadhook(pre_request))
