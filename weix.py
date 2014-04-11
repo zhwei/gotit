@@ -96,7 +96,7 @@ class BaseMsg(object):
         </xml>
         """.format(self.fromUser, self.toUser, int(time.time()), content)
         return text
-    
+
     def replay_code(self, time_md5, content=""):
         if rds.hget(self.fromUser, 'status').startswith('fast'):
             r = '2'
@@ -110,7 +110,7 @@ class BaseMsg(object):
         <ArticleCount>1</ArticleCount>
         <Articles>
             <item>
-                <Title><![CDATA[请输入验证码({5}.重新获取)]]></Title> 
+                <Title><![CDATA[请输入验证码({5}.重新获取)]]></Title>
                 <Description><![CDATA[{4}r 重新获取验证码\nPS:距离远一点能看的更清楚\nq.退出查询状态]]></Description>
                 <PicUrl><![CDATA[http://gotit.asia/zheng/checkcode?r={2}&time_md5={3}]]></PicUrl>
                 <Url><![CDATA[http://gotit.asia/zheng/checkcode?r={2}&time_md5={3}]]></Url>
@@ -127,10 +127,13 @@ class ProcessMsg(object):
         """
         gpa = GPA(xh)
         gpa.getscore_page()
-        jidi = gpa.get_gpa()["ave_score"]
-        ret = "学分绩点: {}\n".format(jidi)
+        try:
+            jidi = gpa.get_gpa()["ave_score"]
+            ret = "学分绩点: {}\n".format(jidi)
+        except errors.PageError, e:
+            ret = e
         return ret
-    
+
     def get_old_cet(self, xh):
         """获取往年四六级成绩"""
         cet = CET()
@@ -304,7 +307,7 @@ class ProcessMsg(object):
             rds.hset(self.fromUser, 'status', 'comment')
             text = "格式: ly#内容\n谢谢支持！"
             return self.replay_text(text)
-        if self.content.startswith('ly#') is False: 
+        if self.content.startswith('ly#') is False:
             rds.hset(self.fromUser, 'status', None)
             return self.replay_text("格式错误, 留言结束,谢谢支持。")
         _data = {
@@ -353,7 +356,7 @@ class WeixinInterface(BaseMsg, ProcessMsg):
         sha1=hashlib.sha1()
         map(sha1.update, li)
         hashcode=sha1.hexdigest()
-        #sha1加密算法        
+        #sha1加密算法
         #如果是来自微信的请求，则回复echostr
         if hashcode == signature:
             return echostr
@@ -408,9 +411,9 @@ class WeixinInterface(BaseMsg, ProcessMsg):
             elif str(_s).startswith('fast'):
                 return self.fast_zf(init=False)
             # gpa and old cet
-            elif self.content in ('3', '4'): 
+            elif self.content in ('3', '4'):
                 return self.cet_jidi()
-            elif _s in ('3', '4'): 
+            elif _s in ('3', '4'):
                 return self.cet_jidi(self.content)
             # comment
             elif _s == 'comment':
