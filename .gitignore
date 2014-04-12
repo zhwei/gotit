@@ -7,6 +7,7 @@ dong.py
 test/*
 .idea/*
 static/pic/*
+static/cdn/*
 stop.sh
 restart.sh
 start.sh

@@ -2,43 +2,34 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
     <title>管理界面</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    {% include "css.html" %}
+    {%- include  "includes/head.html" -%}
     <link rel="stylesheet" href="http://gotit.qiniudn.com/jquery.qeditor.css" />
     <link rel="stylesheet" href="http://gotit.qiniudn.com/font-awesome.min.css" />
     <!-- Le styles -->
     <style>
-      body {
-        padding-top: 60px;
-        padding-bottom: 40px;
+    body {
+      padding-top: 60px;
+      padding-bottom: 40px;
+    }
+    .sidebar-nav {
+      padding: 9px 0;
+    }
+    .qeditor_preview {
+      min-height: 300px;
+    }
+    #editor {
+      height:300px;
+    }
+    @media (max-width: 980px) {
+      /* Enable use of floated navbar text */
+      .navbar-text.pull-right {
+        float: none;
+        padding-left: 5px;
+        padding-right: 5px;
       }
-      .sidebar-nav {
-        padding: 9px 0;
-      }
-      .qeditor_preview {
-        min-height: 300px;
-      }
-      #editor {
-        height:300px;
-      }
-      @media (max-width: 980px) {
-        /* Enable use of floated navbar text */
-        .navbar-text.pull-right {
-          float: none;
-          padding-left: 5px;
-          padding-right: 5px;
-        }
-      }
-    </style>
-
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="/static/js/html5shiv.js"></script>
-    <![endif]-->
+    }
+  </style>
   </head>
 
   <body>
@@ -61,14 +52,8 @@
               <li ><a href="/manage/analytics"><i class="glyphicon glyphicon-hdd"></i>数据统计</a></li>
               <li ><a href="/manage/o/ls/wxcomment"><i class="glyphicon glyphicon-thumbs-up"></i>微信留言</a></li>
               <li ><a href="/manage/o/ls/donate"><i class="glyphicon glyphicon-usd"></i>捐赠者</a></li>
-
-              <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">公告<span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                <li ><a href="/manage/single/info"><i class="glyphicon glyphicon-send"></i>&nbsp;其他公告</a></li>
-                <li ><a href="/manage/o/ls/notice"><i class="glyphicon glyphicon-send"></i>&nbsp;网站公告</a></li>
-                </ul>
-              </li>
+              <li ><a href="/manage/o/ls/notice"><strong>网站动态</strong></a></li>
+              <li ><a href="/manage/single/info"><strong>Single</strong></a></li>
               <li ><a href="/manage/backup"><i class="glyphicon glyphicon-cloud-upload"></i>网站备份</a></li>
               <li ><a href="/manage/readlog/1"><i class="glyphicon glyphicon-eye-open"></i>网站日志</a></li>
               <li ><a href="/manage/de"><i class="glyphicon glyphicon-eye-close"></i>DetailError</a></li>
@@ -91,7 +76,7 @@
         <p class="text-muted">Gotit@2014</p>
       </div>
     </div>
-    {% include "js.html" %}
+    {% include "includes/js.html" %}
 
     {% block footer %}
 

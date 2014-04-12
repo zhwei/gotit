@@ -25,17 +25,19 @@ def redis_memoize(cache_name, ttl=-1):
     cache_name = "cache_" + cache_name
 
     def _decorator(function):
-
         def __memoize(*args, **kwargs):
-            key = 'value'
-            if rds.hexists(cache_name, key):
-                return pickle.loads(rds.hget(cache_name, key))
+            if rds.get('SINGLE_cache') == 'yes':
+                key = 'value'
+                if rds.hexists(cache_name, key):
+                    return pickle.loads(rds.hget(cache_name, key))
+                else:
+                    value = function(*args, **kwargs)
+                    rds.hset(cache_name, key, pickle.dumps(value))
+                    if ttl != -1:
+                        rds.expire(cache_name, ttl)
+                    return value
             else:
-                value = function(*args, **kwargs)
-                rds.hset(cache_name, key, pickle.dumps(value))
-                if ttl != -1:
-                    rds.expire(cache_name, ttl)
-                return value
+                return function(*args, **kwargs)
         return __memoize
     return _decorator
 

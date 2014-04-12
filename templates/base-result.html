@@ -1,27 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>查询结果--Got it</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="山东理工大学,成绩查询,校外,正方教务系统,四六级成绩查询,学分绩点,考试时间地点,课表,本学期,查询">
-    <meta name="description" content="山东理工大学校外成绩查询,学分绩点查询,四六级成绩查询.">
+    {%- include  "includes/head.html" -%}
 
     <!-- Le styles -->
-    {% include "css.html" %}
     <style>
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
     </style>
 
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
   </head>
 
   <body>
@@ -51,7 +40,7 @@
         </div><!-- /.navbar-collapse -->
     </nav>
 
-    
+
       <div id="container" class= "container">
         <div>
           <center>如果我们做的对您有所帮助, 请考虑是否<a href="/donate.html">赞助</a>我们</center>
@@ -68,12 +57,13 @@
           <hr />
         </div>
 
-        {% block content %}
+        {%- block content -%}
 
         {% endblock %}
-        {% include "footer.html" %}
+
+        {%- include "includes/footer.html" -%}
       </div> <!-- /container -->
-      {% include "js.html" %}
+      {%- include "includes/js.html" -%}
       <script language="javascript" type="text/javascript">
       function condensed(){
         var a=document.getElementsByClassName('table-responsive');

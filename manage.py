@@ -292,7 +292,6 @@ class single:
 
         raise web.seeother('/single/info')
 
-
 class DetailError:
     """查看redis中保存的hash错误
     """

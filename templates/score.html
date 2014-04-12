@@ -1,22 +1,22 @@
-{% extends "base-search.html" %}
-{% block title %}成绩查询系统{% endblock %}
+{%- extends "base-search.html" -%}
+{%- block title -%}成绩查询系统{%- endblock -%}
 
-{% block content %}
+{%- block content -%}
     <center><h1>成绩查询系统</h1></center>
     <hr>
     <form name="main" method="post" accept-charset="utf-8" class="form-signin">
-      {% if alert %}
+      {%- if alert -%}
       <div class="alert alert-info">
         {{ alert }}
       </div>
-      {% endif %}
-      {% if not form.valid %}
+      {%- endif -%}
+      {%- if not form.valid -%}
         <p class="alert alert-danger">输入错误:</p>
-      {% endif %}
+      {%- endif -%}
 
-      {% for d in form.inputs %}
-        <input type="{{ d.get_type() }}" id="{{ d.id }}" name="{{ d.name }}" class="form-control" placeholder="{{ d.description }}" {% if loop.first %}autofocus{%endif%}/>
-      {% endfor %}
+      {%- for d in form.inputs -%}
+        <input type="{{ d.get_type() }}" id="{{ d.id }}" name="{{ d.name }}" class="form-control" placeholder="{{ d.description }}" {%- if loop.first -%}autofocus{%-endif-%}/>
+      {%- endfor -%}
 
       <br>
       <center>
@@ -25,4 +25,4 @@
       </center>
     </form>
 
-{% endblock %}
+{%- endblock -%}

@@ -8,22 +8,26 @@
     {% if opera == 'cr' %}
       <form action="" method="POST" class="form-horizontal" role="form">
           <fieldset>
-              {% if item == 'donate' %}
-                {{ form.input(name='name', label='捐赠人') }}
-                {{ form.input(name='much', label='金额') }}
-              {% else %}
-                  <div class="form-group">
-                    <label>内容</label>
-                    <p><input type="text" name="key" class='form-control' placeholder="The Key" /></p>
-                    <p><textarea name="content" id="editor" class="form-control" placeholder="Enter your text .."></textarea></p>
-                    <p class="help-block"></p>
-                  </div>
-              {% endif %}
+            <div class="form-group">
+              <p><a class="btn btn-default btn-block" href="/manage/single/info">全部列表</a></p>
+              <hr />
+              <p><input type="text" name="key" class='form-control' placeholder="The Key" /></p>
+              <p><textarea name="content" id="editor" class="form-control" placeholder="Enter content.."></textarea></p>
+              <div class="well help-block">
+                <ul>
+                  <li>key[default_value] 控制缓存</li>
+                  <li>cache[yes] 是否启用缓存</li>
+                  <li>index 首页标语</li>
+                  <li>zheng 正方公告</li>
+                  <li>score 成绩公告</li>
+                </ul>
+              </div>
+            </div>
           </fieldset>
           {{ form.submit(value="提交") }}
       </form>
     {% elif opera == 'info' %}
-      <p><a href="/manage/single/cr" class='btn btn-default'>Create</a></p>
+      <p><a href="/manage/single/cr" class='btn btn-default btn-block'>Create</a></p>
       <table class='table table-hover'>
       <thead><tr class="active">
           <th>Title</th>

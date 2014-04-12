@@ -1,21 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>{% block title %}{% endblock %}</title>
-    <meta name="author" content="zhwei">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="keywords" content="山东理工大学,成绩查询,校外,正方教务系统,四六级成绩查询,学分绩点,考试时间地点,课表,本学期,查询">
-    <meta name="description" content="山东理工大学校外成绩查询,学分绩点查询,四六级成绩查询.">
+    {%- include  "includes/head.html" -%}
 
-    <!-- Le styles -->
-    {% include "css.html" %}
-
-<script language="javascript">
-	if (self!=top) window.top.location.replace(self.location);
-</script>
 
     <style type="text/css">
       body {
@@ -48,8 +36,7 @@
         padding: 7px 9px;
       }
     </style>
-
-    {% block header %}
+    {%- block header -%}
 
     {% endblock %}
   </head>
@@ -90,20 +77,15 @@
 
     <div id="container" class= "container"><br>
 
-      {% block content %}
+      {%- block content -%}{% endblock %}
 
-      {% endblock %}
-
-
-      {% include "footer.html" %}
+      {%- include "includes/footer.html" -%}
 
       </div> <!-- /container -->
-      
-      {% include "js.html" %}
 
-      {% block foot %}
-         
-      {% endblock %} 
+      {%- include "includes/js.html" -%}
+
+      {%- block foot -%}{% endblock %}
 
       <!-- baidu sitecenter   -->
       </body>
