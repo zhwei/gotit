@@ -316,4 +316,4 @@ class DetailError:
             key=key, hkey=hkey, key_list=key_list, content=content)
 
 
-# manage.add_processor(web.loadhook(pre_request))
+manage.add_processor(web.loadhook(pre_request))
