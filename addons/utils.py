@@ -2,15 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import os
+from os.path import join
+import zipfile
 import logging
 import logging.handlers
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 
-import redis
 
 import config
 import errors
 from addons.calc_GPA import GPA
-from addons.get_all_score import ALL_SCORE
 
 
 LEVELS = {
@@ -53,13 +57,6 @@ def init_log(log_name, level_name="error", fi=True):
 
     return logger
 
-
-
-def init_redis():
-    redis_server = redis.StrictRedis(host='localhost', port=6379, db=0)
-    return redis_server
-
-
 def not_error_page(page):
     """检查页面
     检查页面是否有弹窗警告
@@ -75,10 +72,29 @@ def not_error_page(page):
     return True
 
 def get_score_jidi(xh):
-
-    a = ALL_SCORE()
-    score = a.get_all_score(xh)
+    """返回学分绩点
+    """
     gpa = GPA(xh)
     gpa.getscore_page()
+    score = gpa.get_all_score()
     jidi = gpa.get_gpa()["ave_score"]
     return score, jidi
+
+
+def zipf2strio(foldername, includeEmptyDIr=True):
+    """ 压缩目录, 压缩包写入StringIO 并返回
+    """
+    empty_dirs = []
+    fi = StringIO.StringIO()
+    zip = zipfile.ZipFile(fi, 'w', zipfile.ZIP_DEFLATED)
+    for root, dirs, files in os.walk(foldername):
+        empty_dirs.extend([dir for dir in dirs if os.listdir(join(root, dir)) == []])
+        for name in files:
+            zip.write(join(root ,name))
+        if includeEmptyDIr:
+            for dir in empty_dirs:
+                zif = zipfile.ZipInfo(join(root, dir) + "/")
+                zip.writestr(zif, "")
+        empty_dirs = []
+    zip.close()
+    return fi

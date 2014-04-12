@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>{% block title %}{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Got it,正方教务系统查询工具">
-    <meta name="author" content="zhwei">
+    {%- include  "includes/head.html" -%}
 
-    <!-- Le styles -->
-    {% include "css.html" %}
+
     <style type="text/css">
       body {
         padding-top: 40px;
@@ -41,8 +36,7 @@
         padding: 7px 9px;
       }
     </style>
-
-    {% block header %}
+    {%- block header -%}
 
     {% endblock %}
   </head>
@@ -83,20 +77,15 @@
 
     <div id="container" class= "container"><br>
 
-      {% block content %}
+      {%- block content -%}{% endblock %}
 
-      {% endblock %}
-
-
-      {% include "footer.html" %}
+      {%- include "includes/footer.html" -%}
 
       </div> <!-- /container -->
-      
-      {% include "js.html" %}
 
-      {% block foot %}
-         
-      {% endblock %} 
+      {%- include "includes/js.html" -%}
+
+      {%- block foot -%}{% endblock %}
 
       <!-- baidu sitecenter   -->
       </body>

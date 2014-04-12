@@ -1,0 +1,86 @@
+{% import 'form.html' as form %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>管理界面</title>
+    {%- include  "includes/head.html" -%}
+    <link rel="stylesheet" href="http://gotit.qiniudn.com/jquery.qeditor.css" />
+    <link rel="stylesheet" href="http://gotit.qiniudn.com/font-awesome.min.css" />
+    <!-- Le styles -->
+    <style>
+    body {
+      padding-top: 60px;
+      padding-bottom: 40px;
+    }
+    .sidebar-nav {
+      padding: 9px 0;
+    }
+    .qeditor_preview {
+      min-height: 300px;
+    }
+    #editor {
+      height:300px;
+    }
+    @media (max-width: 980px) {
+      /* Enable use of floated navbar text */
+      .navbar-text.pull-right {
+        float: none;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+    }
+  </style>
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top bs-navbar" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Gotit</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav">
+              <li><a href="/manage/panel">后台首页</a></li>
+              <li ><a href="/manage/now"><i class="glyphicon glyphicon-time"></i>负载状况</a></li>
+              <li ><a href="/manage/analytics"><i class="glyphicon glyphicon-hdd"></i>数据统计</a></li>
+              <li ><a href="/manage/o/ls/wxcomment"><i class="glyphicon glyphicon-thumbs-up"></i>微信留言</a></li>
+              <li ><a href="/manage/o/ls/donate"><i class="glyphicon glyphicon-usd"></i>捐赠者</a></li>
+              <li ><a href="/manage/o/ls/notice"><strong>网站动态</strong></a></li>
+              <li ><a href="/manage/single/info"><strong>Single</strong></a></li>
+              <li ><a href="/manage/backup"><i class="glyphicon glyphicon-cloud-upload"></i>网站备份</a></li>
+              <li ><a href="/manage/readlog/1"><i class="glyphicon glyphicon-eye-open"></i>网站日志</a></li>
+              <li ><a href="/manage/de"><i class="glyphicon glyphicon-eye-close"></i>DetailError</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+          </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+
+
+    <div class="container">
+        <div class="row">
+            {% block content %}
+
+            {% endblock %}
+        </div>
+    </div> <!-- /container -->
+    <div id="footer">
+      <div class="container">
+        <p class="text-muted">Gotit@2014</p>
+      </div>
+    </div>
+    {% include "includes/js.html" %}
+
+    {% block footer %}
+
+    {% endblock %}
+
+  </body>
+</html>

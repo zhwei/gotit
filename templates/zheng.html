@@ -7,7 +7,7 @@
 <form name="main" method="post" accept-charset="utf-8" class="form-signin">
   {% if alert %}
   <div class="alert alert-info">
-    <p>{{ alert }}</p>
+    <p>{{ alert.content }}</p>
   </div>
   {% endif %}
 
@@ -16,15 +16,15 @@
     </p>
     <p><input type="password" id="pw" name="pw" class="form-control" placeholder="密码"/></p>
     <p>
-      <input type="text" id="verify" name="verify" class="form-control" placeholder="验证码" style="width:50%; float:left;"/>
-      <img style="" src="{{ checkcode }}" alt=""/>
+      <input type="text" id="verify" name="verify" class="form-control" placeholder="验证码" style="width:50%; float:left;"/>&nbsp;
+      <img style="cursor: pointer;" onClick="reloadcode()" src="/zheng/checkcode?r={{ ctime }}" id='checkcode' alt="验证码" title="单击换一张验证码"/>
     </p>
     <p>
       <select id="type" name="type" class="selectpicker">
-        <option value="4">最新课表</option>
         <option value="1">成绩查询</option>
         <option value="2">考试时间查询</option>
         <option value="3">课表查询</option>
+        <option value="5" selected>上学期成绩</option>
       </select>
     </p>
     <br>
@@ -40,7 +40,6 @@
 {% block foot %}
 <script type="text/javascript">
   $('select').selectpicker();
-  
   $(document).ready(function () {
     document.cookie = "cookieid=1; expires=60";
     var result = document.cookie.indexOf("cookieid=") != -1;
@@ -48,6 +47,11 @@
         alert("浏览器未启用cookie,会导致无法查询，请启用！");
     }
 });
+function reloadcode()
+  {
+    var verify=document.getElementById('checkcode');
+      verify.src=verify.src+'?';
+  }
 </script>
 {% endblock %}
 

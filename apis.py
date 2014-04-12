@@ -5,12 +5,14 @@ import re
 import web
 import json
 
+from web import ctx
 from web.contrib.template import render_jinja
 
-from addons.calc_GPA import GPA
 from addons.get_CET import CET
-from addons.zf import ZF
-from addons.kb_json import KBJSON
+from addons.calc_GPA import GPA
+from addons.zfr import ZF, Login
+from addons.data_factory import KbJson, get_score_dict
+from addons import errors
 
 render = render_jinja('templates', encoding='utf-8')
 
@@ -21,8 +23,6 @@ urls = (
     '/cet', 'api_cet',
     '/gpa', 'api_gpa',
 )
-
-all_client = {}
 
 # api
 
@@ -51,78 +51,74 @@ class api_kb:
         return json_object
 
 
-
 class api_zheng:
 
     def GET(self):
-        zf = ZF()
-        viewstate, time_md5 = zf.pre_login()
-        all_client[time_md5] = (zf, viewstate)
+
+        try:
+            zf = ZF()
+            time_md5 = zf.pre_login()
+        except errors.ZfError, e:
+            return render.serv_err(err=e.value)
+        ctx.session['time_md5'] = time_md5
+        # get checkcode
         dic = {'time_md5': time_md5}
         json_object = json.dumps(dic)
         return json_object
 
-
-    def __score_get_json(self, table):
-        """
-        成绩正则匹配为json格式
-        """
-        score_re = re.compile('<td>.*</td><td>.</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td>')
-        result = score_re.findall(str(table).decode('utf-8'))
-        dic = {}
-        for i in result:
-            (key,value) = i
-            dic[key] = value
-        json_object = json.dumps(dic)
-        return json_object
+    #def __score_get_json(self, table):
+    #    """
+    #    成绩正则匹配为json格式
+    #    """
+    #    score_re = re.compile('<td>.*</td><td>.</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td>')
+    #    result = score_re.findall(str(table).decode('utf-8'))
+    #    dic = {}
+    #    for i in result:
+    #        (key,value) = i
+    #        dic[key] = value
+    #    json_object = json.dumps(dic)
+    #    return json_object
 
     def __kb_get_json(self, table):
         pass
 
     def POST(self):
-        data = web.input()
-        self.xh, self.pw = data.xh, data.pw
-        t, time_md5 = data.t, data.time_md5
-        verify = data.verify
+        content = web.input()
+        t, time_md5 = content.t, content.time_md5
 
         try:
+            zf = Login()
+            zf.login(time_md5, content)
+            #__dic = {
+            #        '1': zf.get_score,
+            #        '2': zf.get_kaoshi,
+            #        '3': zf.get_kebiao,
+            #        }
+            #if t not in __dic.keys():
+            #    return json_err('data error')
+            #return render.result(table=__dic[t]())
 
-            value = all_client.pop(time_md5)
-            zf, viewstate = value
+            if t == "1":
+                _dic=get_score_dict(zf.get_score())
+                json_object = json.dumps(_dic)
+            elif t == "2":
+                return json_err("please contact admin")
+                #table = zf.get_kaoshi()
+            elif t == "3":
+                table = zf.get_kebiao()
+                k = KbJson(table)
+                json_object = k.get_json()
+            elif t == "4":
+                table = zf.get_last_score()
+                json_object = self.__score_get_json(table)
+            else:
+                return json_err("can not find your t")
 
-        except KeyError:
-            return json_err("can not find target time_md5")
-
-        zf.set_user_info(self.xh, self.pw)
-        ret = zf.login(verify, viewstate)
-
-        if ret.find('欢迎您') != -1:
-            pass
-        elif ret.find('密码错误') != -1:
-            return json_err("password wrong")
-        elif ret.find('验证码不正确') != -1:
-            return json_err("verify code wrong")
-        else:
-            return json_err("server is sleeping ...")
-
-        if t == "1":
-            table = zf.get_score()
-            json_object = self.__score_get_json(table)
-        elif t == "2":
-            return json_err("please contact admin")
-            #table = zf.get_kaoshi()
-        elif t == "3":
-            #return json_err("please contact admin")
-            table = zf.get_kebiao()
-            k = KBJSON(table)
-            json_object = k.get_json()
-        else:
-            return json_err("can not find your t")
-
-        if json_object:
+            web.header('Content-Type','application/json')
             return json_object
-        else:
-            return json_err("can not find your contents")
+
+        except errors.PageError, e:
+            return json_err(e.value)
 
 
 class api_cet:

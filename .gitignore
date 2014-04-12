@@ -5,12 +5,14 @@ addons/*.pyc
 tools.py
 dong.py
 test/*
+.idea/*
 static/pic/*
+static/cdn/*
 stop.sh
 restart.sh
 start.sh
 .idea/*
- 
+initial_data.py
 
 # C extensions
 *.so

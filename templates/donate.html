@@ -33,14 +33,14 @@
     <thead>
     <tr>
       <th>赞助者</th>
-      <td><strong>金额</strong></td>
+      <th><strong>金额</strong></th>
     </tr>
     </thead>
     <tbody>
       {% for sp in sponsor %}
       <tr>
-        <th>{{ sp[0] }}</th>
-        <td>{{ sp[1] }}&nbsp;元</td>
+        <th>{{ sp.name }}</th>
+        <td>{{ sp.much }}&nbsp;元</td>
       </tr>
       {% endfor %}
     </tbody>

@@ -2,12 +2,13 @@
 #coding=utf-8
 #学分基点=∑(课程成绩*课程学分)/应修学分
 import re
-import urllib
-import urllib2
 import logging
+
+import requests
 
 import config
 import errors
+from redis2s import rds
 
 class GPA:
     '''Calculator Grade Point Average'''
@@ -21,16 +22,20 @@ class GPA:
 
     def getscore_page(self):
         '''获取成绩页面'''
-        param = urllib.urlencode({'post_xuehao':GPA.__num})
+        param = {'post_xuehao': GPA.__num}
         try:
-            self.page = urllib2.urlopen( url = config.score_url, data = param, timeout=5).read().decode('utf-8')
-        except urllib2.URLError:
-            return None
+            #self.page = urllib2.urlopen( url = config.score_url, data = param, timeout=5).read().decode('utf-8')
+            self.page = requests.post(url=config.score_url, data=param, timeout=0.05).text
+        except requests.Timeout:
+            raise errors.RequestError('无法连接成绩查询系统')
+            #return None
 
     # 直接抓取表格内容并返回
     def get_all_score(self):
-        page = self.page
-        patten = re.compile('<span class="style3">成绩信息</span>(.*?)</table>',re.M|re.S)  
+        '''获取全部成绩（直接返回一个表格）'''
+        page = self.page.encode('utf-8')
+        patten = re.compile('<span class="style3">成绩信息</span>(.*?)</table>',re.M|re.S)
+        #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为
         return patten.findall(page)
 
 
@@ -119,12 +124,14 @@ class GPA:
             return num
         except:
             try:
-                num = float(text)   
+                num = float(text)
                 return num
             except:
                 logging.error("cannot change %s into number"%text)
+                # store the error pages in redis
+                rds.hset('error_score_page', self.__num, self.page)
                 return -1
-    
+
     def __calc_score(self):
         '''计算平均学分基点'''
         not_accept=[]       #没有通过

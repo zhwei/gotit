@@ -20,9 +20,12 @@ from BeautifulSoup import BeautifulSoup
 
 import config
 import errors
-from utils import init_redis, not_error_page
-from image import process_image_string
+import image
+import redis2s
+from utils import not_error_page
+import mongo2s
 
+rds= redis2s.init_redis()
 
 def process_links(base_url):
     # process links
@@ -83,30 +86,43 @@ class ZF:
         #com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
         #self.VIEWSTATE = com.findall(_content)[0]
 
-        # get checkcode
-        _req1 = safe_get(self.code_url, cookies=_req.cookies, headers=self.headers)
-
+        # create time_md5
         import time
         import md5
-        image_content = _req1.content
         time_md5 = 'user_'+md5.md5(str(time.time())).hexdigest()
-        image_content=process_image_string(image_content)
+
+        # get checkcode
+        #checkcode=self.get_checkcode(time_md5)
+        _req1 = safe_get(self.code_url, cookies=_req.cookies, headers=self.headers)
+        image_content = _req1.content
+        image_content=image.process_image_string(image_content)
         base64_image="data:image/gif;base64,"+image_content.encode('base64').replace('\n','')
 
         # store in redis
-        rds= init_redis()
         rds.hset(time_md5, 'checkcode', base64_image)
         rds.hset(time_md5, 'base_url', self.base_url)
         rds.hset(time_md5, 'viewstate', self.VIEWSTATE)
 
         # pickle cookies
-        pickled = pickle.dumps(_req1.cookies)
+        #pickled = pickle.dumps(_req1.cookies)
+        pickled = pickle.dumps(_req.cookies)
         rds.hset(time_md5, 'cookies', base64.encodestring(pickled))
 
         # set expire time(milliseconds)
         rds.pexpire(time_md5, config.COOKIES_TIME_OUT)
 
         return time_md5
+
+    def get_checkcode(self, time_md5):
+
+        pickled = base64.decodestring(rds.hget(time_md5, 'cookies'))
+        self.cookies = pickle.loads(pickled)
+        rds.pexpire(time_md5, config.COOKIES_TIME_OUT) # 延时
+        # get checkcode
+        _req1 = safe_get(self.code_url, cookies=self.cookies, headers=self.headers)
+        image_content = _req1.content
+        img=image.process_image_string(image_content)
+        return img
 
 
 class Login:
@@ -117,10 +133,12 @@ class Login:
     def init_from_form(self, time_md5, post_content):
         """ 在用户提交帐号密码的时候初始化对象的必要数据
         """
-        self.xh = post_content['xh']
-        self.pw = post_content['pw']
+        self.xh = post_content.get('xh')
+        self.pw = post_content.get('pw')
         self.time_md5 = time_md5
         try:
+            # collect checkcode
+            mongo2s.collect_checkcode(post_content.get('verify', ''))
             self.verify = post_content['verify'].decode("utf-8").encode("gb2312")
         except UnicodeEncodeError:
             raise errors.PageError('验证码错误')
@@ -129,7 +147,6 @@ class Login:
         """ 用户后续查询时从redis获取数据
         """
         # init datas
-        rds= init_redis()
         self.base_url = rds.hget(self.time_md5, 'base_url')
         self.viewstate = rds.hget(self.time_md5, 'viewstate')
         pickled = base64.decodestring(rds.hget(self.time_md5, 'cookies'))
@@ -141,7 +158,6 @@ class Login:
         self.init_from_form(time_md5, post_content)
         self.init_from_redis()
         self.login_url, self.code_url, self.headers = process_links(self.base_url)
-
         # init post data
         data = {
             'Button1':'',
@@ -159,7 +175,7 @@ class Login:
                 cookies=self.cookies,
                 headers=self.headers)
 
-        self.cookies = _req.cookies
+        #self.cookies = _req.cookies
 
         not_error_page(_req.text)
 
@@ -193,7 +209,7 @@ class Login:
         html = self.get_html("xscjcx_dq")
         soup = BeautifulSoup(html, fromEncoding='gbk')
         result = soup.find("table", {"id": "DataGrid1"}).contents
-        return result
+        return (result, )
 
     def get_kebiao(self):
         """
@@ -202,7 +218,8 @@ class Login:
         html = self.get_html("xskbcx")
         soup = BeautifulSoup(html, fromEncoding='gbk')
         result = soup.find("table", {"id": "Table1"}).contents
-        return result
+        ret2 = soup.find("table", {"id": "Table3"}).contents
+        return (result, ret2)
 
     def get_kaoshi(self):
         """
@@ -211,7 +228,7 @@ class Login:
         html = self.get_html("xskscx")
         soup = BeautifulSoup(html, fromEncoding='gbk')
         result = soup.find("table", {"id": "DataGrid1"}).contents
-        return result
+        return (result,)
 
     def more_kebiao(self):
         """ 其他学期课表
@@ -248,37 +265,32 @@ class Login:
                 "__EVENTTARGET":"xqd",
                 "__EVENTARGUMENT":"",
                 "__VIEWSTATE":viewstate,
-                "xnd":'2012-2013',
-                "xqd":"2",
+                "xnd":'2013-2014',
+                "xqd":"1",
                 }
         url = self.base_url + 'xskbcx' + ".aspx?xh=" + self.xh
         _ret = requests.post(url=url, data=data,cookies=self.cookies, headers=self.headers)
         soup = BeautifulSoup(_ret.text, fromEncoding='gbk')
-        result = soup.find("table", {"id": "Table1"}).contents
-        return result
+        ret1 = soup.find("table", {"id": "Table1"}).contents
+        ret3 = soup.find("table", {"id": "Table3"}).contents
+        return (ret1, ret3)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#zf = ZF()
-#v, t = zf.pre_login()
-#y = raw_input('yanzhengma>')
-#zf.set_user_info('1111051046', 'zhejiushimima')
-#print zf.login(y, v)
+    def get_last_score(self):
+        """二次提交
+        """
+        html = self.get_html("xscjcx_dq")
+        viewstate = get_viewstate(html)
+        data = {
+                "__EVENTTARGET":"",
+                "__EVENTARGUMENT":"",
+                "__VIEWSTATE":viewstate,
+                "ddlxn":"2013-2014",
+                "ddlxq":"1",
+                "btnCx":" 查  询 ",
+                }
+        url = self.base_url + 'xscjcx_dq' + ".aspx?xh=" + self.xh
+        _ret = requests.post(url=url, data=data,cookies=self.cookies, headers=self.headers)
+        soup = BeautifulSoup(_ret.text, fromEncoding='gbk')
+        result = soup.find("table", {"id": "DataGrid1"}).contents
+        return (result, )

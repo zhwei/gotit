@@ -8,21 +8,25 @@ import logging
 
 import web
 from web.contrib.template import render_jinja
+from jinja2.exceptions import UndefinedError
+import requests
 
-from addons import get_old_cet, get_book
+from addons import config
+from addons import errors
+from addons.redis2s import rds
+from addons import mongo2s
 from addons.get_CET import CET
 from addons.zfr import ZF, Login
-from addons.autocache import memorize
-from addons import config
-from addons.config import index_cache, debug_mode, sponsor, zheng_alert
+from addons.autocache import memorize, redis_memoize
+from addons import get_old_cet, get_book
 from addons.RedisStore import RedisStore
-from addons.utils import init_redis, get_score_jidi#, init_log
-from addons import errors
-
+from addons.config import index_cache, debug_mode
+from addons.utils import get_score_jidi
+from forms import cet_form, xh_form, login_form
 
 #import apis
 import manage
-from forms import cet_form, xh_form, login_form
+import weix
 
 # debug mode
 web.config.debug = debug_mode
@@ -30,6 +34,7 @@ web.config.debug = debug_mode
 urls = (
     '/', 'index',
     '/zheng', 'zheng',
+    '/zheng/checkcode', 'checkcode',
     '/more/(.+)', 'more',
     '/years', 'years',
     '/score', 'score',
@@ -37,14 +42,13 @@ urls = (
     '/cet/old', 'cet_old',
     '/libr', 'libr',
     #'/api', apis.apis,
+    '/weixin', weix.weixin,
     '/manage', manage.manage,
     '/contact.html', 'contact',
     '/notice.html', 'notice',
     '/help/gpa.html', 'help_gpa',
     '/comment.html', 'comment',
     '/donate.html', 'donate',
-    '/root.txt', 'ttest',
-    '/status', 'status',
 )
 
 # main app
@@ -61,15 +65,22 @@ else:
 # render templates
 render = render_jinja('templates', encoding='utf-8',globals={'context':session})
 
-#logger = init_log('code.py')
+
+# init mongoDB
+mongo = mongo2s.init_mongo()
 
 # 首页索引页
 class index:
 
-    #@memorize(index_cache)
+    @redis_memoize('index', 100)
     def GET(self):
-        return render.index(alert=zheng_alert)
 
+        zheng_alert = rds.get('SINGLE_zheng')
+        score_alert = rds.get('SINGLE_score')
+        index_show = rds.get('SINGLE_index')
+
+        return render.index(zheng_alert=zheng_alert, index_show=index_show,
+                            score_alert=score_alert)
 
 # 成绩查询
 class zheng:
@@ -82,24 +93,18 @@ class zheng:
         except errors.ZfError, e:
             return render.serv_err(err=e.value)
         session['time_md5'] = time_md5
-        # get checkcode
-        r = init_redis()
-        checkcode = r.hget(time_md5, 'checkcode')
-
-        return render.zheng(alert=zheng_alert, checkcode=checkcode)
+        # get alert
+        _alert=rds.get('SINGLE_zheng')
+        import time
+        return render.zheng(alert=_alert, ctime=str(time.time()))
 
     def POST(self):
-        try:
-            content = web.input()
-        except UnicodeDecodeError:
-            content = web.input()
-            logging.error('UnicodeDecodeError '+str(content))
+        content = web.input()
         try:
             session['xh'] = content['xh']
             t = content['type']
             time_md5 = session['time_md5']
         except (AttributeError, KeyError), e:
-            logging.error(str(content))
             return render.alert_err(error='请检查您是否禁用cookie', url='/zheng')
 
         try:
@@ -110,14 +115,29 @@ class zheng:
                     '2': zf.get_kaoshi,
                     '3': zf.get_kebiao,
                     '4': zf.get_last_kebiao,
+                    '5': zf.get_last_score,
                     }
             if t not in __dic.keys():
                 return render.alert_err(error='输入不合理', url='/zheng')
-            return render.result(table=__dic[t]())
+            return render.result(tables=__dic[t]())
         except errors.PageError, e:
             return render.alert_err(error=e.value, url='/zheng')
 
-
+class checkcode:
+    """验证码链接
+    """
+    def GET(self):
+        try:
+            time_md5 = web.input(_method='get').time_md5
+        except AttributeError:
+            try:
+                time_md5=session['time_md5']
+            except KeyError:
+                return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
+        web.header('Content-Type','image/gif')
+        zf = ZF()
+        image_content = zf.get_checkcode(time_md5)
+        return image_content
 
 class more:
     """连续查询 二次查询
@@ -145,13 +165,18 @@ class more:
                     'kaoshi': zf.get_kaoshi,
                     'kebiao': zf.get_kebiao,
                     'lastkebiao': zf.get_last_kebiao,
+                    'lastscore': zf.get_last_score,
                     }
             if t in __dic.keys():
                 zf.init_after_login(session['time_md5'], session['xh'])
-                return render.result(table=__dic[t]())
+                return render.result(tables=__dic[t]())
             raise web.notfound()
-        except (AttributeError, TypeError, KeyError):
+        except (AttributeError, TypeError, KeyError, requests.TooManyRedirects):
             raise web.seeother('/zheng')
+        except errors.RequestError, e:
+            return render.serv_err(err=e)
+        except errors.PageError, e:
+            return render.alert_err(error=e.value, url='/score')
 
 class years:
 
@@ -176,7 +201,7 @@ class years:
 
 class cet:
 
-    @memorize(index_cache)
+    @redis_memoize('cet')
     def GET(self):
         form = cet_form()
         if config.baefetch:
@@ -205,7 +230,7 @@ class cet_old:
     """
     往年cet成绩查询
     """
-    @memorize(index_cache)
+    @redis_memoize('cet_old')
     def GET(self):
         form=xh_form
         title='往年四六级成绩'
@@ -218,15 +243,18 @@ class cet_old:
         else:
             xh = form.d.xh
             session['xh']=xh
-        table=get_old_cet(xh)
-        return render.result(table=table)
+        try:
+            table=get_old_cet(xh)
+            return render.result(table=table)
+        except errors.RequestError, e:
+            return render.serv_err(err=e)
 
 
 class libr:
     """
     图书馆相关
     """
-    @memorize(index_cache)
+    @redis_memoize('libr')
     def GET(self):
         form=login_form
         title='图书馆借书查询'
@@ -247,38 +275,14 @@ class libr:
         return render.result(table=table)
 
 
-# contact us
-
-class status:
-
-    def GET(self):
-        return 'status'
-
-
-class contact:
-
-    """contact us page"""
-    @memorize(index_cache)
-    def GET(self):
-        return render.contact()
-
-# notice
-
-
-class notice:
-
-    @memorize(index_cache)
-    def GET(self):
-        return render.notice()
-
-
 # 全部成绩
 class score:
 
-    @memorize(index_cache)
+    @redis_memoize('score', 100)
     def GET(self):
         form = xh_form()
-        return render.score(form=form)
+        alert=rds.get('SINGLE_score')
+        return render.score(form=form, alert=alert)
 
     def POST(self):
         form = xh_form()
@@ -291,6 +295,8 @@ class score:
                 score, jidi=get_score_jidi(xh)
             except errors.PageError, e:
                 return render.alert_err(error=e.value)
+            except errors.RequestError, e:
+                return render.serv_err(err=e)
 
             return render.result(table=score, jidian=jidi)
 
@@ -302,7 +308,7 @@ class score:
 
 class help_gpa:
 
-    @memorize(index_cache)
+    @redis_memoize('help_gpa')
     def GET(self):
         return render.help_gpa()
 
@@ -310,27 +316,38 @@ class help_gpa:
 
 class comment:
 
+    @redis_memoize('comment')
     def GET(self):
         return render.comment()
 
-# 赞助页面
 
+class contact:
+
+    """contact us page"""
+    @redis_memoize('contanct')
+    def GET(self):
+        return render.contact()
+
+# notice
+
+class notice:
+    @redis_memoize('notice')
+    def GET(self):
+        news = mongo.notice.find().sort("datetime",-1)
+        return render.notice(news=news)
+
+
+# 赞助页面
 
 class donate:
 
+    @redis_memoize('donate')
     def GET(self):
+        sponsor = mongo.donate.find().sort("much",-1)
         return render.donate(sponsor=sponsor)
 
-# 阿里妈妈认证
 
-
-class ttest:
-
-    def GET(self):
-        return render.root()
-
-
-
+# web server
 def session_hook():
     """ share session with sub apps
     """
@@ -345,6 +362,7 @@ def internalerror():
     """500
     """
     web.setcookie('webpy_session_id','',-1)
+    mongo2s.mcount('internalerror')
     return web.internalerror(render.internalerror())
 
 app.notfound = notfound

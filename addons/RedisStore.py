@@ -2,6 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+import base64
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+import logging
 
 import web
 from web.session import Store
@@ -9,6 +19,7 @@ from web.session import Store
 import redis
 
 SESSION_MARKUP='SESSION_'
+
 
 class RedisStore(Store):
     """
@@ -30,8 +41,9 @@ class RedisStore(Store):
 
     def __getitem__(self, key):
 
-        v = self.db.getset(SESSION_MARKUP+key, 600)
+        v = self.db.get(SESSION_MARKUP+key)
         if v:
+            self.db.expire(SESSION_MARKUP+key, 600)
             return self.decode(v)
         else:
             raise KeyError
@@ -45,3 +57,23 @@ class RedisStore(Store):
 
     def cleanup(self, timeout):
         pass
+
+    def decode(self, session_data):
+        """ 重写decode方法
+        避免：Error: Incorrect padding 报错
+
+        Decode base64, padding being optional.
+
+        :param session_data: Base64 data as an ASCII byte string
+        :returns: The decoded byte string.
+        """
+        missing_padding = 4 - len(session_data) % 4
+        if missing_padding:
+            session_data += b'='* missing_padding
+
+        pickled = base64.decodestring(session_data)
+        try:
+            return pickle.loads(pickled)
+        except pickle.UnpicklingError:
+            logging.error('UnpicklingError: '+pickled)
+            return pickle.loads(pickled)
