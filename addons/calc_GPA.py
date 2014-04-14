@@ -62,6 +62,7 @@ class GPA:
             return 0
         except:
             logging.error("cannot get info of %s"%GPA.__num)
+            rds.hset('error_score_cant_get_info', self.__num, self.page)
             return -1
 
 

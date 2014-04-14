@@ -53,7 +53,6 @@ urls = (
 # main app
 app = web.application(urls, globals(),autoreload=False)
 
-
 # session
 if web.config.get('_session') is None:
     session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})

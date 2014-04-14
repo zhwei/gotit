@@ -5,7 +5,7 @@
   {% if item %}
 
     <legend>{{ opera }} - {{ item }}</legend>
-    <p><a href="/manage/o/cr/{{ item }}" class='btn btn-default'><i class="glyphicon glyphicon-plus"></i>&nbsp;添加</a></p>
+    <p><a href="/manage/o/cr/{{ item }}" class='btn btn-default btn-block'><i class="glyphicon glyphicon-plus"></i>&nbsp;添加</a></p>
     {% if opera == 'cr' %}
       <form action="" method="POST" class="form-horizontal" role="form">
           <fieldset>
@@ -30,10 +30,10 @@
             {% if item == 'donate' %}
             <td>{{ l.name }}</td>
             <td>{{ l.much }}</td>
-            <td>{{ l.datetime }}</td>
+            <td class="hidden-xs">{{ l.datetime }}</td>
             {% elif item == 'wxcomment' %}
               <td class='text-overflow'>{{ l.content }}</td>
-              <td>{{ l.datetime }}</td>
+              <td class="hidden-xs">{{ l.datetime }}</td>
               <td><span class="label label-primary" title="{{ l.user }}"><i class="glyphicon glyphicon-user"></i></span></td>
             {% else %}
               <td class='text-overflow'>{{ l.content }}</td>
