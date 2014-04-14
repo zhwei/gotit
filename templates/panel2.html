@@ -4,8 +4,9 @@
 
   {% if opera %}
 
-    <legend>{{ opera }} - {{ item }}</legend>
     {% if opera == 'cr' %}
+    <legend>Create Single</legend>
+      <div class="col-md-12">
       <form action="" method="POST" class="form-horizontal" role="form">
           <fieldset>
             <div class="form-group">
@@ -26,7 +27,9 @@
           </fieldset>
           {{ form.submit(value="提交") }}
       </form>
+      </div>
     {% elif opera == 'info' %}
+    <legend>List Single</legend>
       <p><a href="/manage/single/cr" class='btn btn-default btn-block'>Create</a></p>
       <table class='table table-hover'>
       <thead><tr class="active">
@@ -48,8 +51,8 @@
         </tbody>
       </table>
     {% elif opera == 'del' %}
-    <div class="lead">
-      <br /><br />
+    <div class="lead" style="text-align: center;">
+      <br />
       <form method="post">
         <p class='lead'>是否确认删除？</p>
         <input type="hidden" name="oid" value="{{ oid }}"  />
