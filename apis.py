@@ -17,25 +17,68 @@ from addons import errors
 render = render_jinja('templates', encoding='utf-8')
 
 urls = (
-    '$', 'api_index',
-    '/score', 'api_zheng',
-    '/kb', 'api_kb',
-    '/cet', 'api_cet',
-    '/gpa', 'api_gpa',
+    '/', 'API_Doc',
+
+    # user
+    '/user/login.json', 'UserLogin',
+    '/user/(\w+)\/(\w+).json', 'User',
+    '/user/(\w+)/(\w+)/(raw?).json', 'User',
 )
 
-# api
 
-def json_err(content):
-    """用于生成json error内容"""
-    dic = {'error': content}
-    json_object = json.dumps(dic)
-    return json_object
+class API_Doc:
+    """ API 文档 """
+    def GET(self):
+        return render.api_doc()
 
-class api_index:
+
+class BaseApi(object):
+    """ Base Class of API
+    """
+
+    def json_dumps(self, json_source):
+
+        return json.dumps(json_source, ensure_ascii=False)
+
+    def json_response(self, data, message="Success"):
+        """ 填入 status 信息 """
+        status = {
+            "code" : web.ctx.status,
+            "message" : message
+        }
+        json_source = status.update(data)
+        return self.json_dumps(json_source)
+
+class UserLogin(BaseApi):
 
     def GET(self):
-        return render.apis()
+
+        try:
+            zf = ZF()
+            uid = zf.pre_login()
+        except errors.ZfError, e:
+            return self.json_response({}, message=e.value)
+
+        return self.json_response(data={"uid":uid})
+
+    def POST(self):
+        content = web.input()
+
+        session['xh'] = content['xh']
+        t = content['type']
+        uid = session['uid']
+        try:
+            zf = Login()
+            zf.login(uid, content)
+            return self.json_response(data={"uid":uid})
+        except errors.PageError, e:
+            return self.json_response({}, message=e.value)
+
+class User(BaseApi):
+
+    def GET(self, category=None, item=None, raw=False):
+
+        return web.ctx.path
 
 class api_kb:
 
@@ -57,12 +100,12 @@ class api_zheng:
 
         try:
             zf = ZF()
-            time_md5 = zf.pre_login()
+            uid = zf.pre_login()
         except errors.ZfError, e:
             return render.serv_err(err=e.value)
-        ctx.session['time_md5'] = time_md5
+        ctx.session['uid'] = uid
         # get checkcode
-        dic = {'time_md5': time_md5}
+        dic = {'uid': uid}
         json_object = json.dumps(dic)
         return json_object
 
@@ -84,11 +127,11 @@ class api_zheng:
 
     def POST(self):
         content = web.input()
-        t, time_md5 = content.t, content.time_md5
+        t, uid = content.t, content.uid
 
         try:
             zf = Login()
-            zf.login(time_md5, content)
+            zf.login(uid, content)
             #__dic = {
             #        '1': zf.get_score,
             #        '2': zf.get_kaoshi,
@@ -158,4 +201,4 @@ class api_gpa:
         result = json.dumps(result)
         return result
 
-apis = web.application(urls, locals())
+app = web.application(urls, locals())

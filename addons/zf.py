@@ -63,11 +63,11 @@ class ZF():
         image_content = self.opener.open(req).read()
         import time
         import md5
-        time_md5 = md5.md5(str(time.time())).hexdigest()
+        uid = md5.md5(str(time.time())).hexdigest()
         image_content=process_image_string(image_content)
         redis_server = init_redis()
-        redis_server.setex('CheckCode_'+time_md5, 100,image_content.encode('base64').replace('\n',''))
-        return __VIEWSTATE, time_md5
+        redis_server.setex('CheckCode_'+uid, 100,image_content.encode('base64').replace('\n',''))
+        return __VIEWSTATE, uid
 
     def login(self, yanzhengma, VIEWSTATE):
         yanzhengma = yanzhengma.decode("utf-8").encode("gb2312")

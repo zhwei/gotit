@@ -45,21 +45,35 @@
         <div>
           <center>如果我们做的对您有所帮助, 请考虑是否<a href="/donate.html">赞助</a>我们</center>
           <hr />
-          <p>查询更多：
-            <a class="btn btn-primary" href='/more/zheng'>成绩</a>&nbsp;
-            <a class="btn btn-default" href='/more/lastscore'>上学期成绩</a>&nbsp;
-            <a class="btn btn-info" href='/more/kebiao'>课表</a>&nbsp;
-            <a class="btn btn-warning" href='/more/kaoshi'>考试时间</a>&nbsp;
-            <a class="btn btn-success" href='/more/score'>绩点&总成绩</a>&nbsp;
-            <a class="btn btn-default" href='/more/oldcet'>往年CET</a>&nbsp;
-            <a onclick=condensed() class='btn btn-default'>表格调整</a>&nbsp;
-          </p>
-          <hr />
+          <div class="hidden-xs">
+            <p>查询更多：
+              <a class="btn btn-primary" href='/more/zheng'>成绩</a>&nbsp;
+              <a class="btn btn-default" href='/more/lastscore'>上学期成绩</a>&nbsp;
+              <a class="btn btn-info" href='/more/kebiao'>课表</a>&nbsp;
+              <a class="btn btn-warning" href='/more/kaoshi'>考试时间</a>&nbsp;
+              <a class="btn btn-success" href='/more/score'>绩点&总成绩</a>&nbsp;
+              <a class="btn btn-default" href='/more/oldcet'>往年CET</a>&nbsp;
+              <a onclick=condensed() class='btn btn-default'>表格调整</a>&nbsp;
+            </p>
+            <hr />
+          </div>
         </div>
 
         {%- block content -%}
 
         {% endblock %}
+        <div class="visible-xs">
+            <p>查询更多：
+              <a onclick=condensed() class='btn btn-block btn-default'>表格调整</a>
+              <a class="btn btn-block btn-primary" href='/more/zheng'>成绩</a>
+              <a class="btn btn-block btn-default" href='/more/lastscore'>上学期成绩</a>
+              <a class="btn btn-block btn-info" href='/more/kebiao'>课表</a>
+              <a class="btn btn-block btn-warning" href='/more/kaoshi'>考试时间</a>
+              <a class="btn btn-block btn-success" href='/more/score'>绩点&总成绩</a>
+              <a class="btn btn-block btn-default" href='/more/oldcet'>往年CET</a>
+            </p>
+            <hr />
+        </div>
 
         {%- include "includes/footer.html" -%}
       </div> <!-- /container -->

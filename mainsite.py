@@ -20,16 +20,10 @@ from addons.zfr import ZF, Login
 from addons.autocache import memorize, redis_memoize
 from addons import get_old_cet, get_book
 from addons.RedisStore import RedisStore
-from addons.config import index_cache, debug_mode
+from addons.config import index_cache
 from addons.utils import get_score_jidi
 from forms import cet_form, xh_form, login_form
 
-#import apis
-import manage
-import weix
-
-# debug mode
-web.config.debug = debug_mode
 
 urls = (
     '/', 'index',
@@ -40,9 +34,6 @@ urls = (
     '/cet', 'cet',
     '/cet/old', 'cet_old',
     '/libr', 'libr',
-    #'/api', apis.apis,
-    '/weixin', weix.weixin,
-    '/manage', manage.manage,
     '/contact.html', 'contact',
     '/notice.html', 'notice',
     '/help/gpa.html', 'help_gpa',
@@ -80,6 +71,10 @@ class index:
         return render.index(zheng_alert=zheng_alert, index_show=index_show,
                             score_alert=score_alert)
 
+class BaseSearch(object):
+    """ 各个查询功能的基类
+    """
+
 # 成绩查询
 class zheng:
 
@@ -87,10 +82,10 @@ class zheng:
 
         try:
             zf = ZF()
-            time_md5 = zf.pre_login()
+            uid = zf.pre_login()
         except errors.ZfError, e:
             return render.serv_err(err=e.value)
-        session['time_md5'] = time_md5
+        session['uid'] = uid
         # get alert
         _alert=rds.get('SINGLE_zheng')
         import time
@@ -101,13 +96,13 @@ class zheng:
         try:
             session['xh'] = content['xh']
             t = content['type']
-            time_md5 = session['time_md5']
+            uid = session['uid']
         except (AttributeError, KeyError), e:
             return render.alert_err(error='请检查您是否禁用cookie', url='/zheng')
 
         try:
             zf = Login()
-            zf.login(time_md5, content)
+            zf.login(uid, content)
             __dic = {
                     '1': zf.get_score,
                     '2': zf.get_kaoshi,
@@ -126,15 +121,15 @@ class checkcode:
     """
     def GET(self):
         try:
-            time_md5 = web.input(_method='get').time_md5
+            uid = web.input(_method='get').uid
         except AttributeError:
             try:
-                time_md5=session['time_md5']
+                uid=session['uid']
             except KeyError:
                 return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
         web.header('Content-Type','image/gif')
         zf = ZF()
-        image_content = zf.get_checkcode(time_md5)
+        image_content = zf.get_checkcode(uid)
         return image_content
 
 class more:
@@ -166,7 +161,7 @@ class more:
                     'lastscore': zf.get_last_score,
                     }
             if t in __dic.keys():
-                zf.init_after_login(session['time_md5'], session['xh'])
+                zf.init_after_login(session['uid'], session['xh'])
                 return render.result(tables=__dic[t]())
             raise web.notfound()
         except (AttributeError, TypeError, KeyError, requests.TooManyRedirects):

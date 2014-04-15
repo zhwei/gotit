@@ -42,7 +42,7 @@ db = mongo2s.init_mongo()
 rds = redis2s.init_redis()
 
 urls = (
-    '$', 'ologin',
+    '/', 'ologin',
     '/callback', 'callback',
     '/panel', 'panel',
     '/now', 'now',
@@ -65,7 +65,7 @@ urls = (
     '/de', 'DetailError',
 )
 
-manage = web.application(urls, locals())
+app = web.application(urls, locals())
 
 
 class ologin:
@@ -102,7 +102,7 @@ class callback:
                 return render.ologin(auth_url=AUTH_URL, error='欢迎尝试')
             ctx.session['uid'] = uid
         except APIError:
-            raise web.seeother('../manage')
+            raise web.seeother('/')
 
 
         raise web.seeother('panel')
@@ -115,9 +115,9 @@ def pre_request():
     if web.ctx.path not in ['', '/callback']:
         try:
             if ctx.session.uid != ADMIN_WEIBO_ID:
-                raise web.seeother('../manage')
+                raise web.seeother('/')
         except AttributeError:
-            raise web.seeother('../manage')
+            raise web.seeother('/')
 
 
 class panel:
@@ -316,4 +316,4 @@ class DetailError:
             key=key, hkey=hkey, key_list=key_list, content=content)
 
 
-manage.add_processor(web.loadhook(pre_request))
+# app.add_processor(web.loadhook(pre_request))
