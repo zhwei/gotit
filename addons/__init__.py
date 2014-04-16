@@ -6,7 +6,7 @@ __author__ = 'zhwei maweiwei'
 from addons.get_CET import CET
 from addons.library import login, getbooklist_table
 
-def get_old_cet(xh):
+def get_former_cet(xh):
 
     """
     查询往年四六级成绩

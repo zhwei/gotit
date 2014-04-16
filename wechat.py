@@ -135,7 +135,7 @@ class ProcessMsg(object):
             ret = e
         return ret
 
-    def get_old_cet(self, xh):
+    def get_former_cet(self, xh):
         """获取往年四六级成绩"""
         cet = CET()
         _dic = cet.get_cet_dict(xh)
@@ -235,7 +235,7 @@ class ProcessMsg(object):
                 # 绩点 & 往年四六级成绩
                 _dic = {
                         '3': self.get_gpa,
-                        '4': self.get_old_cet,
+                        '4': self.get_former_cet,
                         }
                 _xh = rds.hget(self.fromUser, 'xh')
                 rds.expire(self.fromUser, EXPIRE_SECONDS)
@@ -292,7 +292,7 @@ class ProcessMsg(object):
             return self.replay_text('请输入学号:\nq.退出查询过程')
         _dic = {
                 '3': self.get_gpa,
-                '4': self.get_old_cet,
+                '4': self.get_former_cet,
                 }
         _t = rds.hget(self.fromUser, 'status')
         try:

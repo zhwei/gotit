@@ -8,25 +8,35 @@ import json
 from web import ctx
 from web.contrib.template import render_jinja
 
+import requests
+
 from addons.get_CET import CET
 from addons.calc_GPA import GPA
 from addons.zfr import ZF, Login
+from addons.redis2s import rds
 from addons.data_factory import KbJson, get_score_dict
 from addons import errors
 
 render = render_jinja('templates', encoding='utf-8')
 
 urls = (
-    '/', 'API_Doc',
+    '/', 'APIDoc',
+
+    '/checkcode.gif', 'CheckCode',
 
     # user
     '/user/login.json', 'UserLogin',
-    '/user/(\w+)\/(\w+).json', 'User',
-    '/user/(\w+)/(\w+)/(raw?).json', 'User',
+    '/user/(score|timetable)/(\w+).json', 'UserRequest',
+    '/user/(score|timetable)/(\w+)/(raw?).json', 'UserRequest',
+
+    '/(score|timetable)/current_semester.json', "CurrentSemester",
+    '/(score|timetable)/(current_semester?)/(raw?).json', "CurrentSemester",
+
+    '/score/(gpa|all|former_cet).json', 'GPAHandler',
 )
 
 
-class API_Doc:
+class APIDoc:
     """ API 文档 """
     def GET(self):
         return render.api_doc()
@@ -40,18 +50,27 @@ class BaseApi(object):
 
         return json.dumps(json_source, ensure_ascii=False)
 
-    def json_response(self, data, message="Success"):
+    def json_response(self, data=None, message="Success"):
         """ 填入 status 信息 """
-        status = {
-            "code" : web.ctx.status,
-            "message" : message
+        json_source = {
+            "status" : {
+                "code" : web.ctx.status[:3],
+                "message" : message
+            },
         }
-        json_source = status.update(data)
+        if data: json_source.update({'data': data})
         return self.json_dumps(json_source)
 
-class UserLogin(BaseApi):
+    def json_request(self):
 
-    def GET(self):
+        json_content = web.input()['data']
+        return json.loads(json_content)
+
+class BaseGet(object):
+    """ 基类
+    默认GET返回UID
+    """
+    def GET(self, category=None, item=None, raw=False):
 
         try:
             zf = ZF()
@@ -61,144 +80,165 @@ class UserLogin(BaseApi):
 
         return self.json_response(data={"uid":uid})
 
-    def POST(self):
-        content = web.input()
+class UserLogin(BaseApi, BaseGet):
+    """ 验证类 登录请求 """
 
-        session['xh'] = content['xh']
-        t = content['type']
-        uid = session['uid']
+    def POST(self):
+
+        try:
+            content = self.json_request()
+        except:
+            web.ctx.status = "400"
+            return self.json_response(message="data format wrong")
+
         try:
             zf = Login()
-            zf.login(uid, content)
-            return self.json_response(data={"uid":uid})
+            zf.login(content["uid"], content)
+            return self.json_response(data={"uid":content["uid"]})
         except errors.PageError, e:
             return self.json_response({}, message=e.value)
 
-class User(BaseApi):
 
-    def GET(self, category=None, item=None, raw=False):
+class CheckCode(BaseApi):
 
-        return web.ctx.path
-
-class api_kb:
+    """ 验证码链接 """
 
     def GET(self):
-        return 'Hello kb!'
-
-    def POST(self):
-        data = web.input()
-        _xh = data.xh
-        _pw = data.pw
-        zheng = ZF(_xh, _pw, 'xskbcx')
-        json_object = zheng.get_json('xskbcx')
-        return json_object
+        try:
+            uid = web.input(_method='get').uid
+        except AttributeError:
+            return self.json_response({}, message='no UID')
+        web.header('Content-Type','image/gif')
+        zf = ZF()
+        return zf.get_checkcode(uid)
 
 
-class api_zheng:
+class UserRequest(BaseApi):
+    """ 验证类: 处理全部请求 """
+    category_list = ('score', 'timetable')
+    item_list = ('current_semester', 'last_semester','all', 'gpa', 'former_cet')
 
-    def GET(self):
+    def POST(self, category=None, item=None, raw=False):
+
+        if category not in self.category_list or item not in self.item_list:
+            raise web.notfound()
+        try:
+            content = self.json_request()
+            self.uid = content['uid']
+        except:
+            web.ctx.status = "400"
+            return self.json_response(message="data format wrong")
 
         try:
-            zf = ZF()
-            uid = zf.pre_login()
-        except errors.ZfError, e:
-            return render.serv_err(err=e.value)
-        ctx.session['uid'] = uid
-        # get checkcode
-        dic = {'uid': uid}
-        json_object = json.dumps(dic)
-        return json_object
+            self.xh = rds.hget(self.uid, "xh")
 
-    #def __score_get_json(self, table):
-    #    """
-    #    成绩正则匹配为json格式
-    #    """
-    #    score_re = re.compile('<td>.*</td><td>.</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>(.*)</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td><td>.*</td>')
-    #    result = score_re.findall(str(table).decode('utf-8'))
-    #    dic = {}
-    #    for i in result:
-    #        (key,value) = i
-    #        dic[key] = value
-    #    json_object = json.dumps(dic)
-    #    return json_object
+            if category == "score":
+                if item == "former_cet":
+                    cet = CET()
+                    data = cet.get_cet_json(self.xh)
+                elif item == "gpa":
+                    gpa = GPA(self.xh)
+                    data = {"gpa": gpa.get_gpa()}
+                elif item == "all":
+                    gpa = GPA(self.xh)
+                    data = gpa.get_allscore_dict()
+                elif item == "current_semester":
+                    zf = Login()
+                    zf.init_after_login(self.uid, self.xh)
+                    score = zf.get_score()
+                    data = get_score_dict(score)
+                elif item == "last_semester":
+                    zf = Login()
+                    zf.init_after_login(self.uid, self.xh)
+                    score = zf.get_last_score()
+                    data = get_score_dict(score)
+            elif category == "timetable":
+                zf = Login()
+                zf.init_after_login(self.uid, self.xh)
 
-    def __kb_get_json(self, table):
-        pass
+                if item == "current_semester":
+                    timetable = zf.get_timetable()
+                elif item == "last_semester":
+                    timetable = zf.get_last_timetable()
+                if raw:
+                    data = {"raw": timetable}
+                else:
+                    k = KbJson(timetable)
+                    data_list = k.get_list()
+                    data = data_list
+            return self.json_response(data)
+        except (AttributeError, TypeError, KeyError, requests.TooManyRedirects), e:
+            web.ctx.status = "401"
+            return self.json_response({}, message="Need Login")
+        except (errors.RequestError, errors.PageError), e:
+            return self.json_response({}, message=e.value)
 
-    def POST(self):
-        content = web.input()
-        t, uid = content.t, content.uid
 
+class CurrentSemester(BaseApi, BaseGet):
+    """ 处理对当前学期的查询 """
+
+    def POST(self, category=None, item=None, raw=False):
+
+        try:
+            content = self.json_request()
+        except:
+            web.ctx.status = "400"
+            return self.json_response(message="data format wrong")
         try:
             zf = Login()
-            zf.login(uid, content)
-            #__dic = {
-            #        '1': zf.get_score,
-            #        '2': zf.get_kaoshi,
-            #        '3': zf.get_kebiao,
-            #        }
-            #if t not in __dic.keys():
-            #    return json_err('data error')
-            #return render.result(table=__dic[t]())
-
-            if t == "1":
-                _dic=get_score_dict(zf.get_score())
-                json_object = json.dumps(_dic)
-            elif t == "2":
-                return json_err("please contact admin")
-                #table = zf.get_kaoshi()
-            elif t == "3":
-                table = zf.get_kebiao()
-                k = KbJson(table)
-                json_object = k.get_json()
-            elif t == "4":
-                table = zf.get_last_score()
-                json_object = self.__score_get_json(table)
-            else:
-                return json_err("can not find your t")
-
-            web.header('Content-Type','application/json')
-            return json_object
-
+            zf.login(content["uid"], content)
+            if category == "score":
+                score = zf.get_score()
+                data = get_score_dict(score)
+            elif category == "timetable":
+                timetable = zf.get_timetable()
+                if raw:
+                    data = {"raw": timetable}
+                else:
+                    k = KbJson(timetable)
+                    data_list = k.get_list()
+                    data = data_list
+            return self.json_response(data)
         except errors.PageError, e:
-            return json_err(e.value)
+            return self.json_response({}, message=e.value)
 
+class GPAHandler(BaseApi):
+    """ 获取全部成绩或者学分绩点 """
 
-class api_cet:
-
-    def GET(self):
-        return 'cet'
-
-    def POST(self):
-        data = web.input()
+    def POST(self, category):
         try:
-            nu = data.nu
-            name = data.name.encode('utf-8')
-        except AttributeError:
-            return json_err("can not find your post content")
-        cet = CET()
-        result = cet.get_last_cet_score(nu, name)
-        result = json.dumps(result)
-        return result
+            content = self.json_request()
+            self.xh = content['xh']
+        except:
+            web.ctx.status = "400"
+            return self.json_response(message="data format wrong")
+        if category == "former_cet":
+            cet = CET()
+            data = cet.get_cet_json(self.xh)
+        else:
+            gpa = GPA(self.xh)
+            if category == "gpa":
+                data = {"gpa": gpa.get_gpa()}
+            elif category == "all":
+                data = gpa.get_allscore_dict()
+        return self.json_response(data)
 
+def notfound():
+    """404
+    """
+    base = BaseApi()
+    web.ctx.status = "404"
+    return web.notfound(base.json_response(message="Not Found"))
 
-class api_gpa:
+def internalerror():
+    """500
+    """
+    base = BaseApi()
+    web.ctx.status = "500"
+    return web.internalerror(base.json_response(message="Internal Error"))
 
-    def GET(self):
-        return 'gpa'
-
-    def POST(self):
-        data = web.input()
-        try:
-            xh = data.xh
-        except AttributeError:
-            return json_err("The id is xh")
-        gpa = GPA(xh)
-        gpa.getscore_page()
-        result = gpa.get_gpa()
-        if result == -1:
-            return json_err("can not find your xh")
-        result = json.dumps(result)
-        return result
 
 app = web.application(urls, locals())
+app.notfound = notfound
+app.internalerror = internalerror
+

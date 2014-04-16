@@ -71,7 +71,7 @@ def not_error_page(page):
         raise errors.ZfError('正方教务系统不可用')
     return True
 
-def get_score_jidi(xh):
+def get_score_gpa(xh):
     """返回学分绩点
     """
     gpa = GPA(xh)

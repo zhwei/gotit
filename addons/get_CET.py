@@ -61,8 +61,8 @@ class CET:
                 ).text
         except requests.Timeout:
             raise errors.RequestError('无法连接成绩查询系统！')
-        patten = re.compile("</caption>(.*?)</table>",re.M|re.S)  
-        #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为 
+        patten = re.compile("</caption>(.*?)</table>",re.M|re.S)
+        #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为
         return patten.findall(page)[1]
 
     def get_cet_dict(self,num):
@@ -73,7 +73,7 @@ class CET:
             data = param,
             timeout=10
             ).read()
-        patten = re.compile('<td scope="col" align="center" valign="middle" nowrap>&nbsp;(.*)</td>') 
+        patten = re.compile('<td scope="col" align="center" valign="middle" nowrap>&nbsp;(.*)</td>')
         res =  patten.findall(page)
         ret = {}
         try:
@@ -104,11 +104,21 @@ class CET:
         ret['cet_score']=cet_score
         return ret
 
-#if __name__=='__main__':
+    def get_cet_json(self, xh):
+        """获取往年四六级成绩"""
+        _dic = self.get_cet_dict(xh)
+        ret = dict()
+        for i in range(_dic.get('total')):
+            ret["{}-{}".format(_dic['cet_time'][i][:6],
+                _dic['cet_type'][i])] = _dic['cet_score'][i]
+        return ret
+
+# if __name__=='__main__':
 #     num = raw_input("请输入你的学号: ")
 #     cet = CET()
-#     info =  cet.get_cet_dict(num)
-#     for i in  range(info['total']):
-#         print info['num'],info['name'],
-#         print info['cet_num'][i],info['cet_time'][i],
-#         print info['cet_type'][i],info['cet_score'][i]
+#     print cet.get_cet_json(num)
+    # info =  cet.get_cet_dict(num)
+    # for i in  range(info['total']):
+    #     print info['num'],info['name'],
+    #     print info['cet_num'][i],info['cet_time'][i],
+    #     print info['cet_type'][i],info['cet_score'][i]

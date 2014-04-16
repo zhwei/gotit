@@ -28,10 +28,8 @@ class KbJson(Base):
     time_re = '(..)第(\d+),(\d+)节{第(\d+)-(\d+)'.decode('utf-8')
     odd_re = '\|(.)周}'.decode('utf-8')
 
-    list_course = []
-
     def __init__(self, kb_html_list):
-
+        self.list_course = []
         self.kb_html_list = kb_html_list
 
     def __create_course_dict(self, tu_course):
@@ -89,23 +87,45 @@ class KbJson(Base):
         except ValueError:
             return False
 
+    # def get_list(self):
+
+    #     #from itertools import product
+    #     #for li, co_re, in product(self.kb_html_list, self.course_re):
+    #     #    pass
+    #     #    parm = re.compile(co_re)
+    #     #    re_result = parm.findall(str(li).decode('utf-8'))
+    #     #    for res in re_result:
+    #     #        try:
+    #     #            course_dict = self.__create_course_dict(res)
+    #     #        except IndexError:
+    #     #            pass
+
+    #     #        if course_dict:
+    #     #            self.list_course.append(course_dict)
+    #     #        else:
+    #     #            return self.__json_err('some lession error, please contact admin')
+
+    #     for li in self.kb_html_list:
+
+    #         for co_re in self.course_re:
+    #             parm = re.compile(co_re)
+    #             re_result = parm.findall(str(li).decode('utf-8'))
+
+    #             for res in re_result:
+    #                 try:
+    #                     course_dict = self.__create_course_dict(res)
+    #                 except IndexError:
+    #                     pass
+    #                 else:
+    #                     if course_dict:
+    #                         self.list_course.append(course_dict)
+    #                     else:
+    #                         return self.__json_err('some lession error, please contact admin')
+
+    #     return self.list_course
+
+
     def get_list(self):
-
-        #from itertools import product
-        #for li, co_re, in product(self.kb_html_list, self.course_re):
-        #    pass
-        #    parm = re.compile(co_re)
-        #    re_result = parm.findall(str(li).decode('utf-8'))
-        #    for res in re_result:
-        #        try:
-        #            course_dict = self.__create_course_dict(res)
-        #        except IndexError:
-        #            pass
-
-        #        if course_dict:
-        #            self.list_course.append(course_dict)
-        #        else:
-        #            return self.__json_err('some lession error, please contact admin')
 
         for li in self.kb_html_list:
 
@@ -126,29 +146,9 @@ class KbJson(Base):
 
         return self.list_course
 
-
     def get_json(self):
 
-        for li in self.kb_html_list:
-
-            for co_re in self.course_re:
-                parm = re.compile(co_re)
-                re_result = parm.findall(str(li).decode('utf-8'))
-
-                for res in re_result:
-                    try:
-                        course_dict = self.__create_course_dict(res)
-                    except IndexError:
-                        pass
-                    else:
-                        if course_dict:
-                            self.list_course.append(course_dict)
-                        else:
-                            return self.__json_err('some lession error, please contact admin')
-
-        json_object = json.dumps(self.list_course)
-
-        return json_object
+        return json.dumps(self.get_list(), ensure_ascii=False)
 
 
 

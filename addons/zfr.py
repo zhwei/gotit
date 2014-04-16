@@ -98,16 +98,14 @@ class ZF:
         image_content=image.process_image_string(image_content)
         base64_image="data:image/gif;base64,"+image_content.encode('base64').replace('\n','')
 
+        pickled_cookies = pickle.dumps(_req.cookies)
         # store in redis
-        rds.hset(uid, 'checkcode', base64_image)
-        rds.hset(uid, 'base_url', self.base_url)
-        rds.hset(uid, 'viewstate', self.VIEWSTATE)
-
-        # pickle cookies
-        #pickled = pickle.dumps(_req1.cookies)
-        pickled = pickle.dumps(_req.cookies)
-        rds.hset(uid, 'cookies', base64.encodestring(pickled))
-
+        rds.hmset(uid, {
+                "checkcode" : base64_image,
+                "base_url"  : self.base_url,
+                "viewstate" : self.VIEWSTATE,
+                'cookies'   : base64.encodestring(pickled_cookies),
+            })
         # set expire time(milliseconds)
         rds.pexpire(uid, config.COOKIES_TIME_OUT)
 
@@ -177,15 +175,16 @@ class Login:
 
         #self.cookies = _req.cookies
 
-        not_error_page(_req.text)
+        not_error_page(_req.text) # 判断请求是否出错
+        rds.hset(uid, "xh", self.xh)
+        rds.pexpire(uid, config.COOKIES_TIME_OUT) # 延时
 
-
-    def init_after_login(self, uid, xh):
+    def init_after_login(self, uid, xh=None):
         """初始化二次查找需要的数据
         用户已经登录，从redis中获取cookies等数据
         进行第二次抓取
         """
-        self.xh = xh
+        self.xh = xh or rds.hget(uid, "xh")
         self.uid=uid
         self.init_from_redis()
         self.login_url, self.code_url, self.headers = process_links(self.base_url)
@@ -211,7 +210,7 @@ class Login:
         result = soup.find("table", {"id": "DataGrid1"}).contents
         return (result, )
 
-    def get_kebiao(self):
+    def get_timetable(self):
         """
         课表 , 返回的内容为列表
         """
@@ -231,7 +230,7 @@ class Login:
         return (result,)
 
 
-    def get_last_kebiao(self):
+    def get_last_timetable(self):
         """二次提交
         """
         html = self.get_html("xskbcx")

@@ -1,8 +1,5 @@
-<!DOCTYPE html><html><head>
-<meta charset="utf-8">
-<title>Gotit 开放接口文档</title>
-<style>
-body {
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>body
+{
   font-size:15px;
   line-height:1.7;
   overflow-x:hidden;
@@ -779,7 +776,7 @@ body .task-list{
 <ul>
 <li>功能<br>
 登录后可以直接获取下面所有接口的结果, 仅需要提供用户识别码(UID)</li>
-<li>接口地址<br><a href="http://api.gotit.asia/login.json">/login.json</a>
+<li>接口地址<br><a href="http://api.gotit.asia/user/login.json">/user/login.json</a>
 </li>
 <li>
 <p>请求方式<br><code>GET</code> + <code>POST</code>  </p>
@@ -791,7 +788,7 @@ body .task-list{
 <ol>
 <li>
 <strong>GET</strong>:  先进行一次GET获取 <code>UID</code> 值(用户识别码), 用户的唯一标识. </li>
-<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode?=[UID]</code>.</li>
+<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]</code>.</li>
 <li> <strong>POST</strong>: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码<code>UID</code>
 </li>
 </ol>
@@ -868,27 +865,27 @@ body .task-list{
 <tbody>
 <tr>
 <td>当前学期成绩</td>
-            <td><a href="http://api.gotit.asia/user/score/current_semester.json">http://api.gotit.asia/user/score/current_semester.json</a></td>
+            <td><a href="http://api.gotit.asia/user/score/current_semester.json">/user/score/current_semester.json</a></td>
         </tr>
 <tr>
 <td>全部成绩</td>
-            <td><a href="http://api.gotit.asia/user/score/all.json">http://api.gotit.asia/user/score/all.json</a></td>
+            <td><a href="http://api.gotit.asia/user/score/all.json">/user/score/all.json</a></td>
         </tr>
 <tr>
 <td>学分绩点</td>
-            <td><a href="http://api.gotit.asia/user/score/gpa.json">http://api.gotit.asia/user/score/gpa.json</a></td>
+            <td><a href="http://api.gotit.asia/user/score/gpa.json">/user/score/gpa.json</a></td>
         </tr>
 <tr>
 <td>往年四六级成绩</td>
-            <td><a href="http://api.gotit.asia/user/score/former_cet.json">http://api.gotit.asia/user/score/former_cet.json</a></td>
+            <td><a href="http://api.gotit.asia/user/score/former_cet.json">/user/score/former_cet.json</a></td>
         </tr>
 <tr>
 <td>当前学期课表</td>
-            <td><a href="http://api.gotit.asia/user/timetable/current_semester.json">http://api.gotit.asia/user/timetable/current_semester.json</a></td>
+            <td><a href="http://api.gotit.asia/user/timetable/current_semester.json">/user/timetable/current_semester.json</a></td>
         </tr>
 <tr>
 <td>当前学期课表(原始html)</td>
-            <td><a href="http://api.gotit.asia/timetable/raw/current_semester.json">http://api.gotit.asia/timetable/raw/current_semester.json</a></td>
+            <td><a href="http://api.gotit.asia/user/timetable/current_semester/raw.json">/user/timetable/current_semester/raw.json</a></td>
         </tr>
 </tbody>
 </table><h2>
@@ -915,7 +912,7 @@ JSON<br>
 <ol>
 <li>
 <strong>GET</strong>:  先进行一次GET获取 <code>UID</code> 值(用户识别码), 用户的唯一标识. </li>
-<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode?=[UID]</code>.</li>
+<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]</code>.</li>
 <li> <strong>POST</strong>: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码<code>UID</code>
 </li>
 </ol>
@@ -983,7 +980,7 @@ JSON<br>
 <ol>
 <li>
 <strong>GET</strong>:  先进行一次GET获取 <code>UID</code> 值(用户识别码), 用户的唯一标识. </li>
-<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode?=[UID]</code>.</li>
+<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]</code>.</li>
 <li> <strong>POST</strong>: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码<code>UID</code>
 </li>
 </ol>
@@ -1078,11 +1075,25 @@ JSON<br>
         <span class="nt">"xh"</span><span class="p">:</span><span class="s2">"1111123456"</span>
     <span class="p">}</span>
 </pre></div>
+</li>
+<li>返回值示例</li>
+</ul><div class="highlight highlight-json"><pre>
+    <span class="p">{</span>
+        <span class="nt">"status"</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="nt">"code"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+            <span class="nt">"message"</span><span class="p">:</span> <span class="s2">"Success"</span>
+        <span class="p">},</span>
+        <span class="nt">"data"</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="nt">"201212-CET4"</span><span class="p">:</span> <span class="s2">"465"</span><span class="p">,</span>
+            <span class="nt">"201306-CET6"</span><span class="p">:</span> <span class="s2">"465"</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</pre></div>
 
 <h2>
 <a name="user-content-%E8%AF%BE%E8%A1%A8%E7%B1%BB" class="anchor" href="#%E8%AF%BE%E8%A1%A8%E7%B1%BB"><span class="octicon octicon-link"></span></a>课表类</h2>
-</li>
-</ul><h3>
+
+<h3>
 <a name="user-content-%E5%BD%93%E5%89%8D%E5%AD%A6%E6%9C%9F%E8%AF%BE%E8%A1%A8" class="anchor" href="#%E5%BD%93%E5%89%8D%E5%AD%A6%E6%9C%9F%E8%AF%BE%E8%A1%A8"><span class="octicon octicon-link"></span></a>当前学期课表</h3>
 
 <ul>
@@ -1100,7 +1111,7 @@ JSON<br>
 <ol>
 <li>
 <strong>GET</strong>:  先进行一次GET获取 <code>UID</code> 值(用户识别码), 用户的唯一标识. </li>
-<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode?=[UID]</code>.</li>
+<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]</code>.</li>
 <li> <strong>POST</strong>: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码<code>UID</code>
 </li>
 </ol>
@@ -1158,7 +1169,7 @@ JSON<br>
 <ul>
 <li>功能<br>
 查询当前学期课表, 跟随正方教务系统, 实时获取, 返回值为从正方教务系统通过正则表达式得出的原始html, 未经任何处理.</li>
-<li>接口地址<br><a href="http://api.gotit.asia/timetable/raw/current_semester.json">/timetable/raw/current_semester.json</a>
+<li>接口地址<br><a href="http://api.gotit.asia/timetable/current_semester/raw.json">/timetable/raw/current_semester.json</a>
 </li>
 <li>
 <p>请求方式<br><code>GET</code> + <code>POST</code>  </p>
@@ -1170,7 +1181,7 @@ JSON<br>
 <ol>
 <li>
 <strong>GET</strong>:  先进行一次GET获取 <code>UID</code> 值(用户识别码), 用户的唯一标识. </li>
-<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode?=[UID]</code>.</li>
+<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]</code>.</li>
 <li> <strong>POST</strong>: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码<code>UID</code>
 </li>
 </ol>

@@ -19,7 +19,7 @@
 `GET` + `POST`  
     + 使用说明  
         1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
-        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode?=[UID]`.
+        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]`.
         3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
 
     + GET 结果示例
@@ -136,7 +136,7 @@ JSON
 `GET` + `POST`  
     + 使用说明  
         1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
-        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode?=[UID]`.
+        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]`.
         3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
 
     + GET 结果示例
@@ -194,37 +194,14 @@ JSON
 + 接口地址  
 [/score/all.json](http://api.gotit.asia/score/all.json)
 + 请求方式  
-`GET` + `POST`  
-    + 使用说明  
-        1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
-        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode?=[UID]`.
-        3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
-
-    + GET 结果示例
+`POST`
+    - 请求数据示例  
+    参数: data
 
     ```json
 
         {
-            "status": {
-                "code": 200,
-                "message": "Success",
-            },
-            "data": {
-                "uid": "user_067e11ac790844c08e068c96fb5b023b"
-            }
-        }
-    ```
-    + POST 示例
-
-    参数: `data`
-
-    ```json
-
-        {
-            "uid": "user_067e11ac790844c08e068c96fb5b023b",
-            "xh": "1111123456",
-            "pw": "password",
-            "verify": "疫讨",
+            "xh":"1111123456"
         }
     ```
 
@@ -267,6 +244,20 @@ JSON
             "xh":"1111123456"
         }
     ```
++ 返回值示例
+
+```json
+
+    {   
+        "status" : {
+            "code": 200,
+            "message": "Success"
+        },
+        "data" : {
+            "gpa": "71.6"
+        }
+    }
+```
 
 ### 往年四六级成绩
 
@@ -285,6 +276,23 @@ JSON
             "xh":"1111123456"
         }
     ```
++ 返回值示例
+
+```json
+
+    {   
+        "status" : {
+            "code": 200,
+            "message": "Success"
+        },
+        "data" : {
+            "201212-CET4": "465",
+            "201306-CET6": "465"
+        }
+    }
+```
+
+
 ## 课表类
 
 ### 当前学期课表
@@ -297,7 +305,7 @@ JSON
 `GET` + `POST`  
     + 使用说明  
         1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
-        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode?=[UID]`.
+        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]`.
         3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
 
     + GET 结果示例
@@ -332,21 +340,27 @@ JSON
 
 ```json
 
-        [
-            {
-                "location": "西3101",
-                "name": "媒体策划与数字编辑",
-                "plan": "周一第7,8节{第10-10周}|双周", \\（原始字符串，用于检测解析是否准确）
-                "teacherName": "鞠英辉",
-                "dayOfWeek": "周一",
-                "oddEvenFlag": 0,       \\（单周为1，双周为2，不分单双周为0）
-                "sectionFrom": "7",     \\（节次开始）
-                "sectionTo": "9",       \\（节次结束）
-                "weekFrom": "2",        \\（开始上课周次）
-                "weekTo": "12 "         \\（结束上课周次）
+        {
+            "status": {
+                "code": 200,
+                "message": "Success",
             },
-            \\ ...
-        ]
+            "data" : [
+                        {
+                            "location": "西3101",
+                            "name": "媒体策划与数字编辑",
+                            "plan": "周一第7,8节{第10-10周}|双周", \\（原始字符串，用于检测解析是否准确）
+                            "teacherName": "鞠英辉",
+                            "dayOfWeek": "周一",
+                            "oddEvenFlag": 0,       \\（单周为1，双周为2，不分单双周为0）
+                            "sectionFrom": "7",     \\（节次开始）
+                            "sectionTo": "9",       \\（节次结束）
+                            "weekFrom": "2",        \\（开始上课周次）
+                            "weekTo": "12 "         \\（结束上课周次）
+                        },
+                        \\ ...
+            ]
+        }
 ```
 
 ### 当前学期课表(原始html)
@@ -359,7 +373,7 @@ JSON
 `GET` + `POST`  
     + 使用说明  
         1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
-        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode?=[UID]`.
+        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]`.
         3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
 
     + GET 结果示例

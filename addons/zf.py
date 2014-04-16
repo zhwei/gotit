@@ -107,7 +107,7 @@ class ZF():
         result = soup.find("table", {"id": "DataGrid1"}).contents
         return result
 
-    def get_kebiao(self):
+    def get_timetable(self):
         """
         课表 , 返回的内容为列表
         """

@@ -18,10 +18,10 @@ from addons import mongo2s
 from addons.get_CET import CET
 from addons.zfr import ZF, Login
 from addons.autocache import memorize, redis_memoize
-from addons import get_old_cet, get_book
+from addons import get_former_cet, get_book
 from addons.RedisStore import RedisStore
 from addons.config import index_cache
-from addons.utils import get_score_jidi
+from addons.utils import get_score_gpa
 from forms import cet_form, xh_form, login_form
 
 
@@ -106,8 +106,8 @@ class zheng:
             __dic = {
                     '1': zf.get_score,
                     '2': zf.get_kaoshi,
-                    '3': zf.get_kebiao,
-                    '4': zf.get_last_kebiao,
+                    '3': zf.get_timetable,
+                    '4': zf.get_last_timetable,
                     '5': zf.get_last_score,
                     }
             if t not in __dic.keys():
@@ -140,14 +140,14 @@ class more:
             raise web.seeother('/zheng')
         try:
             __dic1 = { # need xh
-                    'oldcet':get_old_cet,
+                    'oldcet':get_former_cet,
                     }
             if t in __dic1.keys():
                 return render.result(table=__dic1[t](session['xh']))
 
             elif t=='score':
                 try:
-                    score, jidi=get_score_jidi(session['xh'])
+                    score, jidi=get_score_gpa(session['xh'])
                 except errors.PageError, e:
                     return render.alert_err(error=e.value, url='/score')
                 return render.result(table=score, jidian=jidi)
@@ -156,8 +156,8 @@ class more:
             __dic = { # just call
                     'zheng': zf.get_score,
                     'kaoshi': zf.get_kaoshi,
-                    'kebiao': zf.get_kebiao,
-                    'lastkebiao': zf.get_last_kebiao,
+                    'kebiao': zf.get_timetable,
+                    'lastkebiao': zf.get_last_timetable,
                     'lastscore': zf.get_last_score,
                     }
             if t in __dic.keys():
@@ -218,7 +218,7 @@ class cet_old:
             xh = form.d.xh
             session['xh']=xh
         try:
-            table=get_old_cet(xh)
+            table=get_former_cet(xh)
             return render.result(table=table)
         except errors.RequestError, e:
             return render.serv_err(err=e)
@@ -266,7 +266,7 @@ class score:
             xh = form.d.xh
             session['xh']=xh
             try:
-                score, jidi=get_score_jidi(xh)
+                score, jidi=get_score_gpa(xh)
             except errors.PageError, e:
                 return render.alert_err(error=e.value)
             except errors.RequestError, e:
