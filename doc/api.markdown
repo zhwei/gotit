@@ -136,7 +136,7 @@ JSON
 `GET` + `POST`  
     + 使用说明  
     <i>同<a href="#登录">登录</a></i>
-    + GET 结果示例
+    + GET 结果示例  
     <i>同<a href="#登录">登录</a></i>
     + POST 示例  
     <i>同<a href="#登录">登录</a></i>
@@ -280,9 +280,9 @@ JSON
 `GET` + `POST`  
     + 使用说明  
     <i>同<a href="#登录">登录</a></i>
-    + GET 结果示例
+    + GET 结果示例  
     <i>同<a href="#登录">登录</a></i>
-    + POST 示例
+    + POST 示例  
     <i>同<a href="#登录">登录</a></i>
 
 + 返回值示例
@@ -322,9 +322,9 @@ JSON
 `GET` + `POST`  
     + 使用说明  
     <i>同<a href="#登录">登录</a></i>
-    + GET 结果示例
+    + GET 结果示例  
     <i>同<a href="#登录">登录</a></i>
-    + POST 示例
+    + POST 示例  
     <i>同<a href="#登录">登录</a></i>
 
 + 返回值示例
