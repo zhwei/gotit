@@ -135,37 +135,12 @@ JSON
 + 请求方式  
 `GET` + `POST`  
     + 使用说明  
-        1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
-        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]`.
-        3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
-
+    <i>同<a href="#登录">登录</a></i>
     + GET 结果示例
+    <i>同<a href="#登录">登录</a></i>
+    + POST 示例  
+    <i>同<a href="#登录">登录</a></i>
 
-    ```json
-
-        {
-            "status": {
-                "code": 200,
-                "message": "Success",
-            },
-            "data": {
-                "uid": "user_067e11ac790844c08e068c96fb5b023b"
-            }
-        }
-    ```
-    + POST 示例
-
-    参数: `data`
-
-    ```json
-
-        {
-            "uid": "user_067e11ac790844c08e068c96fb5b023b",
-            "xh": "1111123456",
-            "pw": "password",
-            "verify": "疫讨",
-        }
-    ```
 
 
 + 返回值示例
@@ -304,37 +279,11 @@ JSON
 + 请求方式  
 `GET` + `POST`  
     + 使用说明  
-        1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
-        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]`.
-        3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
-
+    <i>同<a href="#登录">登录</a></i>
     + GET 结果示例
-
-    ```json
-
-        {
-            "status": {
-                "code": 200,
-                "message": "Success",
-            },
-            "data": {
-                "uid": "user_067e11ac790844c08e068c96fb5b023b"
-            }
-        }
-    ```
+    <i>同<a href="#登录">登录</a></i>
     + POST 示例
-
-    参数: `data`
-
-    ```json
-
-        {
-            "uid": "user_067e11ac790844c08e068c96fb5b023b",
-            "xh": "1111123456",
-            "pw": "password",
-            "verify": "疫讨",
-        }
-    ```
+    <i>同<a href="#登录">登录</a></i>
 
 + 返回值示例
 
@@ -372,37 +321,11 @@ JSON
 + 请求方式  
 `GET` + `POST`  
     + 使用说明  
-        1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
-        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]`.
-        3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
-
+    <i>同<a href="#登录">登录</a></i>
     + GET 结果示例
-
-    ```json
-
-        {
-            "status": {
-                "code": 200,
-                "message": "Success",
-            },
-            "data": {
-                "uid": "user_067e11ac790844c08e068c96fb5b023b"
-            }
-        }
-    ```
+    <i>同<a href="#登录">登录</a></i>
     + POST 示例
-
-    参数: `data`
-
-    ```json
-
-        {
-            "uid": "user_067e11ac790844c08e068c96fb5b023b",
-            "xh": "1111123456",
-            "pw": "password",
-            "verify": "疫讨",
-        }
-    ```
+    <i>同<a href="#登录">登录</a></i>
 
 + 返回值示例
 
