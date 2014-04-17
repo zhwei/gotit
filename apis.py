@@ -14,13 +14,20 @@ from addons.get_CET import CET
 from addons.calc_GPA import GPA
 from addons.zfr import ZF, Login
 from addons.redis2s import rds
+from addons.mongo2s import init_mongo
 from addons.data_factory import KbJson, get_score_dict
 from addons import errors
+from addons.autocache import redis_memoize
 
 render = render_jinja('templates', encoding='utf-8')
 
+API_TRIES_LIMIT = 1000  # 使用次数(次)
+API_TIME_LIMIT = 3600   # 时间段(s)    即: 一小时内允许1000次请求(GET and POST)
+
 urls = (
     '/', 'APIDoc',
+
+    '/test', 'APITest',
 
     '/checkcode.gif', 'CheckCode',
 
@@ -30,16 +37,17 @@ urls = (
     '/user/(score|timetable)/(\w+)/(raw?).json', 'UserRequest',
 
     '/(score|timetable)/current_semester.json', "CurrentSemester",
-    '/(score|timetable)/(current_semester?)/(raw?).json', "CurrentSemester",
+    '/(timetable?)/(current_semester?)/(raw?).json', "CurrentSemester",
 
     '/score/(gpa|all|former_cet).json', 'GPAHandler',
 )
 
 
 class APIDoc:
-    """ API 文档 """
+    """ API 文档 首页"""
     def GET(self):
         return render.api_doc()
+
 
 
 class BaseApi(object):
@@ -54,7 +62,7 @@ class BaseApi(object):
         """ 填入 status 信息 """
         json_source = {
             "status" : {
-                "code" : web.ctx.status[:3],
+                "code" : int(web.ctx.status[:3]),
                 "message" : message
             },
         }
@@ -65,6 +73,14 @@ class BaseApi(object):
 
         json_content = web.input()['data']
         return json.loads(json_content)
+
+class APITest(BaseApi):
+
+    def GET(self):
+        # ['status', 'realhome', 'homedomain', 'protocol', 'app_stack',
+        # 'ip', 'fullpath', 'headers', 'host', 'environ', 'env', 'home',
+        # 'homepath', 'output', 'path', 'query', 'method']
+        return web.ctx.environ["HTTP_ACCESS_TOKEN"]
 
 class BaseGet(object):
     """ 基类
@@ -223,6 +239,7 @@ class GPAHandler(BaseApi):
                 data = gpa.get_allscore_dict()
         return self.json_response(data)
 
+
 def notfound():
     """404
     """
@@ -237,8 +254,40 @@ def internalerror():
     web.ctx.status = "500"
     return web.internalerror(base.json_response(message="Internal Error"))
 
+def limit_processor(handler):
+
+    @redis_memoize("developer")
+    def developer_list():
+        db = init_mongo()
+        for d in db['developer'].find():
+            yield d['token']
+
+    base = BaseApi()
+    print web.ctx.path
+    if web.ctx.path not in ['/', '/checkcode.gif']:
+        try:
+            token = web.ctx.environ["HTTP_ACCESS_TOKEN"]
+            if token in developer_list():
+                # 次数限制 todooooooo
+                _key = "token_{}".format(token)
+                if rds.exists(_key):
+                    if int(rds.get(_key)) < API_TRIES_LIMIT:
+                        rds.incr(_key)
+                    else:
+                        return base.json_response(message="Tries Limit")
+                else:
+                    rds.set(_key, 1)
+                    rds.expire(_key, API_TIME_LIMIT)
+                return handler()
+            else:
+                raise KeyError
+        except KeyError:
+            web.ctx.status = "401"
+            return base.json_response(message="No ACCESS_TOKEN SET")
+    else:
+        return handler()
 
 app = web.application(urls, locals())
 app.notfound = notfound
 app.internalerror = internalerror
-
+# app.add_processor(limit_processor)

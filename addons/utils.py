@@ -16,6 +16,14 @@ import config
 import errors
 from addons.calc_GPA import GPA
 
+def get_unique_key(prefix=None):
+
+    import time
+    import md5
+    if prefix:
+        key = "{}_{}".format(prefix, md5.md5(str(time.time())).hexdigest())
+    key = md5.md5(str(time.time())).hexdigest()
+    return key
 
 LEVELS = {
     'debug':logging.DEBUG,

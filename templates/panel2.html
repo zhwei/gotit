@@ -10,7 +10,7 @@
       <form action="" method="POST" class="form-horizontal" role="form">
           <fieldset>
             <div class="form-group">
-              <p><a class="btn btn-default btn-block" href="/manage/single/info">全部列表</a></p>
+              <p><a class="btn btn-default btn-block" href="/single/info">全部列表</a></p>
               <hr />
               <p><input type="text" name="key" class='form-control' placeholder="The Key" /></p>
               <p><textarea name="content" id="editor" class="form-control" placeholder="Enter content.."></textarea></p>
@@ -30,7 +30,7 @@
       </div>
     {% elif opera == 'info' %}
     <legend>List Single</legend>
-      <p><a href="/manage/single/cr" class='btn btn-default btn-block'>Create</a></p>
+      <p><a href="/single/cr" class='btn btn-default btn-block'>Create</a></p>
       <table class='table table-hover'>
       <thead><tr class="active">
           <th>Title</th>
@@ -44,7 +44,7 @@
                 <td>{{ single[1] }}</td>
                 <td>
                     <a class="btn btn-default btn-mini" href=""><i class="glyphicon glyphicon-edit"></i></a>
-                    <a class="btn btn-default btn-mini" href="/manage/single/del/{{ single[0] }}"><i class="glyphicon glyphicon-remove"></i></a>
+                    <a class="btn btn-default btn-mini" href="/single/del/{{ single[0] }}"><i class="glyphicon glyphicon-remove"></i></a>
                 </td>
             </tr>
         {% endfor %}

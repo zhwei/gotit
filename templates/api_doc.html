@@ -1,4 +1,6 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><style>body
+<!DOCTYPE html><html><head>
+<title>Gotit 开放接口文档</title>
+<meta charset="utf-8"><style>body
 {
   font-size:15px;
   line-height:1.7;
@@ -751,24 +753,66 @@ body .task-list{
 <a name="user-content-gotit-%E5%BC%80%E6%94%BE%E6%8E%A5%E5%8F%A3%E6%96%87%E6%A1%A3" class="anchor" href="#gotit-%E5%BC%80%E6%94%BE%E6%8E%A5%E5%8F%A3%E6%96%87%E6%A1%A3"><span class="octicon octicon-link"></span></a>Gotit 开放接口文档</h1>
 
 <ul>
-<li>
-<em>更新时间: 2014-04-15</em><br>
-</li>
-<li><p><em>数据格式均为<code>JSON</code></em>  </p></li>
-<li>
-<p>接口说明:  </p>
-
-<ol>
+<li><em>更新时间: 2014-04-17</em></li>
+<li><em>数据格式均为<code>JSON</code></em></li>
+<li>接口使用说明:<br><ol>
 <li>由于中文验证码的存在, 接口或许有点另类, 希望见谅.<br>
 </li>
 <li>验证类接口需要登录后才能使用, 如果仅查询单项信息推荐使用下面的成绩类或课表类接口<br>
 </li>
-<li>希望开发者在使用接口前先通过<a href="file:///home/zhwei/apps/gotit/doc/mailto:zhwei@gotit.asia">邮件</a>联系作者, 如果有很好的建议或者哪些地方不理解也可以通过邮件联系.<br>
-</li>
+<li>开发者在使用接口前先通过<a href="file:///home/zhwei/apps/gotit/doc/mailto:zhwei@gotit.asia">邮件</a>联系作者 索要<code>ACCESS_TOKEN</code>, 将其放入请求<code>header</code>中.</li>
+<li>次数限制 <code>1000次/小时</code>, 防止端口被恶意使用, 如果配额不够请联系作者.</li>
 </ol>
 </li>
 </ul><h2>
+<a name="user-content-%E7%B4%A2%E5%BC%95" class="anchor" href="#%E7%B4%A2%E5%BC%95"><span class="octicon octicon-link"></span></a>索引</h2>
+
+<ul>
+<li>
+<a href="#%E9%AA%8C%E8%AF%81%E7%B1%BB">验证类</a>
+
+<ul>
+<li>
+<a href="#%E7%99%BB%E5%BD%95">登录</a>
+
+<ul>
+<li>功能</li>
+<li>请求方式
+
+<ul>
+<li>使用说明</li>
+<li>GET结果示例</li>
+<li>POST示例</li>
+</ul>
+</li>
+<li>返回值示例</li>
+</ul>
+</li>
+<li><a href="#%E6%9F%A5%E8%AF%A2%E6%8E%A5%E5%8F%A3%E5%88%97%E8%A1%A8%E9%9C%80%E7%99%BB%E5%BD%95">查询接口列表(需登录)</a></li>
+</ul>
+</li>
+<li>
+<a href="#%E6%88%90%E7%BB%A9%E7%B1%BB">成绩类</a>
+
+<ul>
+<li><a href="#%E5%BD%93%E5%89%8D%E5%AD%A6%E6%9C%9F%E6%88%90%E7%BB%A9">当前学期成绩</a></li>
+<li><a href="#%E5%85%A8%E9%83%A8%E6%88%90%E7%BB%A9">全部成绩</a></li>
+<li><a href="#%E7%BB%A9%E7%82%B9">绩点</a></li>
+<li><a href="#%E5%BE%80%E5%B9%B4%E5%9B%9B%E5%85%AD%E7%BA%A7%E6%88%90%E7%BB%A9">往年四六级成绩</a></li>
+</ul>
+</li>
+<li>
+<a href="#%E8%AF%BE%E8%A1%A8%E7%B1%BB">课表类</a>
+
+<ul>
+<li><a href="#%E5%BD%93%E5%89%8D%E5%AD%A6%E6%9C%9F%E8%AF%BE%E8%A1%A8">当前学期课表</a></li>
+<li><a href="#%E5%BD%93%E5%89%8D%E5%AD%A6%E6%9C%9F%E8%AF%BE%E8%A1%A8%E5%8E%9F%E5%A7%8Bhtml">当前学期课表(原始html)</a></li>
+</ul>
+</li>
+</ul><h2>
 <a name="user-content-%E9%AA%8C%E8%AF%81%E7%B1%BB" class="anchor" href="#%E9%AA%8C%E8%AF%81%E7%B1%BB"><span class="octicon octicon-link"></span></a>验证类</h2>
+
+<p><em>所有接口需要登陆后才能使用， 一次登录后可进行多次查询</em>  </p>
 
 <h3>
 <a name="user-content-%E7%99%BB%E5%BD%95" class="anchor" href="#%E7%99%BB%E5%BD%95"><span class="octicon octicon-link"></span></a>登录</h3>
@@ -817,7 +861,7 @@ body .task-list{
         <span class="nt">"uid"</span><span class="p">:</span> <span class="s2">"user_067e11ac790844c08e068c96fb5b023b"</span><span class="p">,</span>
         <span class="nt">"xh"</span><span class="p">:</span> <span class="s2">"1111123456"</span><span class="p">,</span>
         <span class="nt">"pw"</span><span class="p">:</span> <span class="s2">"password"</span><span class="p">,</span>
-        <span class="nt">"verify"</span><span class="p">:</span> <span class="s2">"疫讨"</span><span class="p">,</span>
+        <span class="nt">"verify"</span><span class="p">:</span> <span class="s2">"疫讨"</span>
     <span class="p">}</span>
 </pre></div>
 </li>
@@ -891,6 +935,8 @@ body .task-list{
 </table><h2>
 <a name="user-content-%E6%88%90%E7%BB%A9%E7%B1%BB" class="anchor" href="#%E6%88%90%E7%BB%A9%E7%B1%BB"><span class="octicon octicon-link"></span></a>成绩类</h2>
 
+<p><em>接口可以直接使用， 单次使用</em>  </p>
+
 <h3>
 <a name="user-content-%E5%BD%93%E5%89%8D%E5%AD%A6%E6%9C%9F%E6%88%90%E7%BB%A9" class="anchor" href="#%E5%BD%93%E5%89%8D%E5%AD%A6%E6%9C%9F%E6%88%90%E7%BB%A9"><span class="octicon octicon-link"></span></a>当前学期成绩</h3>
 
@@ -906,44 +952,13 @@ JSON<br>
 <p>请求方式<br><code>GET</code> + <code>POST</code>  </p>
 
 <ul>
-<li>
-<p>使用说明  </p>
-
-<ol>
-<li>
-<strong>GET</strong>:  先进行一次GET获取 <code>UID</code> 值(用户识别码), 用户的唯一标识. </li>
-<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]</code>.</li>
-<li> <strong>POST</strong>: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码<code>UID</code>
+<li>使用说明<br><i>同<a href="#%E7%99%BB%E5%BD%95">登录</a></i>
 </li>
-</ol>
+<li>GET 结果示例<br><i>同<a href="#%E7%99%BB%E5%BD%95">登录</a></i>
 </li>
-<li><p>GET 结果示例</p></li>
+<li>POST 示例<br><i>同<a href="#%E7%99%BB%E5%BD%95">登录</a></i>
+</li>
 </ul>
-<div class="highlight highlight-json"><pre>
-    <span class="p">{</span>
-        <span class="nt">"status"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">"code"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
-            <span class="nt">"message"</span><span class="p">:</span> <span class="s2">"Success"</span><span class="p">,</span>
-        <span class="p">},</span>
-        <span class="nt">"data"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">"uid"</span><span class="p">:</span> <span class="s2">"user_067e11ac790844c08e068c96fb5b023b"</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-</pre></div>
-
-<ul>
-<li>POST 示例</li>
-</ul>
-<p>参数: <code>data</code></p>
-
-<div class="highlight highlight-json"><pre>
-    <span class="p">{</span>
-        <span class="nt">"uid"</span><span class="p">:</span> <span class="s2">"user_067e11ac790844c08e068c96fb5b023b"</span><span class="p">,</span>
-        <span class="nt">"xh"</span><span class="p">:</span> <span class="s2">"1111123456"</span><span class="p">,</span>
-        <span class="nt">"pw"</span><span class="p">:</span> <span class="s2">"password"</span><span class="p">,</span>
-        <span class="nt">"verify"</span><span class="p">:</span> <span class="s2">"疫讨"</span><span class="p">,</span>
-    <span class="p">}</span>
-</pre></div>
 </li>
 <li><p>返回值示例</p></li>
 </ul><div class="highlight highlight-json"><pre>
@@ -971,45 +986,15 @@ JSON<br>
 <li>接口地址<br><a href="http://api.gotit.asia/score/all.json">/score/all.json</a>
 </li>
 <li>
-<p>请求方式<br><code>GET</code> + <code>POST</code>  </p>
+<p>请求方式<br><code>POST</code></p>
 
 <ul>
-<li>
-<p>使用说明  </p>
-
-<ol>
-<li>
-<strong>GET</strong>:  先进行一次GET获取 <code>UID</code> 值(用户识别码), 用户的唯一标识. </li>
-<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]</code>.</li>
-<li> <strong>POST</strong>: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码<code>UID</code>
-</li>
-</ol>
-</li>
-<li><p>GET 结果示例</p></li>
+<li>请求数据示例<br>
+参数: data</li>
 </ul>
 <div class="highlight highlight-json"><pre>
     <span class="p">{</span>
-        <span class="nt">"status"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">"code"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
-            <span class="nt">"message"</span><span class="p">:</span> <span class="s2">"Success"</span><span class="p">,</span>
-        <span class="p">},</span>
-        <span class="nt">"data"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">"uid"</span><span class="p">:</span> <span class="s2">"user_067e11ac790844c08e068c96fb5b023b"</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-</pre></div>
-
-<ul>
-<li>POST 示例</li>
-</ul>
-<p>参数: <code>data</code></p>
-
-<div class="highlight highlight-json"><pre>
-    <span class="p">{</span>
-        <span class="nt">"uid"</span><span class="p">:</span> <span class="s2">"user_067e11ac790844c08e068c96fb5b023b"</span><span class="p">,</span>
-        <span class="nt">"xh"</span><span class="p">:</span> <span class="s2">"1111123456"</span><span class="p">,</span>
-        <span class="nt">"pw"</span><span class="p">:</span> <span class="s2">"password"</span><span class="p">,</span>
-        <span class="nt">"verify"</span><span class="p">:</span> <span class="s2">"疫讨"</span><span class="p">,</span>
+        <span class="nt">"xh"</span><span class="p">:</span><span class="s2">"1111123456"</span>
     <span class="p">}</span>
 </pre></div>
 </li>
@@ -1054,7 +1039,20 @@ JSON<br>
     <span class="p">}</span>
 </pre></div>
 </li>
-</ul><h3>
+<li>返回值示例</li>
+</ul><div class="highlight highlight-json"><pre>
+    <span class="p">{</span>
+        <span class="nt">"status"</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="nt">"code"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+            <span class="nt">"message"</span><span class="p">:</span> <span class="s2">"Success"</span>
+        <span class="p">},</span>
+        <span class="nt">"data"</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="nt">"gpa"</span><span class="p">:</span> <span class="mf">71.612312312</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</pre></div>
+
+<h3>
 <a name="user-content-%E5%BE%80%E5%B9%B4%E5%9B%9B%E5%85%AD%E7%BA%A7%E6%88%90%E7%BB%A9" class="anchor" href="#%E5%BE%80%E5%B9%B4%E5%9B%9B%E5%85%AD%E7%BA%A7%E6%88%90%E7%BB%A9"><span class="octicon octicon-link"></span></a>往年四六级成绩</h3>
 
 <ul>
@@ -1093,6 +1091,8 @@ JSON<br>
 <h2>
 <a name="user-content-%E8%AF%BE%E8%A1%A8%E7%B1%BB" class="anchor" href="#%E8%AF%BE%E8%A1%A8%E7%B1%BB"><span class="octicon octicon-link"></span></a>课表类</h2>
 
+<p><em>接口可以直接使用， 单次使用</em>  </p>
+
 <h3>
 <a name="user-content-%E5%BD%93%E5%89%8D%E5%AD%A6%E6%9C%9F%E8%AF%BE%E8%A1%A8" class="anchor" href="#%E5%BD%93%E5%89%8D%E5%AD%A6%E6%9C%9F%E8%AF%BE%E8%A1%A8"><span class="octicon octicon-link"></span></a>当前学期课表</h3>
 
@@ -1105,62 +1105,37 @@ JSON<br>
 <p>请求方式<br><code>GET</code> + <code>POST</code>  </p>
 
 <ul>
-<li>
-<p>使用说明  </p>
-
-<ol>
-<li>
-<strong>GET</strong>:  先进行一次GET获取 <code>UID</code> 值(用户识别码), 用户的唯一标识. </li>
-<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]</code>.</li>
-<li> <strong>POST</strong>: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码<code>UID</code>
+<li>使用说明<br><i>同<a href="#%E7%99%BB%E5%BD%95">登录</a></i>
 </li>
-</ol>
+<li>GET 结果示例<br><i>同<a href="#%E7%99%BB%E5%BD%95">登录</a></i>
 </li>
-<li><p>GET 结果示例</p></li>
+<li>POST 示例<br><i>同<a href="#%E7%99%BB%E5%BD%95">登录</a></i>
+</li>
 </ul>
-<div class="highlight highlight-json"><pre>
-    <span class="p">{</span>
-        <span class="nt">"status"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">"code"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
-            <span class="nt">"message"</span><span class="p">:</span> <span class="s2">"Success"</span><span class="p">,</span>
-        <span class="p">},</span>
-        <span class="nt">"data"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">"uid"</span><span class="p">:</span> <span class="s2">"user_067e11ac790844c08e068c96fb5b023b"</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-</pre></div>
-
-<ul>
-<li>POST 示例</li>
-</ul>
-<p>参数: <code>data</code></p>
-
-<div class="highlight highlight-json"><pre>
-    <span class="p">{</span>
-        <span class="nt">"uid"</span><span class="p">:</span> <span class="s2">"user_067e11ac790844c08e068c96fb5b023b"</span><span class="p">,</span>
-        <span class="nt">"xh"</span><span class="p">:</span> <span class="s2">"1111123456"</span><span class="p">,</span>
-        <span class="nt">"pw"</span><span class="p">:</span> <span class="s2">"password"</span><span class="p">,</span>
-        <span class="nt">"verify"</span><span class="p">:</span> <span class="s2">"疫讨"</span><span class="p">,</span>
-    <span class="p">}</span>
-</pre></div>
 </li>
 <li><p>返回值示例</p></li>
 </ul><div class="highlight highlight-json"><pre>
-        <span class="p">[</span>
-            <span class="p">{</span>
-                <span class="nt">"location"</span><span class="p">:</span> <span class="s2">"西3101"</span><span class="p">,</span>
-                <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"媒体策划与数字编辑"</span><span class="p">,</span>
-                <span class="nt">"plan"</span><span class="p">:</span> <span class="s2">"周一第7,8节{第10-10周}|双周"</span><span class="p">,</span> <span class="err">\\（原始字符串，用于检测解析是否准确）</span>
-                <span class="nt">"teacherName"</span><span class="p">:</span> <span class="s2">"鞠英辉"</span><span class="p">,</span>
-                <span class="nt">"dayOfWeek"</span><span class="p">:</span> <span class="s2">"周一"</span><span class="p">,</span>
-                <span class="nt">"oddEvenFlag"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>       <span class="err">\\（单周为1，双周为2，不分单双周为0）</span>
-                <span class="nt">"sectionFrom"</span><span class="p">:</span> <span class="s2">"7"</span><span class="p">,</span>     <span class="err">\\（节次开始）</span>
-                <span class="nt">"sectionTo"</span><span class="p">:</span> <span class="s2">"9"</span><span class="p">,</span>       <span class="err">\\（节次结束）</span>
-                <span class="nt">"weekFrom"</span><span class="p">:</span> <span class="s2">"2"</span><span class="p">,</span>        <span class="err">\\（开始上课周次）</span>
-                <span class="nt">"weekTo"</span><span class="p">:</span> <span class="s2">"12 "</span>         <span class="err">\\（结束上课周次）</span>
+        <span class="p">{</span>
+            <span class="nt">"status"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">"code"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+                <span class="nt">"message"</span><span class="p">:</span> <span class="s2">"Success"</span><span class="p">,</span>
             <span class="p">},</span>
-            <span class="err">\\</span> <span class="err">...</span>
-        <span class="p">]</span>
+            <span class="nt">"data"</span> <span class="p">:</span> <span class="p">[</span>
+                        <span class="p">{</span>
+                            <span class="nt">"location"</span><span class="p">:</span> <span class="s2">"西3101"</span><span class="p">,</span>
+                            <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"媒体策划与数字编辑"</span><span class="p">,</span>
+                            <span class="nt">"plan"</span><span class="p">:</span> <span class="s2">"周一第7,8节{第10-10周}|双周"</span><span class="p">,</span> <span class="err">\\（原始字符串，用于检测解析是否准确）</span>
+                            <span class="nt">"teacherName"</span><span class="p">:</span> <span class="s2">"鞠英辉"</span><span class="p">,</span>
+                            <span class="nt">"dayOfWeek"</span><span class="p">:</span> <span class="s2">"周一"</span><span class="p">,</span>
+                            <span class="nt">"oddEvenFlag"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>       <span class="err">\\（单周为1，双周为2，不分单双周为0）</span>
+                            <span class="nt">"sectionFrom"</span><span class="p">:</span> <span class="s2">"7"</span><span class="p">,</span>     <span class="err">\\（节次开始）</span>
+                            <span class="nt">"sectionTo"</span><span class="p">:</span> <span class="s2">"9"</span><span class="p">,</span>       <span class="err">\\（节次结束）</span>
+                            <span class="nt">"weekFrom"</span><span class="p">:</span> <span class="s2">"2"</span><span class="p">,</span>        <span class="err">\\（开始上课周次）</span>
+                            <span class="nt">"weekTo"</span><span class="p">:</span> <span class="s2">"12 "</span>         <span class="err">\\（结束上课周次）</span>
+                        <span class="p">},</span>
+                        <span class="err">\\</span> <span class="err">...</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
 </pre></div>
 
 <h3>
@@ -1175,44 +1150,13 @@ JSON<br>
 <p>请求方式<br><code>GET</code> + <code>POST</code>  </p>
 
 <ul>
-<li>
-<p>使用说明  </p>
-
-<ol>
-<li>
-<strong>GET</strong>:  先进行一次GET获取 <code>UID</code> 值(用户识别码), 用户的唯一标识. </li>
-<li>通过<code>UID</code>获取验证码, 验证码链接为<code>http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]</code>.</li>
-<li> <strong>POST</strong>: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码<code>UID</code>
+<li>使用说明<br><i>同<a href="#%E7%99%BB%E5%BD%95">登录</a></i>
 </li>
-</ol>
+<li>GET 结果示例<br><i>同<a href="#%E7%99%BB%E5%BD%95">登录</a></i>
 </li>
-<li><p>GET 结果示例</p></li>
+<li>POST 示例<br><i>同<a href="#%E7%99%BB%E5%BD%95">登录</a></i>
+</li>
 </ul>
-<div class="highlight highlight-json"><pre>
-    <span class="p">{</span>
-        <span class="nt">"status"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">"code"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
-            <span class="nt">"message"</span><span class="p">:</span> <span class="s2">"Success"</span><span class="p">,</span>
-        <span class="p">},</span>
-        <span class="nt">"data"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">"uid"</span><span class="p">:</span> <span class="s2">"user_067e11ac790844c08e068c96fb5b023b"</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-</pre></div>
-
-<ul>
-<li>POST 示例</li>
-</ul>
-<p>参数: <code>data</code></p>
-
-<div class="highlight highlight-json"><pre>
-    <span class="p">{</span>
-        <span class="nt">"uid"</span><span class="p">:</span> <span class="s2">"user_067e11ac790844c08e068c96fb5b023b"</span><span class="p">,</span>
-        <span class="nt">"xh"</span><span class="p">:</span> <span class="s2">"1111123456"</span><span class="p">,</span>
-        <span class="nt">"pw"</span><span class="p">:</span> <span class="s2">"password"</span><span class="p">,</span>
-        <span class="nt">"verify"</span><span class="p">:</span> <span class="s2">"疫讨"</span><span class="p">,</span>
-    <span class="p">}</span>
-</pre></div>
 </li>
 <li><p>返回值示例</p></li>
 </ul><div class="highlight highlight-json"><pre>

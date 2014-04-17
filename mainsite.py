@@ -32,7 +32,7 @@ urls = (
     '/more/(.+)', 'more',
     '/score', 'score',
     '/cet', 'cet',
-    '/cet/old', 'cet_old',
+    '/cet/former', 'FormerCET',
     '/libr', 'libr',
     '/contact.html', 'contact',
     '/notice.html', 'notice',
@@ -200,11 +200,11 @@ class cet:
             return render.result_dic(items=items, res=res)
 
 
-class cet_old:
+class FormerCET:
     """
     往年cet成绩查询
     """
-    @redis_memoize('cet_old')
+    @redis_memoize('FormerCET')
     def GET(self):
         form=xh_form
         title='往年四六级成绩'

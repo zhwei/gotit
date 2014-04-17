@@ -42,21 +42,27 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">Gotit</a>
+          <a class="navbar-brand" href="http://gotit.asia/">Gotit</a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse navbar-ex1-collapse">
           <ul class="nav navbar-nav">
-              <li><a href="/manage/panel">后台首页</a></li>
-              <li ><a href="/manage/now"><i class="glyphicon glyphicon-time"></i>负载状况</a></li>
-              <li ><a href="/manage/analytics"><i class="glyphicon glyphicon-hdd"></i>数据统计</a></li>
-              <li ><a href="/manage/o/ls/wxcomment"><i class="glyphicon glyphicon-thumbs-up"></i>微信留言</a></li>
-              <li ><a href="/manage/o/ls/donate"><i class="glyphicon glyphicon-usd"></i>捐赠者</a></li>
-              <li ><a href="/manage/o/ls/notice"><strong>网站动态</strong></a></li>
-              <li ><a href="/manage/single/info"><strong>Single</strong></a></li>
-              <li ><a href="/manage/backup"><i class="glyphicon glyphicon-cloud-upload"></i>网站备份</a></li>
-              <li ><a href="/manage/readlog/1"><i class="glyphicon glyphicon-eye-open"></i>网站日志</a></li>
-              <li ><a href="/manage/de"><i class="glyphicon glyphicon-eye-close"></i>DetailError</a></li>
+              <li><a href="/panel">后台首页</a></li>
+              <li ><a href="/analytics"><i class="glyphicon glyphicon-time"></i>&nbsp;数据统计</a></li>
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="glyphicon glyphicon-plus"></i>&nbsp;内容管理<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/o/ls/wxcomment"><i class="glyphicon glyphicon-thumbs-up"></i>&nbsp;微信留言</a></li>
+                  <li><a href="/o/ls/donate"><i class="glyphicon glyphicon-usd"></i>&nbsp;捐赠者</a></li>
+                  <li><a href="/o/ls/notice"><i class="glyphicon glyphicon-send"></i>&nbsp;网站动态</a></li>
+                  <li class="divider"></li>
+                  <li><a href="/o/ls/developer">开发者Token</a></li>
+                </ul>
+              </li>
+              <li ><a href="/single/info"><strong>Single</strong></a></li>
+              <li ><a href="/backup"><i class="glyphicon glyphicon-cloud-upload"></i>网站备份</a></li>
+              <li ><a href="/readlog/1"><i class="glyphicon glyphicon-eye-open"></i>网站日志</a></li>
+              <li ><a href="/de"><i class="glyphicon glyphicon-eye-close"></i>DetailError</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
           </ul>
@@ -67,6 +73,11 @@
     <div class="container">
         <div class="row">
           <div class="col-md-12">
+            {%- if alert -%}
+            <div class="alert alert-info">
+              <p>{{ alert }}</p>
+            </div>
+            {%- endif -%}
             {% block content %}{% endblock %}
           </div>
         </div>

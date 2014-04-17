@@ -18,7 +18,7 @@ from weibo import APIClient, APIError
 from addons import mongo2s
 from addons import redis2s
 from addons.redis2s import rds
-from addons.utils import zipf2strio
+from addons.utils import zipf2strio, get_unique_key
 from addons.autocache import expire_redis_cache
 # from addons.config import SINGLE_HEAD
 
@@ -45,7 +45,7 @@ urls = (
     '/', 'ologin',
     '/callback', 'callback',
     '/panel', 'panel',
-    '/now', 'now',
+    # '/now', 'now',
     '/analytics', 'analytics',
 
     '/backup/(.+)', 'backup',
@@ -63,6 +63,8 @@ urls = (
     '/de/(.+)/(.+)', 'DetailError',
     '/de/(.+)', 'DetailError',
     '/de', 'DetailError',
+
+    'developer/(\w+)', 'Developer',
 )
 
 app = web.application(urls, locals())
@@ -128,18 +130,6 @@ class panel:
 
         return render.panel(item=False)
 
-class now:
-
-    def GET(self):
-
-
-        data = {
-                'session': redis2s.get_count('SESSION*'),
-                'user': redis2s.get_count('user*'),
-                }
-
-        return render.panel(item=False, opera='now', data=data)
-
 class analytics:
     """ 数据统计
     """
@@ -153,19 +143,20 @@ class analytics:
         except AttributeError:
             pass
         coll = db.analytics
-        times = {
+        data = {
                 'internalerror': coll.find_one({'item':'internalerror'})['times'],
-                'checkcode': db.checkcodes.count(),
-                }
+                'CheckCodes': db.checkcodes.count(),
+                'session': redis2s.get_count('SESSION*'),
+                '用户': redis2s.get_count('user*'),
+            }
         return render.panel(item=None, opera='analytics',
-                            times=times)
+                            data=data)
 
 class readlog:
     """ 查看网站日志
     """
 
     def readfile(self, line):
-        # log_pwd = "/home/group/gotit/log/gotit2-stderr.log"
         log_pwd = rds.get('log_file_path')
         with open(log_pwd) as fi:
             all_lines = fi.readlines()
@@ -174,11 +165,12 @@ class readlog:
                 if lno >= counts-int(line)*50:
                     yield li
 
-
     def GET(self, line):
-
-        lines = self.readfile(line)
-        return render.panel(item=None, opera='readlog', lines=lines)
+        try:
+            lines = self.readfile(line)
+            return render.panel(item=None, opera='readlog', lines=lines)
+        except IOError:
+            return render.panel(alert="没有找到日志文件, pwd=[{}]".format(rds.get('log_file_path')))
 
 
 class backup:
@@ -214,8 +206,8 @@ class backup:
 
 
 class update:
-
-    item_list = ['donate', 'notice', 'wxcomment',]
+    """ 内容管理 """
+    item_list = ['donate', 'notice', 'wxcomment', 'developer']
     opera_list = ['cr', 'del', 'ls']
 
     def GET(self, opera, item, oid=None):
@@ -242,6 +234,14 @@ class update:
                         'datetime': datetime.datetime.now(),
                         })
                     expire_redis_cache('donate')
+                elif item == 'developer':
+                    _token = get_unique_key()
+                    db[item].insert({
+                        'token' : _token,
+                        'description':data['content'],
+                        'datetime': datetime.datetime.now(),
+                        })
+                    expire_redis_cache('developer')
                 else:
                     db[item].insert({
                         'content':data['content'],
@@ -252,7 +252,6 @@ class update:
                 db[item].remove({'_id':ObjectId(data['oid'])})
 
         raise web.seeother('/o/ls/'+item)
-
 
 
 class single:
