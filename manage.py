@@ -75,7 +75,7 @@ class ologin:
     def GET(self):
         try:
             if ctx.session.uid == ADMIN_WEIBO_ID:
-                raise web.seeother('../manage/panel')
+                raise web.seeother('/panel')
         except AttributeError:
             pass
         return render.ologin(auth_url=AUTH_URL)
@@ -107,14 +107,14 @@ class callback:
             raise web.seeother('/')
 
 
-        raise web.seeother('panel')
+        raise web.seeother('/panel')
 
 
 def pre_request():
     ''' 访问限制
     '''
 
-    if web.ctx.path not in ['', '/callback']:
+    if web.ctx.path not in ['/', '/callback']:
         try:
             if ctx.session.uid != ADMIN_WEIBO_ID:
                 raise web.seeother('/')
