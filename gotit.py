@@ -7,6 +7,7 @@ sys.setdefaultencoding('utf-8')
 
 import web
 
+import mainsite
 import apis
 import manage
 import wechat
