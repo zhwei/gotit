@@ -290,4 +290,4 @@ def limit_processor(handler):
 app = web.application(urls, locals())
 app.notfound = notfound
 app.internalerror = internalerror
-# app.add_processor(limit_processor)
+app.add_processor(limit_processor)

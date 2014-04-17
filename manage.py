@@ -27,7 +27,7 @@ render = render_jinja('templates', encoding='utf-8')
 
 APP_KEY = rds.get('weibo_app_key') # app key
 APP_SECRET = rds.get('weibo_app_secret') # app secret
-CALLBACK_URL = 'http://gotit.asia/manage/callback' # callback url
+CALLBACK_URL = 'http://manage.gotit.asia/callback' # callback url
 CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
 AUTH_URL=CLIENT.get_authorize_url()
 
@@ -315,4 +315,4 @@ class DetailError:
             key=key, hkey=hkey, key_list=key_list, content=content)
 
 
-# app.add_processor(web.loadhook(pre_request))
+app.add_processor(web.loadhook(pre_request))
