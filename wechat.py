@@ -129,7 +129,7 @@ class ProcessMsg(object):
         gpa = GPA(xh)
         gpa.getscore_page()
         try:
-            jidi = gpa.get_gpa()["ave_score"]
+            jidi = gpa.get_gpa()
             ret = "学分绩点: {}\n".format(jidi)
         except errors.PageError, e:
             ret = e
@@ -335,6 +335,7 @@ app = web.application(urls, locals())
 
 class WeixinIndex:
 
+    @redis_memoize('weixin')
     def GET(self):
         from web.contrib.template import render_jinja
         render = render_jinja('templates', encoding='utf-8')
@@ -342,7 +343,6 @@ class WeixinIndex:
 
 class WeixinInterface(BaseMsg, ProcessMsg):
 
-    @redis_memoize('weixin')
     def GET(self):
         #获取输入参数
         try:

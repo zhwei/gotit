@@ -85,7 +85,7 @@ def get_score_gpa(xh):
     gpa = GPA(xh)
     gpa.getscore_page()
     score = gpa.get_all_score()
-    jidi = gpa.get_gpa()["ave_score"]
+    jidi = gpa.get_gpa()
     return score, jidi
 
 

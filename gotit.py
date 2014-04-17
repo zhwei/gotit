@@ -17,7 +17,7 @@ from addons.config import debug_mode
 web.config.debug = debug_mode
 
 mapping = (
-    "(www\.)?*.*", mainsite.app,
+    "(www\.)?gotit.asia", mainsite.app,
     "api.gotit.asia", apis.app,
     "wechat.gotit.asia", wechat.app,
     "manage.gotit.asia", manage.app,
