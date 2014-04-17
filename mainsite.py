@@ -45,11 +45,11 @@ urls = (
 app = web.application(urls, globals(),autoreload=False)
 
 # session
-if web.config.get('_session') is None:
-    session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})
-    web.config._session = session
-else:
-    session = web.config._session
+# if web.config.get('_session') is None:
+session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})
+    # web.config._session = session
+# else:
+    # session = web.config._session
 
 # render templates
 render = render_jinja('templates', encoding='utf-8',globals={'context':session})

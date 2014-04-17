@@ -26,7 +26,7 @@ class GPA:
         param = {'post_xuehao': GPA.__num}
         try:
             self.page = requests.post(url="http://210.44.176.116/cjcx/zcjcx_list.php",
-                                        data=param, timeout=0.05).text
+                                        data=param, timeout=1.0).text
         except requests.Timeout:
             raise errors.RequestError('无法连接成绩查询系统')
 

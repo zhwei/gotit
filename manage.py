@@ -26,7 +26,8 @@ from addons.RedisStore import RedisStore
 render = render_jinja('templates', encoding='utf-8')
 
 
-APP_KEY = rds.get('weibo_app_key') # app key
+# APP_KEY = rds.get('weibo_app_key') # app key
+APP_KEY = '4001516920' # app key
 APP_SECRET = rds.get('weibo_app_secret') # app secret
 CALLBACK_URL = 'http://manage.gotit.asia/callback' # callback url
 CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
@@ -37,12 +38,7 @@ SINGLE_HEAD = "SINGLE_"
 
 ADMIN_WEIBO_ID = int(rds.get('admin_weibo_id'))
 
-# session
-if web.config.get('_session') is None:
-    session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})
-    web.config._session = session
-else:
-    session = web.config._session
+
 
 # init mongoDB
 db = mongo2s.init_mongo()
@@ -76,6 +72,8 @@ urls = (
 
 app = web.application(urls, locals())
 
+# session
+session = web.session.Session(app, RedisStore(), {'count': 0,})
 
 class ologin:
 
@@ -121,11 +119,12 @@ def pre_request():
     '''
 
     if web.ctx.path not in ['/', '/callback']:
-        try:
-            if session.uid != ADMIN_WEIBO_ID:
-                raise web.seeother('/')
-        except AttributeError:
+        # try:
+        print type(session), session.keys()
+        if session["uid"] != ADMIN_WEIBO_ID:
             raise web.seeother('/')
+        # except AttributeError:
+        #     raise web.seeother('/')
 
 
 class panel:
