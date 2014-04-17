@@ -20,6 +20,7 @@ from addons import redis2s
 from addons.redis2s import rds
 from addons.utils import zipf2strio, get_unique_key
 from addons.autocache import expire_redis_cache
+from addons.RedisStore import RedisStore
 # from addons.config import SINGLE_HEAD
 
 render = render_jinja('templates', encoding='utf-8')
@@ -36,6 +37,12 @@ SINGLE_HEAD = "SINGLE_"
 
 ADMIN_WEIBO_ID = int(rds.get('admin_weibo_id'))
 
+# session
+if web.config.get('_session') is None:
+    session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})
+    web.config._session = session
+else:
+    session = web.config._session
 
 # init mongoDB
 db = mongo2s.init_mongo()
@@ -74,7 +81,7 @@ class ologin:
 
     def GET(self):
         try:
-            if ctx.session.uid == ADMIN_WEIBO_ID:
+            if session.uid == ADMIN_WEIBO_ID:
                 raise web.seeother('/panel')
         except AttributeError:
             pass
@@ -102,10 +109,9 @@ class callback:
             uid = CLIENT.account.get_uid.get()['uid']
             if uid != ADMIN_WEIBO_ID:
                 return render.ologin(auth_url=AUTH_URL, error='欢迎尝试')
-            ctx.session['uid'] = uid
+            session['uid'] = uid
         except APIError:
             raise web.seeother('/')
-
 
         raise web.seeother('/panel')
 
@@ -116,7 +122,7 @@ def pre_request():
 
     if web.ctx.path not in ['/', '/callback']:
         try:
-            if ctx.session.uid != ADMIN_WEIBO_ID:
+            if session.uid != ADMIN_WEIBO_ID:
                 raise web.seeother('/')
         except AttributeError:
             raise web.seeother('/')
