@@ -10,7 +10,7 @@ from pymongo.errors import ConnectionFailure
 # MongoDB Tools
 
 def init_mongo():
-    """ 初始化MongoDB 
+    """ 初始化MongoDB
     """
     try:
         db = Connection(host='127.0.0.1',port=27017)['gotit']
@@ -19,6 +19,8 @@ def init_mongo():
         sys.exit()
 
     return db
+
+mongod = init_mongo()
 
 def get_last_one_by_date(collection):
 

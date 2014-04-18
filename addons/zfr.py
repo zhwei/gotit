@@ -86,38 +86,36 @@ class ZF:
         #com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
         #self.VIEWSTATE = com.findall(_content)[0]
 
-        # create time_md5
+        # create uid
         import time
         import md5
-        time_md5 = 'user_'+md5.md5(str(time.time())).hexdigest()
+        uid = 'user_'+md5.md5(str(time.time())).hexdigest()
 
         # get checkcode
-        #checkcode=self.get_checkcode(time_md5)
+        #checkcode=self.get_checkcode(uid)
         _req1 = safe_get(self.code_url, cookies=_req.cookies, headers=self.headers)
         image_content = _req1.content
         image_content=image.process_image_string(image_content)
         base64_image="data:image/gif;base64,"+image_content.encode('base64').replace('\n','')
 
+        pickled_cookies = pickle.dumps(_req.cookies)
         # store in redis
-        rds.hset(time_md5, 'checkcode', base64_image)
-        rds.hset(time_md5, 'base_url', self.base_url)
-        rds.hset(time_md5, 'viewstate', self.VIEWSTATE)
-
-        # pickle cookies
-        #pickled = pickle.dumps(_req1.cookies)
-        pickled = pickle.dumps(_req.cookies)
-        rds.hset(time_md5, 'cookies', base64.encodestring(pickled))
-
+        rds.hmset(uid, {
+                "checkcode" : base64_image,
+                "base_url"  : self.base_url,
+                "viewstate" : self.VIEWSTATE,
+                'cookies'   : base64.encodestring(pickled_cookies),
+            })
         # set expire time(milliseconds)
-        rds.pexpire(time_md5, config.COOKIES_TIME_OUT)
+        rds.pexpire(uid, config.COOKIES_TIME_OUT)
 
-        return time_md5
+        return uid
 
-    def get_checkcode(self, time_md5):
+    def get_checkcode(self, uid):
 
-        pickled = base64.decodestring(rds.hget(time_md5, 'cookies'))
+        pickled = base64.decodestring(rds.hget(uid, 'cookies'))
         self.cookies = pickle.loads(pickled)
-        rds.pexpire(time_md5, config.COOKIES_TIME_OUT) # 延时
+        rds.pexpire(uid, config.COOKIES_TIME_OUT) # 延时
         # get checkcode
         _req1 = safe_get(self.code_url, cookies=self.cookies, headers=self.headers)
         image_content = _req1.content
@@ -130,12 +128,12 @@ class Login:
     以及后续的查询操作
     """
 
-    def init_from_form(self, time_md5, post_content):
+    def init_from_form(self, uid, post_content):
         """ 在用户提交帐号密码的时候初始化对象的必要数据
         """
         self.xh = post_content.get('xh')
         self.pw = post_content.get('pw')
-        self.time_md5 = time_md5
+        self.uid = uid
         try:
             # collect checkcode
             mongo2s.collect_checkcode(post_content.get('verify', ''))
@@ -147,15 +145,15 @@ class Login:
         """ 用户后续查询时从redis获取数据
         """
         # init datas
-        self.base_url = rds.hget(self.time_md5, 'base_url')
-        self.viewstate = rds.hget(self.time_md5, 'viewstate')
-        pickled = base64.decodestring(rds.hget(self.time_md5, 'cookies'))
+        self.base_url = rds.hget(self.uid, 'base_url')
+        self.viewstate = rds.hget(self.uid, 'viewstate')
+        pickled = base64.decodestring(rds.hget(self.uid, 'cookies'))
         self.cookies = pickle.loads(pickled)
-        rds.pexpire(self.time_md5, config.COOKIES_TIME_OUT) # 延时
+        rds.pexpire(self.uid, config.COOKIES_TIME_OUT) # 延时
 
-    def login(self, time_md5, post_content):
+    def login(self, uid, post_content):
 
-        self.init_from_form(time_md5, post_content)
+        self.init_from_form(uid, post_content)
         self.init_from_redis()
         self.login_url, self.code_url, self.headers = process_links(self.base_url)
         # init post data
@@ -177,16 +175,17 @@ class Login:
 
         #self.cookies = _req.cookies
 
-        not_error_page(_req.text)
+        not_error_page(_req.text) # 判断请求是否出错
+        rds.hset(uid, "xh", self.xh)
+        rds.pexpire(uid, config.COOKIES_TIME_OUT) # 延时
 
-
-    def init_after_login(self, time_md5, xh):
+    def init_after_login(self, uid, xh=None):
         """初始化二次查找需要的数据
         用户已经登录，从redis中获取cookies等数据
         进行第二次抓取
         """
-        self.xh = xh
-        self.time_md5=time_md5
+        self.xh = xh or rds.hget(uid, "xh")
+        self.uid=uid
         self.init_from_redis()
         self.login_url, self.code_url, self.headers = process_links(self.base_url)
 
@@ -211,7 +210,7 @@ class Login:
         result = soup.find("table", {"id": "DataGrid1"}).contents
         return (result, )
 
-    def get_kebiao(self):
+    def get_timetable(self):
         """
         课表 , 返回的内容为列表
         """
@@ -256,7 +255,7 @@ class Login:
         result = soup.find("table", {"id": "Table1"}).contents
         return result
 
-    def get_last_kebiao(self):
+    def get_last_timetable(self):
         """二次提交
         """
         html = self.get_html("xskbcx")

@@ -18,18 +18,12 @@ from addons import mongo2s
 from addons.get_CET import CET
 from addons.zfr import ZF, Login
 from addons.autocache import memorize, redis_memoize
-from addons import get_old_cet, get_book
+from addons import get_former_cet, get_book
 from addons.RedisStore import RedisStore
-from addons.config import index_cache, debug_mode
-from addons.utils import get_score_jidi
+from addons.config import index_cache
+from addons.utils import get_score_gpa
 from forms import cet_form, xh_form, login_form
 
-#import apis
-import manage
-import weix
-
-# debug mode
-web.config.debug = debug_mode
 
 urls = (
     '/', 'index',
@@ -39,11 +33,8 @@ urls = (
     '/years', 'years',
     '/score', 'score',
     '/cet', 'cet',
-    '/cet/old', 'cet_old',
+    '/cet/former', 'FormerCET',
     '/libr', 'libr',
-    #'/api', apis.apis,
-    '/weixin', weix.weixin,
-    '/manage', manage.manage,
     '/contact.html', 'contact',
     '/notice.html', 'notice',
     '/help/gpa.html', 'help_gpa',
@@ -54,13 +45,8 @@ urls = (
 # main app
 app = web.application(urls, globals(),autoreload=False)
 
-
 # session
-if web.config.get('_session') is None:
-    session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})
-    web.config._session = session
-else:
-    session = web.config._session
+session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})
 
 # render templates
 render = render_jinja('templates', encoding='utf-8',globals={'context':session})
@@ -82,6 +68,10 @@ class index:
         return render.index(zheng_alert=zheng_alert, index_show=index_show,
                             score_alert=score_alert)
 
+class BaseSearch(object):
+    """ 各个查询功能的基类
+    """
+
 # 成绩查询
 class zheng:
 
@@ -89,10 +79,10 @@ class zheng:
 
         try:
             zf = ZF()
-            time_md5 = zf.pre_login()
+            uid = zf.pre_login()
         except errors.ZfError, e:
             return render.serv_err(err=e.value)
-        session['time_md5'] = time_md5
+        session['uid'] = uid
         # get alert
         _alert=rds.get('SINGLE_zheng')
         import time
@@ -103,18 +93,18 @@ class zheng:
         try:
             session['xh'] = content['xh']
             t = content['type']
-            time_md5 = session['time_md5']
+            uid = session['uid']
         except (AttributeError, KeyError), e:
             return render.alert_err(error='请检查您是否禁用cookie', url='/zheng')
 
         try:
             zf = Login()
-            zf.login(time_md5, content)
+            zf.login(uid, content)
             __dic = {
                     '1': zf.get_score,
                     '2': zf.get_kaoshi,
-                    '3': zf.get_kebiao,
-                    '4': zf.get_last_kebiao,
+                    '3': zf.get_timetable,
+                    '4': zf.get_last_timetable,
                     '5': zf.get_last_score,
                     }
             if t not in __dic.keys():
@@ -128,15 +118,15 @@ class checkcode:
     """
     def GET(self):
         try:
-            time_md5 = web.input(_method='get').time_md5
+            uid = web.input(_method='get').uid
         except AttributeError:
             try:
-                time_md5=session['time_md5']
+                uid=session['uid']
             except KeyError:
                 return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
         web.header('Content-Type','image/gif')
         zf = ZF()
-        image_content = zf.get_checkcode(time_md5)
+        image_content = zf.get_checkcode(uid)
         return image_content
 
 class more:
@@ -147,14 +137,14 @@ class more:
             raise web.seeother('/zheng')
         try:
             __dic1 = { # need xh
-                    'oldcet':get_old_cet,
+                    'oldcet':get_former_cet,
                     }
             if t in __dic1.keys():
                 return render.result(table=__dic1[t](session['xh']))
 
             elif t=='score':
                 try:
-                    score, jidi=get_score_jidi(session['xh'])
+                    score, jidi=get_score_gpa(session['xh'])
                 except errors.PageError, e:
                     return render.alert_err(error=e.value, url='/score')
                 return render.result(table=score, jidian=jidi)
@@ -163,12 +153,12 @@ class more:
             __dic = { # just call
                     'zheng': zf.get_score,
                     'kaoshi': zf.get_kaoshi,
-                    'kebiao': zf.get_kebiao,
-                    'lastkebiao': zf.get_last_kebiao,
+                    'kebiao': zf.get_timetable,
+                    'lastkebiao': zf.get_last_timetable,
                     'lastscore': zf.get_last_score,
                     }
             if t in __dic.keys():
-                zf.init_after_login(session['time_md5'], session['xh'])
+                zf.init_after_login(session['uid'], session['xh'])
                 return render.result(tables=__dic[t]())
             raise web.notfound()
         except (AttributeError, TypeError, KeyError, requests.TooManyRedirects):
@@ -226,11 +216,11 @@ class cet:
             return render.result_dic(items=items, res=res)
 
 
-class cet_old:
+class FormerCET:
     """
     往年cet成绩查询
     """
-    @redis_memoize('cet_old')
+    @redis_memoize('FormerCET')
     def GET(self):
         form=xh_form
         title='往年四六级成绩'
@@ -244,7 +234,7 @@ class cet_old:
             xh = form.d.xh
             session['xh']=xh
         try:
-            table=get_old_cet(xh)
+            table=get_former_cet(xh)
             return render.result(table=table)
         except errors.RequestError, e:
             return render.serv_err(err=e)
@@ -292,7 +282,7 @@ class score:
             xh = form.d.xh
             session['xh']=xh
             try:
-                score, jidi=get_score_jidi(xh)
+                score, jidi=get_score_gpa(xh)
             except errors.PageError, e:
                 return render.alert_err(error=e.value)
             except errors.RequestError, e:

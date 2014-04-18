@@ -98,7 +98,7 @@ class BaseMsg(object):
         """.format(self.fromUser, self.toUser, int(time.time()), content)
         return text
 
-    def replay_code(self, time_md5, content=""):
+    def replay_code(self, uid, content=""):
         if rds.hget(self.fromUser, 'status').startswith('fast'):
             r = '2'
         else: r = 'r'
@@ -113,11 +113,11 @@ class BaseMsg(object):
             <item>
                 <Title><![CDATA[请输入验证码({5}.重新获取)]]></Title>
                 <Description><![CDATA[{4}r 重新获取验证码\nPS:距离远一点能看的更清楚\nq.退出查询状态]]></Description>
-                <PicUrl><![CDATA[http://gotit.asia/zheng/checkcode?r={2}&time_md5={3}]]></PicUrl>
-                <Url><![CDATA[http://gotit.asia/zheng/checkcode?r={2}&time_md5={3}]]></Url>
+                <PicUrl><![CDATA[http://gotit.asia/zheng/checkcode?r={2}&uid={3}]]></PicUrl>
+                <Url><![CDATA[http://gotit.asia/zheng/checkcode?r={2}&uid={3}]]></Url>
             </item>
         </Articles>
-        </xml> """.format(self.fromUser, self.toUser, int(time.time()), time_md5, content, r)
+        </xml> """.format(self.fromUser, self.toUser, int(time.time()), uid, content, r)
         return text
 
 class ProcessMsg(object):
@@ -129,13 +129,13 @@ class ProcessMsg(object):
         gpa = GPA(xh)
         gpa.getscore_page()
         try:
-            jidi = gpa.get_gpa()["ave_score"]
+            jidi = gpa.get_gpa()
             ret = "学分绩点: {}\n".format(jidi)
         except errors.PageError, e:
             ret = e
         return ret
 
-    def get_old_cet(self, xh):
+    def get_former_cet(self, xh):
         """获取往年四六级成绩"""
         cet = CET()
         _dic = cet.get_cet_dict(xh)
@@ -157,9 +157,9 @@ class ProcessMsg(object):
                 '1': zf.get_score,
                 '2': zf.get_last_score,
                 }
-        _time_md5 = rds.hget(self.fromUser, 'time_md5')
+        _uid = rds.hget(self.fromUser, 'uid')
         _xh = rds.hget(self.fromUser, 'xh')
-        zf.init_after_login(_time_md5, _xh)
+        zf.init_after_login(_uid, _xh)
         try:
             score = _zf_dic[t]()[0] # 条件选择
             rds.expire(self.fromUser, EXPIRE_SECONDS) # 延长过期时间
@@ -194,16 +194,16 @@ class ProcessMsg(object):
                 rds.hset(self.fromUser, 'status', 'verify')
                 # before login
                 zf = ZF()
-                time_md5 = zf.pre_login()
+                uid = zf.pre_login()
                 rds.expire(self.fromUser, EXPIRE_SECONDS)
-                rds.hset(self.fromUser, 'time_md5', time_md5)
+                rds.hset(self.fromUser, 'uid', uid)
                 rds.hset(self.fromUser, 'status', 'verify')
-                return self.replay_code(time_md5) # return checkcode msg
+                return self.replay_code(uid) # return checkcode msg
             elif self.content == 'r':
                 # 再次获取验证码
                 rds.hset(self.fromUser, 'status', 'verify')
-                time_md5=rds.hget(self.fromUser, 'time_md5')
-                return self.replay_code(time_md5) # return checkcode msg
+                uid=rds.hget(self.fromUser, 'uid')
+                return self.replay_code(uid) # return checkcode msg
             elif st == 'verify':
                 zf = Login()
                 data = {
@@ -211,9 +211,9 @@ class ProcessMsg(object):
                         "pw": rds.hget(self.fromUser, 'pw'),
                         "verify": self.content,
                         }
-                time_md5=rds.hget(self.fromUser, "time_md5")
+                uid=rds.hget(self.fromUser, "uid")
                 try:
-                    zf.login(time_md5, data)
+                    zf.login(uid, data)
                     rds.hset(self.fromUser, 'status', 'logged')
                     return self.replay_text('登录成功！十分钟内无操作删除用户信息。\n{}'.format(self.text_success()))
                 except errors.PageError, e:
@@ -235,7 +235,7 @@ class ProcessMsg(object):
                 # 绩点 & 往年四六级成绩
                 _dic = {
                         '3': self.get_gpa,
-                        '4': self.get_old_cet,
+                        '4': self.get_former_cet,
                         }
                 _xh = rds.hget(self.fromUser, 'xh')
                 rds.expire(self.fromUser, EXPIRE_SECONDS)
@@ -252,11 +252,11 @@ class ProcessMsg(object):
             return self.replay_text(FAST_ZF_HELP)
         if init==True:
             z = ZF()
-            time_md5 = z.pre_login()
+            uid = z.pre_login()
             rds.expire(self.fromUser, EXPIRE_SECONDS)
-            rds.hset(self.fromUser, 'time_md5', time_md5)
+            rds.hset(self.fromUser, 'uid', uid)
             rds.hset(self.fromUser, 'status', 'fast1')
-            return self.replay_code(time_md5, content=FAST_ZF_HELP) # return checkcode msg
+            return self.replay_code(uid, content=FAST_ZF_HELP) # return checkcode msg
         else:
             try:
                 tu = self.content.split("&")
@@ -270,10 +270,10 @@ class ProcessMsg(object):
                     "pw": _pw,
                     "verify": _verify,
                     }
-            time_md5=rds.hget(self.fromUser, "time_md5")
+            uid=rds.hget(self.fromUser, "uid")
             zf = Login()
             try:
-                zf.login(time_md5, _data)
+                zf.login(uid, _data)
                 rds.hset(self.fromUser, 'xh', _xh)
                 ret = self.get_zf_score(tu[0])
             except KeyError:
@@ -292,7 +292,7 @@ class ProcessMsg(object):
             return self.replay_text('请输入学号:\nq.退出查询过程')
         _dic = {
                 '3': self.get_gpa,
-                '4': self.get_old_cet,
+                '4': self.get_former_cet,
                 }
         _t = rds.hget(self.fromUser, 'status')
         try:
@@ -327,14 +327,15 @@ class ProcessMsg(object):
 
 
 urls = (
-        '$', 'WeixinIndex',
+        '/', 'WeixinIndex',
         '/weixin', 'WeixinInterface',
         )
 
-weixin = web.application(urls, locals())
+app = web.application(urls, locals())
 
 class WeixinIndex:
 
+    @redis_memoize('weixin')
     def GET(self):
         from web.contrib.template import render_jinja
         render = render_jinja('templates', encoding='utf-8')
@@ -342,7 +343,6 @@ class WeixinIndex:
 
 class WeixinInterface(BaseMsg, ProcessMsg):
 
-    @redis_memoize('weixin')
     def GET(self):
         #获取输入参数
         try:

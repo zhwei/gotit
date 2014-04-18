@@ -18,16 +18,18 @@ from weibo import APIClient, APIError
 from addons import mongo2s
 from addons import redis2s
 from addons.redis2s import rds
-from addons.utils import zipf2strio
+from addons.utils import zipf2strio, get_unique_key
 from addons.autocache import expire_redis_cache
+from addons.RedisStore import RedisStore
 # from addons.config import SINGLE_HEAD
 
 render = render_jinja('templates', encoding='utf-8')
 
 
-APP_KEY = rds.get('weibo_app_key') # app key
+# APP_KEY = rds.get('weibo_app_key') # app key
+APP_KEY = '4001516920' # app key
 APP_SECRET = rds.get('weibo_app_secret') # app secret
-CALLBACK_URL = 'http://gotit.asia/manage/callback' # callback url
+CALLBACK_URL = 'http://manage.gotit.asia/callback' # callback url
 CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
 AUTH_URL=CLIENT.get_authorize_url()
 
@@ -37,15 +39,16 @@ SINGLE_HEAD = "SINGLE_"
 ADMIN_WEIBO_ID = int(rds.get('admin_weibo_id'))
 
 
+
 # init mongoDB
 db = mongo2s.init_mongo()
 rds = redis2s.init_redis()
 
 urls = (
-    '$', 'ologin',
+    '/', 'ologin',
     '/callback', 'callback',
     '/panel', 'panel',
-    '/now', 'now',
+    # '/now', 'now',
     '/analytics', 'analytics',
 
     '/backup/(.+)', 'backup',
@@ -63,17 +66,21 @@ urls = (
     '/de/(.+)/(.+)', 'DetailError',
     '/de/(.+)', 'DetailError',
     '/de', 'DetailError',
+
+    'developer/(\w+)', 'Developer',
 )
 
-manage = web.application(urls, locals())
+app = web.application(urls, locals())
 
+# session
+session = web.session.Session(app, RedisStore(), {'count': 0,})
 
 class ologin:
 
     def GET(self):
         try:
-            if ctx.session.uid == ADMIN_WEIBO_ID:
-                raise web.seeother('../manage/panel')
+            if session.uid == ADMIN_WEIBO_ID:
+                raise web.seeother('/panel')
         except AttributeError:
             pass
         return render.ologin(auth_url=AUTH_URL)
@@ -100,24 +107,23 @@ class callback:
             uid = CLIENT.account.get_uid.get()['uid']
             if uid != ADMIN_WEIBO_ID:
                 return render.ologin(auth_url=AUTH_URL, error='欢迎尝试')
-            ctx.session['uid'] = uid
+            session['uid'] = uid
         except APIError:
-            raise web.seeother('../manage')
+            raise web.seeother('/')
 
-
-        raise web.seeother('panel')
+        raise web.seeother('/panel')
 
 
 def pre_request():
     ''' 访问限制
     '''
 
-    if web.ctx.path not in ['', '/callback']:
+    if web.ctx.path not in ['/', '/callback']:
         try:
-            if ctx.session.uid != ADMIN_WEIBO_ID:
-                raise web.seeother('../manage')
+            if session.uid != ADMIN_WEIBO_ID:
+                raise web.seeother('/')
         except AttributeError:
-            raise web.seeother('../manage')
+            raise web.seeother('/')
 
 
 class panel:
@@ -127,18 +133,6 @@ class panel:
     def GET(self):
 
         return render.panel(item=False)
-
-class now:
-
-    def GET(self):
-
-
-        data = {
-                'session': redis2s.get_count('SESSION*'),
-                'user': redis2s.get_count('user*'),
-                }
-
-        return render.panel(item=False, opera='now', data=data)
 
 class analytics:
     """ 数据统计
@@ -153,19 +147,20 @@ class analytics:
         except AttributeError:
             pass
         coll = db.analytics
-        times = {
+        data = {
                 'internalerror': coll.find_one({'item':'internalerror'})['times'],
-                'checkcode': db.checkcodes.count(),
-                }
+                'CheckCodes': db.checkcodes.count(),
+                'session': redis2s.get_count('SESSION*'),
+                '用户': redis2s.get_count('user*'),
+            }
         return render.panel(item=None, opera='analytics',
-                            times=times)
+                            data=data)
 
 class readlog:
     """ 查看网站日志
     """
 
     def readfile(self, line):
-        # log_pwd = "/home/group/gotit/log/gotit2-stderr.log"
         log_pwd = rds.get('log_file_path')
         with open(log_pwd) as fi:
             all_lines = fi.readlines()
@@ -174,11 +169,12 @@ class readlog:
                 if lno >= counts-int(line)*50:
                     yield li
 
-
     def GET(self, line):
-
-        lines = self.readfile(line)
-        return render.panel(item=None, opera='readlog', lines=lines)
+        try:
+            lines = self.readfile(line)
+            return render.panel(item=None, opera='readlog', lines=lines)
+        except IOError:
+            return render.panel(alert="没有找到日志文件, pwd=[{}]".format(rds.get('log_file_path')))
 
 
 class backup:
@@ -214,8 +210,8 @@ class backup:
 
 
 class update:
-
-    item_list = ['donate', 'notice', 'wxcomment',]
+    """ 内容管理 """
+    item_list = ['donate', 'notice', 'wxcomment', 'developer']
     opera_list = ['cr', 'del', 'ls']
 
     def GET(self, opera, item, oid=None):
@@ -242,6 +238,14 @@ class update:
                         'datetime': datetime.datetime.now(),
                         })
                     expire_redis_cache('donate')
+                elif item == 'developer':
+                    _token = get_unique_key()
+                    db[item].insert({
+                        'token' : _token,
+                        'description':data['content'],
+                        'datetime': datetime.datetime.now(),
+                        })
+                    expire_redis_cache('developer')
                 else:
                     db[item].insert({
                         'content':data['content'],
@@ -252,7 +256,6 @@ class update:
                 db[item].remove({'_id':ObjectId(data['oid'])})
 
         raise web.seeother('/o/ls/'+item)
-
 
 
 class single:
@@ -316,4 +319,4 @@ class DetailError:
             key=key, hkey=hkey, key_list=key_list, content=content)
 
 
-manage.add_processor(web.loadhook(pre_request))
+app.add_processor(web.loadhook(pre_request))

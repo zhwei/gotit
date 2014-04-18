@@ -30,9 +30,9 @@ def login(number,pwd):
     req = urllib2.Request(url=login_url, data=data)
     login_ret = opener.open(req).read()
     if login_ret.find('密码错误') > 0:
-        raise errors.PageError('对不起，密码错误，请查实！！') 
+        raise errors.PageError('对不起，密码错误，请查实！！')
     elif login_ret.find('您尚未完成身份认证') > 0:
-        raise errors.PageError('您尚未完成图书馆身份认证！') 
+        raise errors.PageError('您尚未完成图书馆身份认证！')
     elif login_ret.find("证件信息") > 0:
         return True
 
@@ -43,7 +43,7 @@ def getbooklist_table():
     ret = opener.open(req).read()
     if ret.find('您的该项记录为空！')>0:
         return "您没有借书记录"
-    patten = re.compile("<table.*?</table>",re.M|re.S)  
+    patten = re.compile("<table.*?</table>",re.M|re.S)
     book_table = patten.findall(ret)
     return book_table[0]
 
@@ -76,7 +76,7 @@ def getbooklist_json():
     return json.dumps(all)
 
 def unescape(text):
-    """Removes HTML or XML character references 
+    """Removes HTML or XML character references
     and entities from a text string.
     keep &amp;, &gt;, &lt; in the source code.
     from Fredrik Lundh
@@ -92,7 +92,7 @@ def unescape(text):
                 else:
                     return unichr(int(text[2:-1]))
             except ValueError:
-                print "erreur de valeur"
+                # print "erreur de valeur"
                 pass
         else:
             # named entity
@@ -103,11 +103,9 @@ def unescape(text):
                     text = "&amp;gt;"
                 elif text[1:-1] == "lt":
                     text = "&amp;lt;"
-                else:
-                    print text[1:-1]
             except KeyError:
-                print "keyerror"
                 pass
+                # print "keyerror"
         return text # leave as is
     return re.sub("&#?\w+;", fixup, text)
 

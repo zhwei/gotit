@@ -1,4 +1,4 @@
-# python简单缓存系统
+# Python简单缓存系统
 
 ###来源
 [ma6174](https://github.com/ma6174/pycache)

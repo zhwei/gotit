@@ -16,6 +16,14 @@ import config
 import errors
 from addons.calc_GPA import GPA
 
+def get_unique_key(prefix=None):
+
+    import time
+    import md5
+    if prefix:
+        key = "{}_{}".format(prefix, md5.md5(str(time.time())).hexdigest())
+    key = md5.md5(str(time.time())).hexdigest()
+    return key
 
 LEVELS = {
     'debug':logging.DEBUG,
@@ -71,13 +79,13 @@ def not_error_page(page):
         raise errors.ZfError('正方教务系统不可用')
     return True
 
-def get_score_jidi(xh):
+def get_score_gpa(xh):
     """返回学分绩点
     """
     gpa = GPA(xh)
     gpa.getscore_page()
     score = gpa.get_all_score()
-    jidi = gpa.get_gpa()["ave_score"]
+    jidi = gpa.get_gpa()
     return score, jidi
 
 

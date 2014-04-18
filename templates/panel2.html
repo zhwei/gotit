@@ -4,12 +4,13 @@
 
   {% if opera %}
 
-    <legend>{{ opera }} - {{ item }}</legend>
     {% if opera == 'cr' %}
+    <legend>Create Single</legend>
+      <div class="col-md-12">
       <form action="" method="POST" class="form-horizontal" role="form">
           <fieldset>
             <div class="form-group">
-              <p><a class="btn btn-default btn-block" href="/manage/single/info">全部列表</a></p>
+              <p><a class="btn btn-default btn-block" href="/single/info">全部列表</a></p>
               <hr />
               <p><input type="text" name="key" class='form-control' placeholder="The Key" /></p>
               <p><textarea name="content" id="editor" class="form-control" placeholder="Enter content.."></textarea></p>
@@ -26,8 +27,10 @@
           </fieldset>
           {{ form.submit(value="提交") }}
       </form>
+      </div>
     {% elif opera == 'info' %}
-      <p><a href="/manage/single/cr" class='btn btn-default btn-block'>Create</a></p>
+    <legend>List Single</legend>
+      <p><a href="/single/cr" class='btn btn-default btn-block'>Create</a></p>
       <table class='table table-hover'>
       <thead><tr class="active">
           <th>Title</th>
@@ -41,15 +44,15 @@
                 <td>{{ single[1] }}</td>
                 <td>
                     <a class="btn btn-default btn-mini" href=""><i class="glyphicon glyphicon-edit"></i></a>
-                    <a class="btn btn-default btn-mini" href="/manage/single/del/{{ single[0] }}"><i class="glyphicon glyphicon-remove"></i></a>
+                    <a class="btn btn-default btn-mini" href="/single/del/{{ single[0] }}"><i class="glyphicon glyphicon-remove"></i></a>
                 </td>
             </tr>
         {% endfor %}
         </tbody>
       </table>
     {% elif opera == 'del' %}
-    <div class="lead">
-      <br /><br />
+    <div class="lead" style="text-align: center;">
+      <br />
       <form method="post">
         <p class='lead'>是否确认删除？</p>
         <input type="hidden" name="oid" value="{{ oid }}"  />

@@ -3,6 +3,7 @@
 #学分基点=∑(课程成绩*课程学分)/应修学分
 import re
 import logging
+import json
 
 import requests
 
@@ -24,11 +25,10 @@ class GPA:
         '''获取成绩页面'''
         param = {'post_xuehao': GPA.__num}
         try:
-            #self.page = urllib2.urlopen( url = config.score_url, data = param, timeout=5).read().decode('utf-8')
-            self.page = requests.post(url=config.score_url, data=param, timeout=0.05).text
+            self.page = requests.post(url="http://210.44.176.116/cjcx/zcjcx_list.php",
+                                        data=param, timeout=1.0).text
         except requests.Timeout:
             raise errors.RequestError('无法连接成绩查询系统')
-            #return None
 
     # 直接抓取表格内容并返回
     def get_all_score(self):
@@ -62,6 +62,7 @@ class GPA:
             return 0
         except:
             logging.error("cannot get info of %s"%GPA.__num)
+            rds.hset('error_score_cant_get_info', self.__num, self.page)
             return -1
 
 
@@ -199,7 +200,7 @@ class GPA:
         GPA.__ret['not_accept']=not_accept        #至今未通过科目
         return 0
 
-    def get_gpa(self):
+    def get_dict(self):
         '''通过这个函数调用上面的函数'''
         self.__match_table()
         if self.__get_basic_info() == -1:
@@ -208,14 +209,28 @@ class GPA:
         self.__calc_score()
         return GPA.__ret
 
+    def get_gpa(self):
+        """返回平均学分绩点"""
+        self.getscore_page()
+        info = self.get_dict()
+        return info["ave_score"]
 
+    def get_allscore_dict(self):
+        """ 获取全部成绩信息 字典
+        详细格式见`api.markdown`
+        """
+        self.getscore_page()
+        info = self.get_dict()
+        data = {info["course"][i]: {"initial": info["score"][i],
+                "makeup":info["score2"][i]} for i in range(len(info["course"]))}
+        return data
+        # return json.dumps(data, ensure_ascii=False)
 
-#if __name__=='__main__':
-#    num = raw_input("请输入你的学号: ")
-#    gpa = GPA(num)
-#    info = gpa.get_gpa()
-#    if info == -1:
-#        print "error"
-#    else:
-#        print "学号\t\t姓名\t\t专业\t\t班级\t\t学分基点\t总基点\t\t总学分\t至今未通过科目"
-#        print "%s\t%s\t%s\t%s\t%s\t\t%s\t\t%s\t%d"%(info['id'],info['name'],info['major'],info['Class'],info['ave_score'],info['totle_score'],info['totle_credits'],len(info['not_accept']))
+# if __name__=='__main__':
+#     num = raw_input("请输入你的学号: ")
+#     gpa = GPA(num)
+#     print gpa.get_score_json()
+#     gpa.getscore_page()
+#     info = gpa.get_dict()
+#     for i in range(len(info["course"])):
+#         print info["course"][i], info["score"][i], info["score2"][i]
