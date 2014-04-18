@@ -259,11 +259,9 @@ def limit_processor(handler):
     @redis_memoize("developer")
     def developer_list():
         db = init_mongo()
-        for d in db['developer'].find():
-            yield d['token']
+        return [d['token'] for d in db['developer'].find()]
 
     base = BaseApi()
-    print web.ctx.path
     if web.ctx.path not in ['/', '/checkcode.gif']:
         try:
             token = web.ctx.environ["HTTP_ACCESS_TOKEN"]
