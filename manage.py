@@ -120,7 +120,7 @@ def pre_request():
 
     if web.ctx.path not in ['/', '/callback']:
         try:
-            if session["uid"] != ADMIN_WEIBO_ID:
+            if session.uid != ADMIN_WEIBO_ID:
                 raise web.seeother('/')
         except AttributeError:
             raise web.seeother('/')
