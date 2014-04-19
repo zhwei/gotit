@@ -8,6 +8,9 @@ test/*
 .idea/*
 static/pic/*
 static/cdn/*
+static/css/*
+static/js/*
+static/img/*
 stop.sh
 restart.sh
 start.sh

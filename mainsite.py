@@ -58,15 +58,16 @@ mongo = mongo2s.init_mongo()
 # 首页索引页
 class index:
 
-    @redis_memoize('index', 100)
+    # @redis_memoize('index', 100)
     def GET(self):
 
-        zheng_alert = rds.get('SINGLE_zheng')
-        score_alert = rds.get('SINGLE_score')
-        index_show = rds.get('SINGLE_index')
+        # zheng_alert = rds.get('SINGLE_zheng')
+        # score_alert = rds.get('SINGLE_score')
+        # index_show = rds.get('SINGLE_index')
 
-        return render.index(zheng_alert=zheng_alert, index_show=index_show,
-                            score_alert=score_alert)
+        # return render.index(zheng_alert=zheng_alert, index_show=index_show,
+        #                     score_alert=score_alert)
+        return render.index_new()
 
 class BaseSearch(object):
     """ 各个查询功能的基类
