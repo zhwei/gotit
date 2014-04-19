@@ -1,75 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>{%- block title -%}{%- endblock -%} &middot; Got it</title>
-    {%- include  "includes/head.html" -%}
-
-    <style type="text/css">
-      body {
-        padding-top: 20px;
-        padding-bottom: 40px;
-      }
-
-      /* Custom container */
-      .container-narrow {
-        margin: 0 auto;
-        max-width: 700px;
-      }
-      .container-narrow > hr {
-        margin: 30px 0;
-      }
-
-      /* Main marketing message and sign up button */
-      .jumbotron {
-        margin: 60px 0;
-        text-align: center;
-      }
-      .jumbotron h1 {
-        font-size: 72px;
-        line-height: 1;
-      }
-      .jumbotron .btn {
-        font-size: 21px;
-        padding: 14px 24px;
-      }
-
-      /* Supporting marketing content */
-      .marketing {
-        margin: 60px 0;
-      }
-      .marketing p + h4 {
-        margin-top: 28px;
-      }
-    </style>
-
-  </head>
-
-  <body>
-
-    <div class="container-narrow">
-
-      <div class="masthead">
-        <ul class="nav nav-pills pull-right">
-          {%- block nav -%}
-          {%- endblock -%}
-        </ul>
-        <h3 class="muted">Got it</h3>
-      </div>
-
-      <hr>
-      {%- block content -%}
-
-      {%- endblock -%}
-
-      {%- include  "includes/footer.html" -%}
-
-    </div> <!-- container -->
+<head>
+    <title>{%- block title -%}{%- endblock -%}&middot; Got it</title>
+    {% include "includes/head.html" %}
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top">
+    {% include "includes/nav.html" %}
+</div>
 
 
+<div class="container" id="site-body">
+    {% if alert %}
+    <div class="alert alert-dismissable alert-info">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        {{ alert }}
+    </div>
+    {% endif %}
 
-  <!-- Le javascript
-  ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
-  {%- include "includes/js.html" -%}
+    <div>
+        {% block content -%}{%- endblock %}
+    </div>
+</div>
+
+{% include "includes/footer.html" %}
+
+{% block foot -%}{%- endblock %}
+
 </body>
 </html>

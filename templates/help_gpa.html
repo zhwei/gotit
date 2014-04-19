@@ -1,5 +1,17 @@
-{% extends "base-search.html" %}
+{% extends "base-index.html" %}
+
+{% block head %}
+    <style>
+        .col-lg-9 {
+            margin: 0 auto;
+            float: none;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
+
+    <div class="col-lg-9">
 
         <h3>学分基点计算说明：</h3>
 
@@ -30,8 +42,8 @@
         </ul>
 
         <h5>程序源码：</h5>
+        <p><strong><a href="https://github.com/ma6174/calc_GPA/blob/master/calc_GPA.py">Link</a></strong></p>
 
-        <p><a href="https://github.com/ma6174/calc_GPA/blob/master/calc_GPA.py">https://github.com/ma6174/calc<em>GPA/blob/master/calc</em>GPA.py</a></p>
-
+    </div>
 
 {% endblock %}

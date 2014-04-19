@@ -1,29 +1,33 @@
 {% extends "base-index.html" %}
 
 {% block title %}留言{% endblock %}
-
-{% block nav %}
-<li><a href="/">首页</a></li>
-<li><a href="/notice.html">公告</a></li>
-<li class="active"><a href="/comment.html">留言</a></li>
-<li><a href="/donate.html">赞助</a></li>
+{% block head %}
+    <style>
+        html, body {
+            background-color: #FFFFFF;
+        }
+    </style>
 {% endblock %}
-
 {% block content %}
 
-<!-- Duoshuo Comment BEGIN -->
-<div class="ds-thread"></div>
-<script type="text/javascript">
-  var duoshuoQuery = {short_name:"gotit"};
-(function() {
- var ds = document.createElement('script');
- ds.type = 'text/javascript';ds.async = true;
- ds.src = 'http://static.duoshuo.com/embed.js';
- ds.charset = 'UTF-8';
- (document.getElementsByTagName('head')[0] 
-  || document.getElementsByTagName('body')[0]).appendChild(ds);
- })();
-</script>
-<!-- Duoshuo Comment END -->
+    <div class="center col-md-9">
+
+        <!-- Duoshuo Comment BEGIN -->
+        <div class="ds-thread"></div>
+        <script type="text/javascript">
+            var duoshuoQuery = {short_name: "gotit"};
+            (function () {
+                var ds = document.createElement('script');
+                ds.type = 'text/javascript';
+                ds.async = true;
+                ds.src = 'http://static.duoshuo.com/embed.js';
+                ds.charset = 'UTF-8';
+                (document.getElementsByTagName('head')[0]
+                        || document.getElementsByTagName('body')[0]).appendChild(ds);
+            })();
+        </script>
+        <!-- Duoshuo Comment END -->
+
+    </div>
 
 {% endblock %}

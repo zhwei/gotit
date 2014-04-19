@@ -2,33 +2,14 @@
 <html lang="en">
 <head>
     <title>我们为你Got it&middot; Got it</title>
-    <meta charset="utf-8">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="keywords" content="成绩查询,校外,正方教务系统,四六级成绩查询,学分绩点,考试时间地点,课表,本学期,查询">
-    <meta name="description" content="山东理工大学校外成绩查询,学分绩点查询,四六级成绩查询.">
-    <meta name="author" content="ma6174,zhwei">
-    <meta property="wb:webmaster" content="0c9867e1232b2dd4"/>
-    <!-- Le styles -->
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/index.css" rel="stylesheet">
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-    <script src="/static/js/html5shiv.min.js"></script>
-    <![endif]-->
-    <!-- Favicons -->
-    <link rel="apple-touch-icon-precomposed" sizes="256x256" href="/static/ico/favicon.png">
-    <link rel="shortcut icon" href="/static/ico/favicon.png">
+    {% include "includes/head.html" %}
 </head>
 
 <body>
 
-<div class="jumbotron">
+<div class="index-jumbotron jumbotron">
     <div class="container">
         <h1>Got it</h1>
-
         <div class="words">
             <p>While the truncheon may be used in lieu of conversation , Words will always retain their power.</p>
         </div>
@@ -36,54 +17,16 @@
 </div>
 
 <div class="navbar navbar-default index-nav">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse"
-                    data-target=".navbar-responsive-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Got it</a>
-        </div>
-        <div class="navbar-collapse collapse navbar-responsive-collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="">正方</a></li>
-                <li><a href="#">绩点</a></li>
-                <li>
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">其他<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">图书馆余书</a></li>
-                        <li><a href="#">CET</a></li>
-                        <li><a href="#">往年CET成绩</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">公告</a></li>
-                <li><a href="#">留言</a></li>
-            </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">关于<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">联系我们</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">API</a></li>
-                        <li><a href="http://bootswatch.com/flatly/">bootswatch</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
+    {% include "includes/nav.html" %}
 </div>
-<!--nav end-->
 
 <div class="container index-body">
+    {% if alert %}
     <div class="alert alert-dismissable alert-info">
         <button type="button" class="close" data-dismiss="alert">×</button>
-        <strong>Heads up!</strong> This <a href="#" class="alert-link">alert needs your attention</a>, but it's not
-        super important.
+        {{ alert }}
     </div>
+    {% endif %}
     <div>
         <div class="col-lg-4">
             <div class="panel panel-primary">
@@ -183,24 +126,15 @@
 </div>
 
 
-<div class="footer">
-    <a class="logoimg" href="/zheng"><img src="/static/ico/favicon.png" alt=""/></a>
-</div>
-<!-- Le javascript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="/static/js/jquery.min.js"></script>
+{% include "includes/footer.html" %}
 <script src="/static/js/stick-up.min.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
 <script type="text/javascript">
     //initializing jQuery
     jQuery(function ($) {
         $(document).ready(function () {
-            //enabling stickUp on the '.navbar-wrapper' class
             $('.navbar-default').stickUp();
         });
     });
-
 </script>
 </body>
 </html>

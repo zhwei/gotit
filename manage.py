@@ -319,4 +319,4 @@ class DetailError:
             key=key, hkey=hkey, key_list=key_list, content=content)
 
 
-app.add_processor(web.loadhook(pre_request))
+# app.add_processor(web.loadhook(pre_request))

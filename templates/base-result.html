@@ -1,96 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <title>查询结果--Got it</title>
     {%- include  "includes/head.html" -%}
 
-    <!-- Le styles -->
+    {% block head %}{% endblock %}
     <style>
-      body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-      }
+        html, body {
+            background-color: #ffffff;
+        }
     </style>
 
-  </head>
+</head>
 
-  <body>
+<body>
 
-    <nav class="navbar navbar-inverse navbar-fixed-top bs-navbar" role="navigation">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-            <span class="sr-only">Gotit</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">Gotit</a>
-        </div>
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse navbar-ex1-collapse">
-          <ul class="nav navbar-nav">
-            <li><a href="/">首页</a></li>
-            <li><a href="/score">绩点·成绩</a></li>
-            <li><a href="/cet">CET</a></li>
-            <li><a href="/notice.html">公告</a></li>
-            <li><a href="/contact.html">联系我们</a></li>
-            <li><a href="/comment.html">留言</a></li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-          </ul>
-        </div><!-- /.navbar-collapse -->
-    </nav>
+<div class="navbar navbar-default navbar-fixed-top">
+    {% include "includes/nav.html" %}
+</div>
 
 
-      <div id="container" class= "container">
-        <div>
-          <center>如果我们做的对您有所帮助, 请考虑是否<a href="/donate.html">赞助</a>我们</center>
-          <hr />
-          <div class="hidden-xs">
+<div id="site-body" class="container">
+    <div>
+        <p style="text-align: center;">如果我们做的对您有所帮助, 请考虑是否<a href="/donate.html">赞助</a>我们</p>
+        <hr/>
+        <div class="hidden-xs">
             <p>查询更多：
-              <a class="btn btn-primary" href='/more/zheng'>成绩</a>&nbsp;
-              <a class="btn btn-default" href='/more/lastscore'>上学期成绩</a>&nbsp;
-              <a class="btn btn-info" href='/more/kebiao'>课表</a>&nbsp;
-              <a class="btn btn-warning" href='/more/kaoshi'>考试时间</a>&nbsp;
-              <a class="btn btn-success" href='/more/score'>绩点&总成绩</a>&nbsp;
-              <a class="btn btn-default" href='/more/oldcet'>往年CET</a>&nbsp;
-              <a onclick=condensed() class='btn btn-default'>表格调整</a>&nbsp;
+                <a class="btn btn-primary" href='/more/zheng'>成绩</a>&nbsp;
+                <a class="btn btn-default" href='/more/lastscore'>上学期成绩</a>&nbsp;
+                <a class="btn btn-info" href='/more/kebiao'>课表</a>&nbsp;
+                <a class="btn btn-warning" href='/more/kaoshi'>考试时间</a>&nbsp;
+                <a class="btn btn-success" href='/more/score'>绩点&总成绩</a>&nbsp;
+                <a class="btn btn-default" href='/more/oldcet'>往年CET</a>&nbsp;
+                <a onclick=condensed() class='btn btn-default'>表格调整</a>&nbsp;
             </p>
-            <hr />
-          </div>
+            <hr/>
         </div>
+    </div>
 
-        {%- block content -%}
+    {%- block content -%}
 
-        {% endblock %}
-        <div class="visible-xs">
-            <p>查询更多：
-              <a onclick=condensed() class='btn btn-block btn-default'>表格调整</a>
-              <a class="btn btn-block btn-primary" href='/more/zheng'>成绩</a>
-              <a class="btn btn-block btn-default" href='/more/lastscore'>上学期成绩</a>
-              <a class="btn btn-block btn-info" href='/more/kebiao'>课表</a>
-              <a class="btn btn-block btn-warning" href='/more/kaoshi'>考试时间</a>
-              <a class="btn btn-block btn-success" href='/more/score'>绩点&总成绩</a>
-              <a class="btn btn-block btn-default" href='/more/oldcet'>往年CET</a>
-            </p>
-            <hr />
-        </div>
+    {% endblock %}
+    <div class="visible-xs">
+        <p>查询更多：
+            <a onclick=condensed() class='btn btn-block btn-default'>表格调整</a>
+            <a class="btn btn-block btn-primary" href='/more/zheng'>成绩</a>
+            <a class="btn btn-block btn-default" href='/more/lastscore'>上学期成绩</a>
+            <a class="btn btn-block btn-info" href='/more/kebiao'>课表</a>
+            <a class="btn btn-block btn-warning" href='/more/kaoshi'>考试时间</a>
+            <a class="btn btn-block btn-success" href='/more/score'>绩点&总成绩</a>
+            <a class="btn btn-block btn-default" href='/more/oldcet'>往年CET</a>
+        </p>
+        <hr/>
+    </div>
 
-        {%- include "includes/footer.html" -%}
-      </div> <!-- /container -->
-      {%- include "includes/js.html" -%}
-      <script language="javascript" type="text/javascript">
-      function condensed(){
-        var a=document.getElementsByClassName('table-responsive');
-        if (a.length != 0){
-          for (var i=0; i<a.length; i++)
-            {a[i].className="table-condensed";}
+</div>
+<!-- /container -->
+
+{%- include "includes/footer.html" -%}
+
+<script language="javascript" type="text/javascript">
+    function condensed() {
+        var a = document.getElementsByClassName('table-responsive');
+        if (a.length != 0) {
+            for (var i = 0; i < a.length; i++) {
+                a[i].className = "table-condensed";
+            }
         }
-        if (a.length==0){
-          var b=document.getElementsByClassName('table-condensed');
-          for (var i=0; i<a.length; i++)
-            {a[i].className="table-responsive";}
+        if (a.length == 0) {
+            var b = document.getElementsByClassName('table-condensed');
+            for (var i = 0; i < a.length; i++) {
+                a[i].className = "table-responsive";
+            }
         }
-      }
-      </script>
-      </body>
-    </html>
+    }
+</script>
+</body>
+</html>

@@ -1,23 +1,22 @@
 {% extends 'base-index.html' %}
+
 {% block title %}微博登录{% endblock %}
 
-{% block nav %}
-<li class="active"><a href="/">首页</a></li>
-<li><a href="http://gotit.asia/comment.html">留言</a></li>
-<li><a href="http://gotit.asia/donate.html">赞助</a></li>
+{% block head %}
+    <style>
+        html, body {
+            background-color: #ffffff;
+        }
+    </style>
+
 {% endblock %}
 
 {% block content %}
-<div class="jumbotron">
-  <a class="btn btn-large btn-success" href="{{ auth_url }}">微博登录</a>
 
-  {% if error %}
-  <div class="info">
-    <p>{{ error }}</p>
-  </div>
-  {% endif %}
-</div>
+    <div class="jumbotron text-center">
+        <a class="btn btn-lg btn-success" href="{{ auth_url }}">微博登录</a>
+    </div>
 
-<hr />
+    <hr/>
 
 {% endblock %}
