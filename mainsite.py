@@ -62,7 +62,7 @@ mongo = mongo2s.init_mongo()
 # 首页索引页
 class index:
 
-    # @redis_memoize('index', 100)
+    @redis_memoize('index', 100)
     def GET(self):
         zheng_alert = rds.get('SINGLE_zheng')
         score_alert = rds.get('SINGLE_score')

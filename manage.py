@@ -30,7 +30,7 @@ render = render_jinja('templates', encoding='utf-8',
 # APP_KEY = rds.get('weibo_app_key') # app key
 APP_KEY = '4001516920' # app key
 APP_SECRET = rds.get('weibo_app_secret') # app secret
-CALLBACK_URL = 'http://manage.t.gotit.asia/callback' # callback url
+CALLBACK_URL = 'http://{}/callback'.format(domains['manage']) # callback url
 CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
 AUTH_URL=CLIENT.get_authorize_url()
 
