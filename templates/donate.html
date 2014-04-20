@@ -4,22 +4,19 @@
 
 {% block head %}
     <style>
-        body {
+        html, body {
             background-color: #FFFFFF;
         }
+
         .jumbotron {
             text-align: center;
-        }
-        .content {
-            margin: 0 auto;
-            float: none;
         }
     </style>
 {% endblock %}
 
 {% block content %}
 
-    <div class="content col-md-9">
+    <div class="center col-md-9">
         <div class="jumbotron">
             <a href='http://me.alipay.com/zhweifcx'>
                 <img src='https://img.alipay.com/sys/personalprod/style/mc/btn-index.png'/>
@@ -35,24 +32,26 @@
         </div>
 
         <div>
-        <h4 id="names">赞助者名单</h4>
+            <h3 id="names">赞助者名单</h3>
             <br/>
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>赞助者</th>
-                    <th><strong>金额</strong></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for sp in sponsor %}
+            <div class="list-group-item">
+                <table class="table table-hover">
+                    <thead>
                     <tr>
-                        <th>{{ sp.name }}</th>
-                        <td>{{ sp.much }}&nbsp;元</td>
+                        <th>赞助者</th>
+                        <th><strong>金额</strong></th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for sp in sponsor %}
+                        <tr>
+                            <th>{{ sp.name }}</th>
+                            <td>{{ sp.much }}&nbsp;元</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div>

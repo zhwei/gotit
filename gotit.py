@@ -19,10 +19,10 @@ from addons.RedisStore import RedisStore
 web.config.debug = debug_mode
 
 mapping = (
-    "(www\.)?gotit.asia", mainsite.app,
-    "api.gotit.asia", apis.app,
-    "wechat.gotit.asia", wechat.app,
-    "manage.gotit.asia", manage.app,
+    "www.t.gotit.asia", mainsite.app,
+    "api.t.gotit.asia", apis.app,
+    "wechat.t.gotit.asia", wechat.app,
+    "manage.t.gotit.asia", manage.app,
 )
 
 

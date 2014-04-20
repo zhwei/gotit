@@ -13,8 +13,8 @@
             {%- endif -%}
 
             {%- for d in form.inputs -%}
-                <input type="{{ d.get_type() }}" id="{{ d.id }}" name="{{ d.name }}" class="form-control"
-                       placeholder="{{ d.description }}" {%- if loop.first -%}autofocus{%- endif -%}/>
+                <p><input type="{{ d.get_type() }}" id="{{ d.id }}" name="{{ d.name }}" class="form-control"
+                       placeholder="{{ d.description }}" {%- if loop.first -%}autofocus{%- endif -%}/></p>
             {%- endfor -%}
 
             <div class="search-control">

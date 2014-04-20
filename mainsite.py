@@ -17,10 +17,9 @@ from addons.redis2s import rds
 from addons import mongo2s
 from addons.get_CET import CET
 from addons.zfr import ZF, Login
-from addons.autocache import memorize, redis_memoize
+from addons.autocache import redis_memoize
 from addons import get_former_cet, get_book
 from addons.RedisStore import RedisStore
-from addons.config import index_cache
 from addons.utils import get_score_gpa
 from forms import cet_form, xh_form, login_form
 

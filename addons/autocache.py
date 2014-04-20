@@ -13,10 +13,8 @@ from functools import wraps
 
 from redis2s import rds
 
-_cache = {}
+# _cache = {}
 
-from hashlib import sha1
-from redis import Redis
 
 def redis_memoize(cache_name, ttl=-1):
     """
@@ -26,7 +24,7 @@ def redis_memoize(cache_name, ttl=-1):
 
     def _decorator(function):
         def __memoize(*args, **kwargs):
-            if rds.get('SINGLE_cache') == 'yes':
+            if rds.get('SINGLE_cache') == 'yes_bak':
                 key = 'value'
                 if rds.hexists(cache_name, key):
                     return pickle.loads(rds.hget(cache_name, key))
@@ -59,26 +57,26 @@ def _compute_key(function, args,kw):
     key = pickle.dumps((function.func_name,args,kw))
     return hashlib.sha1(key).hexdigest()
 
-def memorize(duration = -1):
-    '''自动缓存'''
-    def _memoize(function):
-        @wraps(function) # 自动复制函数信息
-        def __memoize(*args, **kw):
-            key = _compute_key(function, args, kw)
-            #是否已缓存？
-            if key in _cache:
-                #是否过期？
-                if _is_obsolete(_cache[key], duration) is False:
-                    return _cache[key]['value']
-            # 运行函数
-            result = function(*args, **kw)
-            #保存结果
-            _cache[key] = {
-                'value' : result,
-                'time'  : time.time()
-            }
-            return result
-        return __memoize
-    return _memoize
+# def memorize(duration = -1):
+#     '''自动缓存'''
+#     def _memoize(function):
+#         @wraps(function) # 自动复制函数信息
+#         def __memoize(*args, **kw):
+#             key = _compute_key(function, args, kw)
+#             #是否已缓存？
+#             if key in _cache:
+#                 #是否过期？
+#                 if _is_obsolete(_cache[key], duration) is False:
+#                     return _cache[key]['value']
+#             # 运行函数
+#             result = function(*args, **kw)
+#             #保存结果
+#             _cache[key] = {
+#                 'value' : result,
+#                 'time'  : time.time()
+#             }
+#             return result
+#         return __memoize
+#     return _memoize
 
 
