@@ -21,9 +21,10 @@ from addons.redis2s import rds
 from addons.utils import zipf2strio, get_unique_key
 from addons.autocache import expire_redis_cache
 from addons.RedisStore import RedisStore
-# from addons.config import SINGLE_HEAD
 
-render = render_jinja('templates', encoding='utf-8')
+from addons.config import domains
+render = render_jinja('templates', encoding='utf-8',
+                      globals={"domains": domains})
 
 
 # APP_KEY = rds.get('weibo_app_key') # app key
@@ -185,11 +186,11 @@ class backup:
 
         if label=='download':
 
-            mongoexport_path = rds.get('mongoexport_path')
+            mongodump_path = rds.get('mongodump_path')
             # 备份mongodb数据库，打包成zip文件并返回下载
             dt=datetime.datetime.now()
             filename = '/tmp/gotit-backup-{}'.format(dt.strftime('%Y%m%d%H%M%S'))
-            os.system('{} -d gotit -o {}'.format(mongoexport_path, filename))
+            os.system('{} -d gotit -o {}'.format(mongodump_path, filename))
             ret = zipf2strio(filename) # 打包写入StringIO对象
             try:
                 import shutil

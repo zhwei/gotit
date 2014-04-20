@@ -13,16 +13,16 @@ import manage
 import wechat
 
 # debug mode
-from addons.config import debug_mode
-from addons.RedisStore import RedisStore
+from addons.config import debug_mode, domains
 
 web.config.debug = debug_mode
 
 mapping = (
-    "www.t.gotit.asia", mainsite.app,
-    "api.t.gotit.asia", apis.app,
-    "wechat.t.gotit.asia", wechat.app,
-    "manage.t.gotit.asia", manage.app,
+    domains['main'], mainsite.app,
+    domains['www'], mainsite.app,
+    domains['api'], apis.app,
+    domains['wechat'], wechat.app,
+    domains['manage'], manage.app,
 )
 
 

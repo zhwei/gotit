@@ -339,7 +339,8 @@ class WeixinIndex:
     def GET(self):
         from web.contrib.template import render_jinja
         render = render_jinja('templates', encoding='utf-8')
-        return render.weixin()
+        from addons.config import domains
+        return render.weixin(domains=domains)
 
 class WeixinInterface(BaseMsg, ProcessMsg):
 

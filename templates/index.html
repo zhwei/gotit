@@ -1,82 +1,140 @@
-{% extends 'base-index.html' %}
-{% block title %}我们为你Got it{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>我们为你Got it&middot; Got it</title>
+    {% include "includes/head.html" %}
+</head>
 
+<body>
 
-{% block nav %}
-<li class="active"><a href="/">首页</a></li>
-<li><a href="/notice.html">公告</a></li>
-<li><a href="/comment.html">留言</a></li>
-<li><a href="/donate.html">赞助</a></li>
-{% endblock %}
-
-{%- block content -%}
-<div class="jumbotron">
-  <p><a class="btn btn-large btn-success" href="">Got It</a></p>
-  <div class="text-center">
-    {{ index_show | default("<p class='lead text-success'>天天有个好心情!</p>", True) }}
-  </div>
+<div class="index-jumbotron jumbotron">
+    <div class="container">
+        <h1>Got it</h1>
+        <div class="words">
+            <p>While the truncheon may be used in lieu of conversation , Words will always retain their power.</p>
+        </div>
+    </div>
 </div>
 
-<hr>
-
-<div class="row marketing">
-  <div class="col-lg-6">
-    <div class="well" onclick="location.href='/zheng';" style="cursor:pointer;">
-
-      <h4><a href="/zheng">本学期课表 成绩 考试时间</a></h4>
-      <p>查询本学期课表 成绩以及考试时间.</p>
-      {%- if zheng_alert -%}
-      <div class="alert alert-info">
-        <p>{{ zheng_alert }}</p>
-      </div>
-      {% endif %}
-    </div>
-    <div class="well" onclick="location.href='/cet';" style="cursor:pointer;">
-      <h4><a href="/cet">四六级成绩查询</a></h4>
-      <p>最新四六级成绩查询.</p>
-    </div>
-
-    <div class="well" onclick="location.href='/libr';" style="cursor:pointer;">
-      <h4><a href="/libr">图书馆借书查询</a></h4>
-      <p>在图书馆借了那些书，超期了没有？</p>
-    </div>
-
-    <div class="well" onclick="location.href='/404';" style="cursor:pointer;">
-      <h4><a href="/404">公益404页面</a></h4>
-      <p></p>
-    </div>
-
-  </div>
-
-  <div class="col-lg-6">
-    <div class="well" onclick="location.href='http://wechat.gotit.asia';" style="cursor:pointer;">
-      <h4><a href="http://wechat.gotit.asia">微信公众账号</a></h4>
-      <p>微信公众账号，成绩查询，方便快捷！</p>
-    </div>
-  </div>
-
-  <div class="col-lg-6">
-    <div class="well" onclick="location.href='/score';" style="cursor:pointer;">
-      <h4><a href="/score">总成绩 学分绩点</a></h4>
-      <p>查询入学以来所有成绩,包括第二专业和补考成绩以及平均学分绩点.</p>
-      {%- if score_alert -%}
-      <div class="alert alert-info">
-        <p>{{ score_alert }}</p>
-      </div>
-      {%- endif -%}
-    </div>
-  </div>
-
-  <div class="col-lg-6">
-
-    <div class="well" onclick="location.href='/cet/former';" style="cursor:pointer;">
-      <h4><a href="/cet/former">往年四六级成绩</a></h4>
-      <p>往年四六级成绩查询，看看你的战绩！</p>
-    </div>
-    <div class="well" onclick="location.href='/donate.html#names';" style="cursor:pointer;">
-      <h4><a href="/donate.html#names">网站赞助者名单</a></h4>
-      <p>您的每一分钱都会让<strong>Gotit</strong>做得更好!</p>
-    </div>
-  </div>
+<div class="navbar navbar-default index-nav">
+    {% include "includes/nav.html" %}
 </div>
-{% endblock %}
+
+<div class="container index-body">
+    {% if alert %}
+    <div class="alert alert-dismissable alert-info">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        {{ alert }}
+    </div>
+    {% endif %}
+    <div>
+        <div class="col-lg-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">正方教务系统</h3>
+                </div>
+                <div class="panel-body">
+                    <p>查询本学期最新成绩, 最新课表, 考试时间</p>
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/zheng" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">CET</h3>
+                </div>
+                <div class="panel-body">
+                    <p>四六级最新成绩查询</p>
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/cet" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Former CET</h3>
+                </div>
+                <div class="panel-body">
+                    <p>往年四六级成绩, 痛定思痛!</p>
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/cet/former" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">微信公众帐号</h3>
+                </div>
+                <div class="panel-body">
+                    <p>微信公众帐号, 成绩查询, 方便快捷, 一目了然!</p>
+                </div>
+                <div class="panel-footer">
+                    <a href="http://wechat.gotit.asia" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">图书馆</h3>
+                </div>
+                <div class="panel-body">
+                    <p>在图书馆借了哪些书, 超期了没有?</p>
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/libr" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">公益404</h3>
+                </div>
+                <div class="panel-body">
+                    <p>您访问的页面找不回来了！ 但我们可以一起寻找失踪宝贝</p>
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/404" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">绩点 总成绩 </h3>
+                </div>
+                <div class="panel-body">
+                    <p>查询入学以来所有成绩,包括第二专业和补考成绩以及平均学分绩点.</p>
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/score" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">网站赞助者</h3>
+                </div>
+                <div class="panel-body">
+                    <p>您的每一分钱都会让<strong>Gotit</strong>做的更好!</p>
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/donate.html#names" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% include "includes/footer.html" %}
+<script src="http://gotit.qiniudn.com/js/stick-up.min.js"></script>
+<script type="text/javascript">
+    //initializing jQuery
+    jQuery(function ($) {
+        $(document).ready(function () {
+            $('.navbar-default').stickUp();
+        });
+    });
+</script>
+</body>
+</html>

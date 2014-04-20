@@ -48,7 +48,12 @@ app = web.application(urls, globals(),autoreload=False)
 session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})
 
 # render templates
-render = render_jinja('templates', encoding='utf-8',globals={'context':session})
+from addons.config import domains
+render = render_jinja('templates', encoding='utf-8',
+                      globals={
+                          'context':session,
+                          "domains":domains
+                      })
 
 
 # init mongoDB
@@ -59,14 +64,12 @@ class index:
 
     # @redis_memoize('index', 100)
     def GET(self):
+        zheng_alert = rds.get('SINGLE_zheng')
+        score_alert = rds.get('SINGLE_score')
+        index_show = rds.get('SINGLE_index')
 
-        # zheng_alert = rds.get('SINGLE_zheng')
-        # score_alert = rds.get('SINGLE_score')
-        # index_show = rds.get('SINGLE_index')
-
-        # return render.index(zheng_alert=zheng_alert, index_show=index_show,
-        #                     score_alert=score_alert)
-        return render.index_new()
+        return render.index(zheng_alert=zheng_alert, index_show=index_show,
+                            score_alert=score_alert)
 
 class BaseSearch(object):
     """ 各个查询功能的基类
@@ -194,11 +197,7 @@ class cet:
     @redis_memoize('cet')
     def GET(self):
         form = cet_form()
-        if config.baefetch:
-            return render.cet_bae(form=form)
-        else:
-            return render.cet(form=form)
-        # return render.cet_raise()
+        return render.cet_bae(form=form)
 
     def POST(self):
         form = cet_form()
