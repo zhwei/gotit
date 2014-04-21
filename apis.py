@@ -264,7 +264,7 @@ def limit_processor(handler):
     base = BaseApi()
     if web.ctx.path not in ['/', '/checkcode.gif']:
         try:
-            token = web.ctx.environ["HTTP_ACCESS_TOKEN"]
+            token = web.ctx.environ["HTTP_ACCESSTOKEN"]
             if token in developer_list():
                 # 次数限制 todooooooo
                 _key = "token_{}".format(token)
