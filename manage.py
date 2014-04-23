@@ -308,7 +308,9 @@ class DetailError:
         if do == "del":
             rds.hdel(key, hkey)
             raise web.seeother("/de/{}".format(key))
-
+        if key and hkey=="clear" and do=="clear":
+            rds.delete(key)
+            raise web.seeother("/de")
         if hkey:
             content = rds.hget(key, hkey)
         elif key:

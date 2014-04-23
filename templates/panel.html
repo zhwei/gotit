@@ -116,7 +116,8 @@
   <h2>Detail Errors</h2>
   <hr>
   {% if hkey -%}
-  <p><a href="{{ hkey }}/del" class="btn btn-default">Delete</a></p>
+  <p><a href="{{ hkey }}/del" class="btn btn-default">Delete</a>
+      <a href="/de/{{ key }}/clear/clear" class="btn btn-default">Clear</a></p>
   {%- endif %}
     {%- if key_list and not hkey -%}
         <ul>
