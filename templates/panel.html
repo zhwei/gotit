@@ -96,17 +96,19 @@
     <h2>数据统计</h2>
     <table class="table table-hover">
       <thead>
+      <tr>
         <th>项目</th>
         <th>次数</th>
         <th>置零</th>
+      </tr>
       </thead>
       {% for d in data -%}
       <tr>
         <th>{{ d }}</th>
         <td><span class='label label-primary'>{{ data[d] }}</span></td>
         <td>
-          {%- if d == "internalerror" -%}
-          <a href="?zero=internalerror" class="btn btn-default">置零</a>
+          {%- if d in ("internalerror", "cache") -%}
+          <a href="?zero={{ d }}" class="btn btn-default">置零</a>
           {%- endif -%}
         </td>
       </tr>

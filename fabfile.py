@@ -13,7 +13,7 @@ PROJECT_HOME = '/home/group/gotit'
 ## project name in supervisor
 PROJECT_NAME_IN_SUPERVISOR = 'gotit'
 ## default deploy branch
-DEPLOY_BARNCH = '2.0-stable'
+DEPLOY_BRANCH = '2.0-stable'
 
 def put_sshkey():
     """push ssh key to server
@@ -64,5 +64,5 @@ def deploy(do='app'):
 
     with cd(PROJECT_HOME):
 
-        git_pull(DEPLOY_BARNCH)
+        git_pull(DEPLOY_BRANCH)
         restart_project(PROJECT_NAME_IN_SUPERVISOR)

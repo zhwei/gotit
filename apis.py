@@ -46,11 +46,12 @@ urls = (
 class APIDoc:
     """ API 文档 首页"""
     def GET(self):
-        return render.api_doc()
+        url = "https://github.com/zhwei/gotit/blob/2.0-stable/doc/api.markdown"
+        raise web.seeother(url)
 
 
 
-class BaseApi(object):
+class BaseApiMixin(object):
     """ Base Class of API
     """
 
@@ -74,7 +75,7 @@ class BaseApi(object):
         json_content = web.input()['data']
         return json.loads(json_content)
 
-class APITest(BaseApi):
+class APITest(BaseApiMixin):
 
     def GET(self):
         # ['status', 'realhome', 'homedomain', 'protocol', 'app_stack',
@@ -96,7 +97,7 @@ class BaseGet(object):
 
         return self.json_response(data={"uid":uid})
 
-class UserLogin(BaseApi, BaseGet):
+class UserLogin(BaseApiMixin, BaseGet):
     """ 验证类 登录请求 """
 
     def POST(self):
@@ -106,16 +107,21 @@ class UserLogin(BaseApi, BaseGet):
         except:
             web.ctx.status = "400"
             return self.json_response(message="data format wrong")
-
         try:
             zf = Login()
-            zf.login(content["uid"], content)
-            return self.json_response(data={"uid":content["uid"]})
+            try:
+                if web.input(_method='get').nocode == "true":
+                    uid = zf.no_code_login(content)
+                else: raise AttributeError
+            except AttributeError:
+                uid = content["uid"]
+                zf.login(uid, content)
+            return self.json_response(data={"uid": uid})
         except errors.PageError, e:
             return self.json_response({}, message=e.value)
 
 
-class CheckCode(BaseApi):
+class CheckCode(BaseApiMixin):
 
     """ 验证码链接 """
 
@@ -129,7 +135,7 @@ class CheckCode(BaseApi):
         return zf.get_checkcode(uid)
 
 
-class UserRequest(BaseApi):
+class UserRequest(BaseApiMixin):
     """ 验证类: 处理全部请求 """
     category_list = ('score', 'timetable')
     item_list = ('current_semester', 'last_semester','all', 'gpa', 'former_cet')
@@ -190,7 +196,7 @@ class UserRequest(BaseApi):
             return self.json_response({}, message=e.value)
 
 
-class CurrentSemester(BaseApi, BaseGet):
+class CurrentSemester(BaseApiMixin, BaseGet):
     """ 处理对当前学期的查询 """
 
     def POST(self, category=None, item=None, raw=False):
@@ -202,7 +208,12 @@ class CurrentSemester(BaseApi, BaseGet):
             return self.json_response(message="data format wrong")
         try:
             zf = Login()
-            zf.login(content["uid"], content)
+            try:
+                if web.input(_method='get').nocode == "true":
+                    zf.no_code_login(content)
+                else: raise AttributeError
+            except AttributeError:
+                zf.login(content["uid"], content)
             if category == "score":
                 score = zf.get_score()
                 data = get_score_dict(score)
@@ -218,7 +229,7 @@ class CurrentSemester(BaseApi, BaseGet):
         except errors.PageError, e:
             return self.json_response({}, message=e.value)
 
-class GPAHandler(BaseApi):
+class GPAHandler(BaseApiMixin):
     """ 获取全部成绩或者学分绩点 """
 
     def POST(self, category):
@@ -243,14 +254,14 @@ class GPAHandler(BaseApi):
 def notfound():
     """404
     """
-    base = BaseApi()
+    base = BaseApiMixin()
     web.ctx.status = "404"
     return web.notfound(base.json_response(message="Not Found"))
 
 def internalerror():
     """500
     """
-    base = BaseApi()
+    base = BaseApiMixin()
     web.ctx.status = "500"
     return web.internalerror(base.json_response(message="Internal Error"))
 
@@ -261,7 +272,7 @@ def limit_processor(handler):
         db = init_mongo()
         return [d['token'] for d in db['developer'].find()]
 
-    base = BaseApi()
+    base = BaseApiMixin()
     if web.ctx.path not in ['/', '/checkcode.gif']:
         try:
             token = web.ctx.environ["HTTP_ACCESSTOKEN"]

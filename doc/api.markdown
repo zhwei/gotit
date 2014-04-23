@@ -34,6 +34,25 @@
 _所有接口需要登陆后才能使用， 一次登录后可进行多次查询_  
 
 ### 登录
+
+#### 无验证码登录
+_以后正方系统可能屏蔽此登录方式_
++ 功能  
+登录后可以直接获取下面所有接口的结果, 仅需要提供用户识别码(UID)
++ 接口地址  
+[/user/login.json?nocode=true](http://api.gotit.asia/user/nocode/login.json?nocode=true)
++ 请求方式  
+`POST`
++ POST示例
+```json
+    {
+        "xh": "1111123456",
+        "pw": "password",
+    }
+```
+
+#### 有验证码登录
+_长期支持_
 + 功能  
 登录后可以直接获取下面所有接口的结果, 仅需要提供用户识别码(UID)
 + 接口地址  
@@ -42,7 +61,7 @@ _所有接口需要登陆后才能使用， 一次登录后可进行多次查询
 `GET` + `POST`  
     + 使用说明  
         1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
-        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/zheng/checkcode.gif?uid=[UID]`.
+        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/checkcode.gif?uid=[UID]`(无括号).
         3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
 
     + GET 结果示例
@@ -148,6 +167,8 @@ _登录状态在完成**最后一次查询操作**五分钟后失效_
 ## 成绩类
 
 _接口可以直接使用， 单次使用_  
+_请求方式与**登录**相同的可以选择有验证码登录或无验证码登录, 有验证码登录长期支持, 使用无验证码登录时接口地址后面加`?nocode=true`_
+_例如: 无验证码登录 http://api.gotit.asia/user/login.json?nocode=true, 只需要post学号和密码_
 
 ### 当前学期成绩
 
@@ -158,7 +179,7 @@ _接口可以直接使用， 单次使用_
 + 支持格式  
 JSON  
 + 请求方式  
-`GET` + `POST`  
+<i>同<a href="#登录">登录</a></i>  
     + 使用说明  
     <i>同<a href="#登录">登录</a></i>
     + GET 结果示例  
@@ -304,7 +325,7 @@ _接口可以直接使用， 单次使用_
 + 接口地址  
 [/timetable/current_semester.json](http://api.gotit.asia/timetable/current_semester.json)
 + 请求方式  
-`GET` + `POST`  
+<i>同<a href="#登录">登录</a></i>  
     + 使用说明  
     <i>同<a href="#登录">登录</a></i>
     + GET 结果示例  
@@ -346,7 +367,7 @@ _接口可以直接使用， 单次使用_
 + 接口地址  
 [/timetable/raw/current_semester.json](http://api.gotit.asia/timetable/current_semester/raw.json)
 + 请求方式  
-`GET` + `POST`  
+<i>同<a href="#登录">登录</a></i>
     + 使用说明  
     <i>同<a href="#登录">登录</a></i>
     + GET 结果示例  

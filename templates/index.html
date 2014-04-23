@@ -29,15 +29,16 @@
     {% endif %}
     <div>
         <div class="col-lg-4">
-            <div class="panel panel-primary">
+            <div class="panel panel-info">
                 <div class="panel-heading">
                     <h3 class="panel-title">正方教务系统</h3>
                 </div>
                 <div class="panel-body">
                     <p>查询本学期最新成绩, 最新课表, 考试时间</p>
+                    {% if zheng_alert %}{{ zheng_alert }}{% endif %}
                 </div>
                 <div class="panel-footer">
-                    <a href="http://{{ domains.main }}/zheng" class="btn btn-default btn-block">Go</a>
+                    <a href="http://{{ domains.main }}/zheng/nocode" class="btn btn-default btn-block">Gooo</a>
                 </div>
             </div>
             <div class="panel panel-primary">
@@ -66,13 +67,13 @@
         <div class="col-lg-4">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title">微信公众帐号</h3>
+                    <h3 class="panel-title">正方教务系统</h3>
                 </div>
                 <div class="panel-body">
-                    <p>微信公众帐号, 成绩查询, 方便快捷, 一目了然!</p>
+                    <p>查询本学期最新成绩, 最新课表, 考试时间</p>
                 </div>
                 <div class="panel-footer">
-                    <a href="http://wechat.gotit.asia" class="btn btn-default btn-block">Go</a>
+                    <a href="http://{{ domains.main }}/zheng" class="btn btn-default btn-block">Go</a>
                 </div>
             </div>
             <div class="panel panel-primary">
@@ -99,6 +100,17 @@
             </div>
         </div>
         <div class="col-lg-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">微信公众帐号</h3>
+                </div>
+                <div class="panel-body">
+                    <p>微信公众帐号, 成绩查询, 方便快捷, 一目了然!</p>
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.wechat }}" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">绩点 总成绩 </h3>

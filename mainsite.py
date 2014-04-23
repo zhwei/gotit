@@ -27,6 +27,7 @@ from forms import cet_form, xh_form, login_form
 urls = (
     '/', 'index',
     '/zheng', 'zheng',
+    '/zheng/nocode', 'zheng_no_code',
     '/zheng/checkcode', 'checkcode',
     '/more/(.+)', 'more',
     '/years', 'years',
@@ -164,12 +165,36 @@ class more:
                 zf.init_after_login(session['uid'], session['xh'])
                 return render.result(tables=__dic[t]())
             raise web.notfound()
-        except (AttributeError, TypeError, KeyError, requests.TooManyRedirects):
+        except (AttributeError, TypeError, KeyError):
             raise web.seeother('/zheng')
         except errors.RequestError, e:
             return render.serv_err(err=e)
         except errors.PageError, e:
             return render.alert_err(error=e.value, url='/score')
+
+class zheng_no_code:
+    """
+    无验证码正方登录
+    """
+    title='正方教务系统'
+
+    @redis_memoize('zheng_no_code')
+    def GET(self):
+        form=login_form
+        return render.normal_form(title=self.title, form=form)
+
+    def POST(self):
+        form=login_form()
+        if not form.validates():
+            return render.normal_form(title=self.title,form=form)
+        else:
+            try:
+                zf = Login()
+                session['uid'] = zf.no_code_login(form.d)
+                session['xh'] = form.d.xh
+                return render.result(tables=zf.get_last_score())
+            except errors.PageError, e:
+                return render.alert_err(error=e.value, url='/libr')
 
 class years:
 

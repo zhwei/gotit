@@ -9,7 +9,7 @@
 
 import re
 import base64
-
+import logging
 try:
     import cPickle as pickle
 except ImportError:
@@ -22,15 +22,13 @@ import config
 import errors
 import image
 import redis2s
-from utils import not_error_page
+from utils import not_error_page, get_unique_key
 import mongo2s
 
 rds= redis2s.init_redis()
 
-def process_links(base_url):
+def prepare_request(base_url, just_header=False):
     # process links
-    login_url = base_url + "Default2.aspx"
-    code_url = base_url + 'CheckCode.aspx'
     headers = {
             'Referer':base_url,
             'Host':base_url[7:21],
@@ -38,6 +36,9 @@ def process_links(base_url):
                     rv:18.0) Gecko/20100101 Firefox/18.0",
             'Connection':'Keep-Alive'
             }
+    if just_header: return headers
+    login_url = base_url + "Default2.aspx"
+    code_url = base_url + 'CheckCode.aspx'
     return login_url, code_url, headers
 
 def safe_get(*args, **kwargs):
@@ -75,7 +76,7 @@ class ZF:
         else:
             self.base_url = config.zf_url
 
-        self.login_url, self.code_url, self.headers = process_links(self.base_url)
+        self.login_url, self.code_url, self.headers = prepare_request(self.base_url)
 
     def pre_login(self):
 
@@ -87,9 +88,7 @@ class ZF:
         #self.VIEWSTATE = com.findall(_content)[0]
 
         # create uid
-        import time
-        import md5
-        uid = 'user_'+md5.md5(str(time.time())).hexdigest()
+        uid = get_unique_key(prefix="user")
 
         # get checkcode
         #checkcode=self.get_checkcode(uid)
@@ -155,7 +154,7 @@ class Login:
 
         self.init_from_form(uid, post_content)
         self.init_from_redis()
-        self.login_url, self.code_url, self.headers = process_links(self.base_url)
+        self.login_url, self.code_url, self.headers = prepare_request(self.base_url)
         # init post data
         data = {
             'Button1':'',
@@ -166,7 +165,6 @@ class Login:
             '__VIEWSTATE':self.viewstate,
             'lbLanguage':'',
         }
-
         _req = safe_post(
                 url=self.login_url,
                 data=data,
@@ -179,15 +177,61 @@ class Login:
         rds.hset(uid, "xh", self.xh)
         rds.pexpire(uid, config.COOKIES_TIME_OUT) # 延时
 
+    def no_code_login(self, post_content):
+        """ 无验证码登录 """
+        if config.random:
+            with_random_url = safe_get(config.zf_url).url
+            _random = with_random_url.split('/')[-2]
+            self.base_url=config.zf_url+_random+'/'
+        else:
+            self.base_url = config.zf_url
+
+        self.xh = post_content.get('xh')
+        self.pw = post_content.get('pw')
+        self.login_url = self.base_url + "default6.aspx"
+        self.headers = prepare_request(self.base_url, just_header=True)
+        _req1 = safe_get(self.login_url, headers=self.headers)
+        _viewstate = get_viewstate(_req1.content)
+        self.cookies = _req1.cookies
+        data = {
+            'tname':'',
+            'tbtns':'',
+            'tnameXw':'yhdl',
+            'tbtnsXw':'yhdl|xwxsdl',
+            'tbtnsXm':'',
+            'rblJs':"学生",
+            "txtYhm":self.xh,
+            'txtMm':self.pw,
+            '__VIEWSTATE': _viewstate,
+            'btnDl': '登 录',
+        }
+        _req = safe_post(
+                url=self.login_url,
+                data=data,
+                cookies = _req1.cookies,
+                headers=self.headers)
+
+        logging.error((self.cookies, _req1.cookies, _req.cookies))
+
+        uid = get_unique_key('user')
+        pickled_cookies = pickle.dumps(self.cookies)
+        rds.hmset(uid, {
+                "base_url"  : self.base_url,
+                'cookies'   : base64.encodestring(pickled_cookies),
+                "xh"        : self.xh,
+            })
+        rds.pexpire(uid, config.COOKIES_TIME_OUT) # 延时
+        return uid
+
     def init_after_login(self, uid, xh=None):
         """初始化二次查找需要的数据
         用户已经登录，从redis中获取cookies等数据
         进行第二次抓取
         """
         self.xh = xh or rds.hget(uid, "xh")
-        self.uid=uid
+        self.uid= uid
         self.init_from_redis()
-        self.login_url, self.code_url, self.headers = process_links(self.base_url)
+        self.login_url, self.code_url, self.headers = prepare_request(self.base_url)
 
 
     def get_html(self, search_item):
@@ -195,7 +239,8 @@ class Login:
         仅用来抓取目的网页
         """
         url = self.base_url + search_item + ".aspx?xh=" + self.xh
-        _req = safe_get(url = url, cookies=self.cookies, headers = self.headers)
+        logging.error(self.cookies)
+        _req = safe_get(url = url, cookies=self.cookies, headers = self.headers, allow_redirects=False)
 
         not_error_page(_req.text)
 
