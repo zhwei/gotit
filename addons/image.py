@@ -32,7 +32,9 @@ def process_image_string(image):
     传入图片的字符串, 返回处理后图片的字符串
     """
 
-    im = process_image(image)
+    #im = process_image(image)
+    input_file=StringIO.StringIO(image)
+    im = Image.open(input_file)
 
     output_file=StringIO.StringIO()
     im.save(output_file, format='gif')
