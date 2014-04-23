@@ -160,9 +160,9 @@ class Login:
         data = {
             'Button1':'',
             'RadioButtonList1':"学生",
-            "TextBox1":self.xh,
+            "txtUserName":self.xh,
             'TextBox2':self.pw,
-            'TextBox3':self.verify,
+            'txtSecretCode':self.verify,
             '__VIEWSTATE':self.viewstate,
             'lbLanguage':'',
         }
