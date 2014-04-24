@@ -16,7 +16,7 @@ Got it
     测试运行
     python test_run.py
     正式上线
-    gunicorn code:application
+    gunicorn gotit:application
 
 ## 安装依赖包
 
