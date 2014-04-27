@@ -211,8 +211,6 @@ class Login:
                 cookies = _req1.cookies,
                 headers=self.headers)
 
-        logging.error((self.cookies, _req1.cookies, _req.cookies))
-
         uid = get_unique_key('user')
         pickled_cookies = pickle.dumps(self.cookies)
         rds.hmset(uid, {
@@ -239,7 +237,6 @@ class Login:
         仅用来抓取目的网页
         """
         url = self.base_url + search_item + ".aspx?xh=" + self.xh
-        logging.error(self.cookies)
         _req = safe_get(url = url, cookies=self.cookies, headers = self.headers, allow_redirects=False)
 
         not_error_page(_req.text)

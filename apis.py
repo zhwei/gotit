@@ -72,7 +72,7 @@ class BaseApiMixin(object):
 
     def json_request(self):
 
-        json_content = web.input()['data']
+        json_content = web.data()
         return json.loads(json_content)
 
 class APITest(BaseApiMixin):
