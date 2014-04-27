@@ -137,7 +137,10 @@ class more:
     """连续查询 二次查询
     """
     def GET(self, t):
-        if session['xh'] is False:
+        try:
+            if session['xh'] is False:
+                raise KeyError
+        except KeyError:
             raise web.seeother('/zheng')
         try:
             __dic1 = { # need xh
@@ -222,7 +225,7 @@ class cet:
     @redis_memoize('cet')
     def GET(self):
         form = cet_form()
-        return render.cet_bae(form=form)
+        return render.cet(form=form)
 
     def POST(self):
         form = cet_form()
@@ -232,12 +235,10 @@ class cet:
             zkzh = form.d.zkzh
             name = form.d.name
             name = name.encode('utf-8')
-            items = ["学校","姓名","阅读", "写作", "综合",
-                    "准考证号", "考试时间", "总分", "考试类别",
-                    "听力"]
-            cet = CET()
-            res = cet.get_last_cet_score(zkzh, name)
-            return render.result_dic(items=items, res=res)
+            from addons.get_CET import get_cet_fm_jae
+            table = get_cet_fm_jae(zkzh, name)
+            return render.result(single_table=table)
+
 
 
 class FormerCET:

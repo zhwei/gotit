@@ -45,7 +45,11 @@
     {% endfor %}
   </table>
 {% endif %}
-
+{% if single_table %}
+  <table class="table table-striped table-bordered table-condensed">
+    {{ single_table }}
+  </table>
+{% endif %}
 </div>
 <h2 id="error">{{ error }}</h2>
 
