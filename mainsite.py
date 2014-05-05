@@ -20,7 +20,7 @@ from addons.zfr import ZF, Login
 from addons.autocache import redis_memoize
 from addons import get_former_cet, get_book
 from addons.RedisStore import RedisStore
-from addons.utils import get_score_gpa
+from addons.utils import get_score_gpa, PageAlert
 from forms import cet_form, xh_form, login_form
 
 
@@ -51,26 +51,22 @@ session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})
 # render templates
 from addons.config import domains
 render = render_jinja('templates', encoding='utf-8',
-                      globals={
-                          'context':session,
-                          "domains":domains
-                      })
+                      globals=dict(context=session,domains=domains,
+                            alert=PageAlert(),
+                            ))
 
 
 # init mongoDB
 mongo = mongo2s.init_mongo()
+
+
 
 # 首页索引页
 class index:
 
     @redis_memoize('index', 100)
     def GET(self):
-        zheng_alert = rds.get('SINGLE_zheng')
-        score_alert = rds.get('SINGLE_score')
-        index_show = rds.get('SINGLE_index')
-
-        return render.index(zheng_alert=zheng_alert, index_show=index_show,
-                            score_alert=score_alert)
+        return render.index()
 
 class BaseSearch(object):
     """ 各个查询功能的基类
@@ -84,13 +80,11 @@ class zheng:
         try:
             zf = ZF()
             uid = zf.pre_login()
-        except errors.ZfError, e:
+        except errors.RequestError, e:
             return render.serv_err(err=e.value)
         session['uid'] = uid
-        # get alert
-        _alert=rds.get('SINGLE_zheng')
         import time
-        return render.zheng(alert=_alert, ctime=str(time.time()))
+        return render.zheng(ctime=str(time.time()))
 
     def POST(self):
         content = web.input()
@@ -100,7 +94,6 @@ class zheng:
             uid = session['uid']
         except (AttributeError, KeyError), e:
             return render.alert_err(error='请检查您是否禁用cookie', url='/zheng')
-
         try:
             zf = Login()
             zf.login(uid, content)
@@ -116,6 +109,8 @@ class zheng:
             return render.result(tables=__dic[t]())
         except errors.PageError, e:
             return render.alert_err(error=e.value, url='/zheng')
+        except errors.RequestError, e:
+            return render.serv_err(err=e)
 
 class checkcode:
     """验证码链接
@@ -125,7 +120,8 @@ class checkcode:
             uid = web.input(_method='get').uid
         except AttributeError:
             try:
-                uid=session['uid']
+                uid = session['uid']
+                if not uid: raise KeyError
             except KeyError:
                 return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
         web.header('Content-Type','image/gif')
@@ -181,7 +177,7 @@ class zheng_no_code:
     """
     title='正方教务系统'
 
-    @redis_memoize('zheng_no_code')
+    @redis_memoize('nocode')
     def GET(self):
         form=login_form
         return render.normal_form(title=self.title, form=form)
@@ -229,16 +225,19 @@ class cet:
 
     def POST(self):
         form = cet_form()
-        if not form.validates():
+        try:
+            if not form.validates():
+                return render.cet(form=form)
+            else:
+                zkzh = form.d.zkzh
+                name = form.d.name
+                name = name.encode('utf-8')
+                from addons.get_CET import get_cet_fm_jae
+                table = get_cet_fm_jae(zkzh, name)
+                return render.result(single_table=table)
+        except UnicodeDecodeError:
+            rds.hset('error_cet_unicode_de_er', form.d.zkzh, form.d.name)
             return render.cet(form=form)
-        else:
-            zkzh = form.d.zkzh
-            name = form.d.name
-            name = name.encode('utf-8')
-            from addons.get_CET import get_cet_fm_jae
-            table = get_cet_fm_jae(zkzh, name)
-            return render.result(single_table=table)
-
 
 
 class FormerCET:

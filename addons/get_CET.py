@@ -10,7 +10,7 @@ from time import ctime
 import requests
 
 import errors
-import config
+from redis2s import rds
 DIR = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -72,9 +72,14 @@ class CET:
                 ).text
         except requests.Timeout:
             raise errors.RequestError('无法连接成绩查询系统！')
-        patten = re.compile("</caption>(.*?)</table>",re.M|re.S)
-        #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为
-        return patten.findall(page)[1]
+        try:
+            patten = re.compile("</caption>(.*?)</table>",re.M|re.S)
+            #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为
+            ret = patten.findall(page)[1]
+        except IndexError:
+            rds.hset('error_score_cant_get_info', num, page)
+            raise errors.PageError('找不到您的成绩单!')
+        return ret
 
     def get_cet_dict(self,num):
         '''获取四六级成绩（返回一个字典）'''

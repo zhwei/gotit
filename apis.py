@@ -92,7 +92,7 @@ class BaseGet(object):
         try:
             zf = ZF()
             uid = zf.pre_login()
-        except errors.ZfError, e:
+        except errors.RequestError, e:
             return self.json_response({}, message=e.value)
 
         return self.json_response(data={"uid":uid})

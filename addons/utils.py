@@ -14,7 +14,18 @@ except ImportError:
 
 import config
 import errors
-from addons.calc_GPA import GPA
+from calc_GPA import GPA
+from redis2s import rds
+
+class PageAlert(object):
+    """ 处理页面警告
+    从redis中获取页面警告
+    """
+
+    def __getattr__(self, item):
+        """从redis中获取警告内容"""
+        alert = rds.get('SINGLE_{}'.format(item))
+        return alert
 
 def get_unique_key(prefix=None):
 
@@ -76,7 +87,7 @@ def not_error_page(page):
         raise errors.PageError(_m.group(1))
         #return _m.group(1)
     if page.find('ERROR - 出错啦！') != -1:
-        raise errors.ZfError('正方教务系统不可用')
+        raise errors.RequestError('正方教务系统不可用')
     return True
 
 def get_score_gpa(xh):

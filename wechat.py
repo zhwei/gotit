@@ -127,8 +127,8 @@ class ProcessMsg(object):
         """ 获取绩点
         """
         gpa = GPA(xh)
-        gpa.getscore_page()
         try:
+            gpa.getscore_page()
             jidi = gpa.get_gpa()
             ret = "学分绩点: {}\n".format(jidi)
         except errors.PageError, e:

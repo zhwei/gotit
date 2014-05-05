@@ -10,8 +10,9 @@
 <div class="index-jumbotron jumbotron">
     <div class="container">
         <h1>Got it</h1>
+
         <div class="words">
-            <p>While the truncheon may be used in lieu of conversation , Words will always retain their power.</p>
+            <p>{{ alert.head }}</p>
         </div>
     </div>
 </div>
@@ -21,12 +22,7 @@
 </div>
 
 <div class="container index-body">
-    {% if alert %}
-    <div class="alert alert-dismissable alert-info">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        {{ alert }}
-    </div>
-    {% endif %}
+
     <div>
         <div class="col-lg-4">
             <div class="panel panel-info">
@@ -35,7 +31,7 @@
                 </div>
                 <div class="panel-body">
                     <p>查询本学期最新成绩, 最新课表, 考试时间</p>
-                    {% if zheng_alert %}{{ zheng_alert }}{% endif %}
+                    {% if alert.nocode %}{{ alert.nocode }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/zheng/nocode" class="btn btn-default btn-block">Gooo</a>
@@ -47,6 +43,7 @@
                 </div>
                 <div class="panel-body">
                     <p>四六级最新成绩查询</p>
+                    {% if alert.cet %}{{ alert.cet }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/cet" class="btn btn-default btn-block">Go</a>
@@ -58,6 +55,7 @@
                 </div>
                 <div class="panel-body">
                     <p>往年四六级成绩, 痛定思痛!</p>
+                    {% if alert.former_cet %}{{ alert.former_cet }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/cet/former" class="btn btn-default btn-block">Go</a>
@@ -71,6 +69,7 @@
                 </div>
                 <div class="panel-body">
                     <p>查询本学期最新成绩, 最新课表, 考试时间</p>
+                    {% if alert.zheng %}{{ alert.zheng }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/zheng" class="btn btn-default btn-block">Go</a>
@@ -82,6 +81,7 @@
                 </div>
                 <div class="panel-body">
                     <p>在图书馆借了哪些书, 超期了没有?</p>
+                    {% if alert.libr %}{{ alert.libr }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/libr" class="btn btn-default btn-block">Go</a>
@@ -106,6 +106,7 @@
                 </div>
                 <div class="panel-body">
                     <p>微信公众帐号, 成绩查询, 方便快捷, 一目了然!</p>
+                    {% if alert.wechat %}{{ alert.wechat }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.wechat }}" class="btn btn-default btn-block">Go</a>
@@ -117,6 +118,7 @@
                 </div>
                 <div class="panel-body">
                     <p>查询入学以来所有成绩,包括第二专业和补考成绩以及平均学分绩点.</p>
+                    {% if alert.score %}{{ alert.score }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/score" class="btn btn-default btn-block">Go</a>
@@ -128,6 +130,7 @@
                 </div>
                 <div class="panel-body">
                     <p>您的每一分钱都会让<strong>Gotit</strong>做的更好!</p>
+                    {% if alert.donate %}{{ alert.donate }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/donate.html#names" class="btn btn-default btn-block">Go</a>

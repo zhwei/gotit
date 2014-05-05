@@ -1,11 +1,16 @@
-{% extends "base-new.html" %}
+{% extends "base-search.html" %}
 {% block title %}Got it--正方教务系统查询工具{% endblock %}
 
 {% block content %}
 
     <div class="search-area col-lg-5">
         <p class="search-title">正方教务系统</p>
-
+            {% if alert.zheng %}
+                <div class="alert alert-dismissable alert-info">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    <strong>Heads up!</strong> {{- alert.zheng }}
+                </div>
+            {% endif %}
         <form name="main" method="post" accept-charset="utf-8" class="search-form">
 
             <p><input type="text" id="xh" name="xh" class="form-control" placeholder="学号" autofocus/></p>

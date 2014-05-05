@@ -46,7 +46,7 @@ def safe_get(*args, **kwargs):
         _req = requests.get(*args, **kwargs)
         not_error_page(_req.text)
     except requests.ConnectionError:
-        raise errors.ZfError('无法连接到正方教务系统')
+        raise errors.RequestError('无法连接到正方教务系统')
     return _req
 
 def safe_post(*args, **kwargs):
@@ -54,14 +54,20 @@ def safe_post(*args, **kwargs):
         _req = requests.post(*args, **kwargs)
         not_error_page(_req.text)
     except requests.ConnectionError:
-        raise errors.ZfError('无法连接到正方教务系统')
+        raise errors.RequestError('无法连接到正方教务系统')
     return _req
 
 def get_viewstate(page):
     """get __VIEWSTATE
     """
-    com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
-    return com.findall(page)[0]
+    try:
+        com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
+        vs = com.findall(page)[0]
+    except IndexError:
+        import time
+        rds.hset('error_get_vs_indexerror', time.time(), page)
+        raise errors.PageError("请求错误, 请重新查询")
+    return vs
 
 
 class ZF:
