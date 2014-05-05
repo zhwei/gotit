@@ -7,7 +7,7 @@
 COOKIES_TIME_OUT = 600000
 
 # 网站运行模式
-debug_mode = True
+debug_mode = False
 
 domains = {
     "main": "gotit.asia",
