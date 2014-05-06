@@ -328,7 +328,7 @@ class ProcessMsg(object):
 
 urls = (
         '/', 'WeixinIndex',
-        '/weixin', 'WeixinInterface',
+        '/weixin', 'WeChatInterface',
         )
 
 app = web.application(urls, locals())
@@ -337,12 +337,13 @@ class WeixinIndex:
 
     @redis_memoize('weixin')
     def GET(self):
-        from web.contrib.template import render_jinja
-        render = render_jinja('templates', encoding='utf-8')
-        from addons.config import domains
-        return render.weixin(domains=domains)
+        from mainsite import render
+        # from web.contrib.template import render_jinja
+        # render = render_jinja('templates', encoding='utf-8')
+        # from addons.config import domains
+        return render.weixin()
 
-class WeixinInterface(BaseMsg, ProcessMsg):
+class WeChatInterface(BaseMsg, ProcessMsg):
 
     def GET(self):
         #获取输入参数
