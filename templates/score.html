@@ -7,10 +7,10 @@
 
         <p class="search-title">成绩查询系统</p>
         {% if alert.score %}
-        <div class="alert alert-dismissable alert-info">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            {{ alert.score }}
-        </div>
+            <div class="alert alert-dismissable alert-info">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                {{ alert.score }}
+            </div>
         {% endif %}
         <form name="main" method="post" accept-charset="utf-8" class="search-form">
             {%- if not form.valid -%}
@@ -18,8 +18,9 @@
             {%- endif -%}
 
             {%- for d in form.inputs -%}
-                <p><input type="{{ d.get_type() }}" id="{{ d.id }}" name="{{ d.name }}" class="form-control"
-                       placeholder="{{ d.description }}" {%- if loop.first -%}autofocus{%- endif -%}/></p>
+                <p><input type="number" id="{{ d.id }}" name="{{ d.name }}" class="form-control"
+                          placeholder="{{ d.description }}" {%- if loop.first -%}autofocus{%- endif -%} />
+                </p>
             {%- endfor -%}
 
             <div class="search-control">

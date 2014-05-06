@@ -52,9 +52,7 @@ session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})
 from addons.config import domains
 render = render_jinja('templates', encoding='utf-8',
                       globals=dict(context=session,domains=domains,
-                            alert=PageAlert(),
-                            ))
-
+                            alert=PageAlert(),))
 
 # init mongoDB
 mongo = mongo2s.init_mongo()

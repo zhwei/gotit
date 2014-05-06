@@ -62,7 +62,15 @@
               </li>
               <li ><a href="/single/info"><strong>Single</strong></a></li>
               <li ><a href="/backup"><i class="glyphicon glyphicon-cloud-upload"></i>网站备份</a></li>
-              <li ><a href="/readlog/1"><i class="glyphicon glyphicon-eye-open"></i>网站日志</a></li>
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="glyphicon glyphicon-eye-open"></i>&nbsp;网站日志<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li ><a href="/readlog/stderr/1">&nbsp;StdErr</a></li>
+                    <li ><a href="/readlog/stdout/1">&nbsp;StdOut</a></li>
+                    <li ><a href="/readlog/nginx_error/1">&nbsp;Nginx_Error</a></li>
+                    <li ><a href="/readlog/nginx_access/1">&nbsp;Nginx_Access</a></li>
+                </ul>
+              </li>
               <li ><a href="/de"><i class="glyphicon glyphicon-eye-close"></i>DetailError</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">

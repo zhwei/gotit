@@ -31,9 +31,8 @@ def get_unique_key(prefix=None):
 
     import time
     import md5
-    if prefix:
-        key = "{}_{}".format(prefix, md5.md5(str(time.time())).hexdigest())
     key = md5.md5(str(time.time())).hexdigest()
+    if prefix: key = "{}_{}".format(prefix, key)
     return key
 
 LEVELS = {

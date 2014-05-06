@@ -55,7 +55,7 @@ urls = (
     '/backup/(.+)', 'backup',
     '/backup', 'backup',
 
-    '/readlog/(.+)', 'readlog',
+    '/readlog/(\w+)/(.+)', 'readlog',
 
     '/o/(.+)/(.+)/(.+)', 'update',
     '/o/(.+)/(.+)', 'update',
@@ -74,7 +74,7 @@ urls = (
 app = web.application(urls, locals())
 
 # session
-session = web.session.Session(app, RedisStore(), {'count': 0,})
+session = web.session.Session(app, RedisStore(markup='MANAGE_'), {'count': 0,})
 
 class ologin:
 
@@ -165,8 +165,8 @@ class readlog:
     """ 查看网站日志
     """
 
-    def readfile(self, line):
-        log_pwd = rds.get('log_file_path')
+    def readfile(self, fi, line):
+        log_pwd = rds.hget('log_file_path', fi)
         with open(log_pwd) as fi:
             all_lines = fi.readlines()
             counts = len(all_lines)
@@ -174,9 +174,9 @@ class readlog:
                 if lno >= counts-int(line)*50:
                     yield li
 
-    def GET(self, line):
+    def GET(self, fi, line=1):
         try:
-            lines = self.readfile(line)
+            lines = self.readfile(fi, line)
             return render.panel(item=None, opera='readlog', lines=lines)
         except IOError:
             return render.panel(alert="没有找到日志文件, pwd=[{}]".format(rds.get('log_file_path')))

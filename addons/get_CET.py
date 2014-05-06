@@ -101,8 +101,8 @@ class CET:
             ret['class']=res[6]     #班级
             ret['foreign']=res[11]  #外语类型
         except:
-            logging.error("cannot get info")
-            return -1
+            rds.hset('error_score_cant_get_info', num, page)
+            raise errors.PageError('找不到您的成绩单!')
         total = (len(res)-13)/7
         cet_num=[]      #四六级考号
         cet_time=[]     #四六级考试时间

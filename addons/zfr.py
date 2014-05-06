@@ -211,11 +211,11 @@ class Login:
             '__VIEWSTATE': _viewstate,
             'btnDl': '登 录',
         }
-        _req = safe_post(
-                url=self.login_url,
-                data=data,
-                cookies = _req1.cookies,
-                headers=self.headers)
+        safe_post(
+            url=self.login_url,
+            data=data,
+            cookies = _req1.cookies,
+            headers=self.headers)
 
         uid = get_unique_key('user')
         pickled_cookies = pickle.dumps(self.cookies)

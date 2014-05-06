@@ -61,9 +61,8 @@ class GPA:
             GPA.__ret["foreign"] = GPA.__table[11]  #外语
             return 0
         except:
-            logging.error("cannot get info of %s"%GPA.__num)
             rds.hset('error_score_cant_get_info', self.__num, self.page)
-            return -1
+            raise errors.PageError('找不到您的成绩单!')
 
 
     def __get_score_info(self):
@@ -105,8 +104,10 @@ class GPA:
             u'中等':73,
             u'中':73,
             u'及格':62,
+            u'及':62,
             u'不及格':0,
             u'缺考':0,
+            u'缺':0,
             u'禁考':0,
             u'退学':0,
             u'缓考（时':0,
@@ -116,6 +117,7 @@ class GPA:
             u'作弊':0,
             u'取消':0,
             u'免修':60,
+            u'已修': 60,
             u'免考':60,
             '-':0,
             '':0
@@ -128,9 +130,7 @@ class GPA:
                 num = float(text)
                 return num
             except:
-                logging.error("cannot change %s into number"%text)
-                # store the error pages in redis
-                rds.hset('error_score_page', self.__num, self.page)
+                rds.hset('error_score_page', "{}+{}".format(self.__num, text), self.page)
                 return -1
 
     def __calc_score(self):
