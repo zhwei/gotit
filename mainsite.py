@@ -258,6 +258,8 @@ class FormerCET:
         try:
             table=get_former_cet(xh)
             return render.result(table=table)
+        except errors.PageError, e:
+            return render.alert_err(error=e.value, url='/cet/former')
         except errors.RequestError, e:
             return render.serv_err(err=e)
 
