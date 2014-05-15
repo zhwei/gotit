@@ -29,9 +29,8 @@ class PageAlert(object):
 
 def get_unique_key(prefix=None):
 
-    import time
-    import md5
-    key = md5.md5(str(time.time())).hexdigest()
+    import uuid
+    key = uuid.uuid4().hex
     if prefix: key = "{}_{}".format(prefix, key)
     return key
 
