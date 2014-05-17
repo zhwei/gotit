@@ -4,6 +4,8 @@ Got it
 
 [http://gotit.asia](http://gotit.asia)
 
+帮助使用校外网的同学使用正方教务系统， 以及计算学分绩点等其他功能。
+
 ##组件
 
 + 在线查询系统
