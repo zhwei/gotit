@@ -265,13 +265,13 @@ def internalerror():
     web.ctx.status = "500"
     return web.internalerror(base.json_response(message="Internal Error"))
 
-def incr_key(key, expire):
+def incr_key(key, expire=False):
     """ 如果存在则++，不存在则设为0 """
     if rds.exists(key): rds.incr(key)
     else:
         rds.set(key, 0)
-        rds.expire(key, expire)
-    return int(rds.get(key))
+        if expire: rds.expire(key, expire)
+    return int(rds.get(key) or 0)
 
 def limit_processor(handler):
 
@@ -289,17 +289,17 @@ def limit_processor(handler):
                 _key = "token_{}".format(token)
                 _day_key = "token_day_{}".format(token)
                 _total_key = "token_total_{}".format(token)
-                if incr_key(_key) < API_TRIES_LIMIT:
+                if incr_key(_key, API_TIME_LIMIT) < API_TRIES_LIMIT:
                     incr_key(_day_key, 3600*24) # day
-                    incr_key(_total_key, -1)    # total
+                    incr_key(_total_key)    # total
                     return handler()
-                incr_key("tries_limit", -1)
+                incr_key("tries_limit")
                 return base.json_response(message="Tries Limit")
             else:
                 raise KeyError
         except KeyError:
             web.ctx.status = "401"
-            incr_key("no_access_token", -1)
+            incr_key("no_access_token")
             return base.json_response(message="No ACCESS_TOKEN SET")
     else:
         return handler()
