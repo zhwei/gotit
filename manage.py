@@ -219,12 +219,22 @@ class update:
     item_list = ['donate', 'notice', 'wxcomment', 'developer']
     opera_list = ['cr', 'del', 'ls']
 
+    def get_counts(self, token):
+
+        _day_key = "token_day_{}".format(token)
+        _total_key = "token_total_{}".format(token)
+
+        return rds.get(_day_key), rds.get(_total_key)
+
     def GET(self, opera, item, oid=None):
 
         if item in self.item_list and opera in self.opera_list:
 
             if opera == 'ls':
                 ls = db[item].find().sort("datetime",-1)
+                if item == "developer":
+                    for _i in item:
+                        _i['day'], _i['total'] = self.get_counts(_i['token'])
                 return render.panel(item=item, opera=opera, ls=ls)
 
         return render.panel(item=item, opera=opera, oid=oid)

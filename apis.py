@@ -265,6 +265,14 @@ def internalerror():
     web.ctx.status = "500"
     return web.internalerror(base.json_response(message="Internal Error"))
 
+def incr_key(key, expire):
+    """ 如果存在则++，不存在则设为0 """
+    if rds.exists(key): rds.incr(key)
+    else:
+        rds.set(key, 0)
+        rds.expire(key, expire)
+    return int(rds.get(key))
+
 def limit_processor(handler):
 
     @redis_memoize("developer")
@@ -277,21 +285,21 @@ def limit_processor(handler):
         try:
             token = web.ctx.environ["HTTP_ACCESSTOKEN"]
             if token in developer_list():
-                # 次数限制 todooooooo
+                # times limit
                 _key = "token_{}".format(token)
-                if rds.exists(_key):
-                    if int(rds.get(_key)) < API_TRIES_LIMIT:
-                        rds.incr(_key)
-                    else:
-                        return base.json_response(message="Tries Limit")
-                else:
-                    rds.set(_key, 1)
-                    rds.expire(_key, API_TIME_LIMIT)
-                return handler()
+                _day_key = "token_day_{}".format(token)
+                _total_key = "token_total_{}".format(token)
+                if incr_key(_key) < API_TRIES_LIMIT:
+                    incr_key(_day_key, 3600*24) # day
+                    incr_key(_total_key, -1)    # total
+                    return handler()
+                incr_key("tries_limit", -1)
+                return base.json_response(message="Tries Limit")
             else:
                 raise KeyError
         except KeyError:
             web.ctx.status = "401"
+            incr_key("no_access_token", -1)
             return base.json_response(message="No ACCESS_TOKEN SET")
     else:
         return handler()
