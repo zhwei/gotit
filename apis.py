@@ -18,6 +18,7 @@ from addons.mongo2s import init_mongo
 from addons.data_factory import KbJson, get_score_dict
 from addons import errors
 from addons.autocache import redis_memoize
+from addons.utils import incr_key
 
 render = render_jinja('templates', encoding='utf-8')
 
@@ -264,14 +265,6 @@ def internalerror():
     base = BaseApiMixin()
     web.ctx.status = "500"
     return web.internalerror(base.json_response(message="Internal Error"))
-
-def incr_key(key, expire=False):
-    """ 如果存在则++，不存在则设为0 """
-    if rds.exists(key): rds.incr(key)
-    else:
-        rds.set(key, 0)
-        if expire: rds.expire(key, expire)
-    return int(rds.get(key) or 0)
 
 def limit_processor(handler):
 

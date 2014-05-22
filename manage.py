@@ -157,6 +157,7 @@ class analytics:
                 'session': redis2s.get_count('SESSION*'),
                 '用户': redis2s.get_count('user*'),
                 "cache": redis2s.get_count("cache_*"),
+                "zhe800": rds.get('ad_count_zhe800'),
             }
         return render.panel(item=None, opera='analytics',
                             data=data)

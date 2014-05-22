@@ -21,6 +21,7 @@ from addons.autocache import redis_memoize
 from addons import get_former_cet, get_book
 from addons.RedisStore import RedisStore
 from addons.utils import get_score_gpa, PageAlert
+from addons.utils import incr_key
 from forms import cet_form, xh_form, login_form
 
 
@@ -40,6 +41,8 @@ urls = (
     '/help/gpa.html', 'help_gpa',
     '/comment.html', 'comment',
     '/donate.html', 'donate',
+
+    '/ad/(.+)', 'ad',
 )
 
 # main app
@@ -350,6 +353,17 @@ class notice:
         news = mongo.notice.find().sort("datetime",-1)
         return render.notice(news=news)
 
+class ad:
+
+    def GET(self, ad_name):
+        link_dict = {
+            'zhe800': 'http://campus.tuan800.com/campus/promotion/download/zhe800/431332.apk',
+        }
+        try:
+            incr_key('ad_count_zhe800')
+            raise web.seeother(link_dict[ad_name])
+        except KeyError:
+            raise web.notfound()
 
 # 赞助页面
 

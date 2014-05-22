@@ -115,3 +115,12 @@ def zipf2strio(foldername, includeEmptyDIr=True):
         empty_dirs = []
     zip.close()
     return fi
+
+
+def incr_key(key, expire=False):
+    """ 如果存在则++，不存在则设为0 """
+    if rds.exists(key): rds.incr(key)
+    else:
+        rds.set(key, 0)
+        if expire: rds.expire(key, expire)
+    return int(rds.get(key) or 0)
