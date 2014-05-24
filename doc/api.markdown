@@ -42,7 +42,7 @@ _以后正方系统可能屏蔽此登录方式_
 + 功能  
 登录后可以直接获取下面所有接口的结果, 仅需要提供用户识别码(UID)
 + 接口地址  
-[/user/login.json?nocode=true](http://api.gotit.asia/user/nocode/login.json?nocode=true)
+[/user/login.json?nocode=true](http://api.gotit.asia/user/login.json?nocode=true)
 + 请求方式  
 `POST`
 + POST示例
