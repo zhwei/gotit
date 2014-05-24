@@ -229,6 +229,9 @@ class CurrentSemester(BaseApiMixin, BaseGet):
             return self.json_response(data)
         except errors.PageError, e:
             return self.json_response({}, message=e.value)
+        except KeyError, e:
+            web.ctx.status = "400"
+            return self.json_response(message="KeyError: %s" % e)
 
 class GPAHandler(BaseApiMixin):
     """ 获取全部成绩或者学分绩点 """

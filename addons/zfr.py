@@ -118,7 +118,10 @@ class ZF:
 
     def get_checkcode(self, uid):
 
-        pickled = base64.decodestring(rds.hget(uid, 'cookies'))
+        try:
+            pickled = base64.decodestring(rds.hget(uid, 'cookies'))
+        except TypeError:
+            raise errors.PageError("请求错误, 请重新查询")
         self.cookies = pickle.loads(pickled)
         rds.pexpire(uid, config.COOKIES_TIME_OUT) # 延时
         # get checkcode
