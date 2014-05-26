@@ -138,11 +138,14 @@ class ProcessMsg(object):
     def get_former_cet(self, xh):
         """获取往年四六级成绩"""
         cet = CET()
-        _dic = cet.get_cet_dict(xh)
-        ret = ""
-        for i in range(_dic.get('total')):
-            ret += "<{}-{}>  {}\n".format(_dic['cet_time'][i][:6],
-                    _dic['cet_type'][i], _dic['cet_score'][i])
+        try:
+            _dic = cet.get_cet_dict(xh)
+            ret = ""
+            for i in range(_dic.get('total')):
+                ret += "<{}-{}>  {}\n".format(_dic['cet_time'][i][:6],
+                        _dic['cet_type'][i], _dic['cet_score'][i])
+        except errors.PageError, e:
+            ret = e
         return ret
 
     def get_zf_score(self, t):

@@ -127,7 +127,10 @@ class checkcode:
                 return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
         web.header('Content-Type','image/gif')
         zf = ZF()
-        image_content = zf.get_checkcode(uid)
+        try:
+            image_content = zf.get_checkcode(uid)
+        except errors.PageError, e:
+            pass
         return image_content
 
 class more:
