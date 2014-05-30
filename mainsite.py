@@ -129,9 +129,9 @@ class checkcode:
         zf = ZF()
         try:
             image_content = zf.get_checkcode(uid)
+            return image_content
         except errors.PageError, e:
             pass
-        return image_content
 
 class more:
     """连续查询 二次查询
