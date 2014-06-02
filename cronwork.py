@@ -64,7 +64,8 @@ class GotitAPI:
                     score, _mark = {"STATUS":u"暂无成绩"}, False
                 else: _mark = True
                 new_hash = get_sha(score)
-                if new_hash != _user.get('score_hash', None                    if send_dict_email([_email], score):
+                if new_hash != _user.get('score_hash', None):
+                    if send_dict_email([_email], score):
                         if _mark:
                             mongod.users.update({'_id':ObjectId(_user['_id'])},
                               {'$set':{"score_hash": new_hash,
