@@ -31,6 +31,7 @@
                 </div>
                 <div class="panel-body">
                     <p>查询本学期最新成绩, 最新课表, 考试时间</p>
+                    <p>无验证码登录</p>
                     {% if alert.nocode %}{{ alert.nocode }}{% endif %}
                 </div>
                 <div class="panel-footer">
@@ -75,7 +76,7 @@
             </div>
         </div>
         <div class="col-lg-4">
-            <div class="panel panel-danger">
+            <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">赞助商&middot;折800&nbsp;APP</h3>
                 </div>
@@ -108,8 +109,33 @@
                     <a href="http://{{ domains.main }}/404" class="btn btn-default btn-block">Go</a>
                 </div>
             </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">网站赞助者</h3>
+                </div>
+                <div class="panel-body">
+                    <p>您的每一分钱都会让<strong>Gotit</strong>做的更好!</p>
+                    {% if alert.donate %}{{ alert.donate }}{% endif %}
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/donate.html#names" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
         </div>
         <div class="col-lg-4">
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <h3 class="panel-title">成绩推送服务</h3>
+                </div>
+                <div class="panel-body">
+                    <p>系统每十分钟查询为您查询一次成绩，如果成绩更新则发送邮件到设定的邮箱！</p>
+                    <p>感谢大家的支持！</p>
+                    {% if alert.cron %}{{ alert.cron }}{% endif %}
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/cron.html" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">微信公众帐号</h3>
@@ -134,18 +160,7 @@
                     <a href="http://{{ domains.main }}/score" class="btn btn-default btn-block">Go</a>
                 </div>
             </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">网站赞助者</h3>
-                </div>
-                <div class="panel-body">
-                    <p>您的每一分钱都会让<strong>Gotit</strong>做的更好!</p>
-                    {% if alert.donate %}{{ alert.donate }}{% endif %}
-                </div>
-                <div class="panel-footer">
-                    <a href="http://{{ domains.main }}/donate.html#names" class="btn btn-default btn-block">Go</a>
-                </div>
-            </div>
+
         </div>
     </div>
 </div>

@@ -6,6 +6,7 @@ import datetime
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
+import logging
 
 import web
 from web import ctx
@@ -68,7 +69,11 @@ urls = (
     '/de/(.+)', 'DetailError',
     '/de', 'DetailError',
 
-    'developer/(\w+)', 'Developer',
+    '/developer/(\w+)', 'Developer',
+
+    '/users', 'UserManage',
+    '/users/(\w+)', 'UserManage',
+    '/users/(\w+)/(\w+)', 'UserManage',
 )
 
 app = web.application(urls, locals())
@@ -123,6 +128,7 @@ def pre_request():
         try:
             if session.uid != ADMIN_WEIBO_ID:
                 raise web.seeother('/')
+            web.header("Cache-Control", "no-cache")
         except AttributeError:
             raise web.seeother('/')
 
@@ -336,5 +342,57 @@ class DetailError:
         return render.panel(item=False, opera='detail_error',
             key=key, hkey=hkey, key_list=key_list, content=content)
 
+class UserManage:
+
+
+    def GET(self, action="list", user_id=None):
+
+        user_list = log_list = cuser = None
+        if action == "list":
+            user_list = db.users.find().sort('created_date', -1)
+        if action in ("detail", "update", "delete", "log") and user_id:
+            cuser = db.users.find_one({'_id':ObjectId(user_id)})
+        if action == "log":
+            log_list = db.CronLog.find({"user_id": ObjectId(user_id)}).sort('created_date', -1).limit(77)
+        if action.endswith("active"):
+            # active or deactive
+            _t = True if action == "active" else False
+            logging.error(_t)
+            db.users.update({'_id':ObjectId(user_id)},
+                      {'$set':{'active': _t,
+                        'updated_date': datetime.datetime.now(),}},)
+            raise web.redirect("/users/detail/%s" % user_id)
+        return render.user(action=action, user_list=user_list,
+                           cuser=cuser, log_list=log_list)
+
+    def POST(self, action="create", user_id=None):
+
+        data = web.input()
+        if action == "create":
+            db["users"].insert({
+                'name': data['name'],
+                'email' : data["email"],
+                'xh': data['xh'],
+                'pw': data['pw'],
+                'alipay': data['alipay'],
+                'created_date': datetime.datetime.now(),
+                'updated_date': datetime.datetime.now(),
+            })
+        elif action == "update":
+            db.users.update({'_id':ObjectId(user_id)},
+                      {'$set':{
+                        'name': data['name'],
+                        'email' : data["email"],
+                        'xh': data['xh'],
+                        'pw': data['pw'],
+                        'alipay': data['alipay'],
+                        'updated_date': datetime.datetime.now(),}
+                      },)
+            raise web.redirect("/users/detail/%s" % user_id)
+        elif action == "delete":
+            db.users.remove({"_id":ObjectId(data['user_id'])})
+            db.CronLog.remove({"user_id": ObjectId(data['user_id'])})
+
+        raise web.redirect("/users")
 
 app.add_processor(web.loadhook(pre_request))

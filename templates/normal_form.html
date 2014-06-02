@@ -7,16 +7,19 @@
     <div class="search-area col-lg-5">
         <p class="search-title">{{ title }}</p>
         <form name="main" method="post" accept-charset="utf-8" class="search-form">
-            {% if not form.valid %}
-                <p class="alert alert-danger">输入错误:</p>
+            {% if not form.valid and form.note %}
+                <p class="alert alert-danger">{{ form.note }}</p>
             {% endif %}
             {% for d in form.inputs %}
                 <p><input type="{{ d.get_type() }}" id="{{ d.id }}" name="{{ d.name }}" class="form-control"
                           placeholder="{{ d.description }}" {% if loop.first %}autofocus{% endif %}/></p>
+                {% if d.note %}
+                    <p class="help-block">{{ d.note }}</p>
+                {% endif %}
             {% endfor %}
 
             <div class="search-control">
-                <button type="submit" class="btn btn-primary">查询</button>
+                <button type="submit" class="btn btn-primary">提交</button>
                 <button type="reset" class="btn">重置</button>
             </div>
         </form>

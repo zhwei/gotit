@@ -7,7 +7,7 @@
 COOKIES_TIME_OUT = 600000
 
 # 网站运行模式
-debug_mode = False
+debug_mode = True
 
 domains = {
     "main": "gotit.asia",
@@ -34,3 +34,9 @@ zf_url = "http://210.44.176.132/"
 # url中是否有随机字符串
 random = False
 
+# Send Mail
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'postmaster@sandbox9302.mailgun.org'
+EMAIL_HOST_PASSWORD = '4f9tbvwp2cu2'
+DEFAULT_FROM_EMAIL = 'noreply@gotit.asia'
