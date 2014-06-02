@@ -2,29 +2,28 @@
 # -*- coding: utf-8 -*-
 
 import json
-from urlparse import urljoin
 import logging
 import datetime
 import gevent
 import gevent.monkey
 from gevent.queue import Queue, Empty
 gevent.monkey.patch_socket()
+from urlparse import urljoin
 
 import requests
 from bson import ObjectId
 
 from addons.mongo2s import mongod
 from addons.utils import send_mail
+from addons.config import CRON_TOKEN
 
 class GotitAPI:
 
-    headers={
-            'accesstoken':'203ccbb1c5d05d2a58bf6d81e68fb9b2'
-        }
+    headers={'accesstoken': CRON_TOKEN,}
 
     def get_url(self, url):
         """ Get target url """
-        base_url = "http://api.t.gotit.asia/"
+        base_url = "http://api.gotit.asia/"
         return urljoin(base_url, url)
 
     def __init__(self):
@@ -60,32 +59,36 @@ class GotitAPI:
             score_dict = self.get_score(_xh, _pw)
             score_message = score_dict['status']['message']
             if score_message == "Success":
-                mongod.users.update({'_id':ObjectId(_user['_id'])},
-                          {'$set':{
-                              "score_status": score_message,
-                              'last_fetch': datetime.datetime.now(),}
-                          },)
                 score = score_dict.get('data', None)
+                if not score:
+                    score, _mark = {"STATUS":u"暂无成绩"}, False
+                else: _mark = True
                 new_hash = get_sha(score)
-                if new_hash != _user.get('score_hash', None):
-                    mongod.users.update({'_id':ObjectId(_user['_id'])},
-                      {'$set':{
-                          "score_hash": new_hash,
-                          'last_fetch': datetime.datetime.now(),}
-                      },)
-                    if send_dict_email([_email], score):
-                        user_log(_user['_id'], "Score", "OK","Success", thread_name)
+                if new_hash != _user.get('score_hash', None                    if send_dict_email([_email], score):
+                        if _mark:
+                            mongod.users.update({'_id':ObjectId(_user['_id'])},
+                              {'$set':{"score_hash": new_hash,
+                                  "score_status": score_message,
+                                  'last_fetch': datetime.datetime.now(),}},)
+                            user_log(_user['_id'], "Score", "OK","Success", thread_name)
+                        else:
+                            mongod.users.update({'_id':ObjectId(_user['_id'])},
+                              {'$set':{"score_hash": new_hash,
+                                  "score_status": "NO SCORE",
+                                  'last_fetch': datetime.datetime.now(),}},)
+                            user_log(_user['_id'], "Score", "EMPTY", "NO SCORE", thread_name)
                 else:
+                    mongod.users.update({'_id':ObjectId(_user['_id'])},
+                          {'$set':{"score_status": "Not Change",
+                              'last_fetch': datetime.datetime.now(),}},)
                     user_log(_user['_id'], "Score", "PASS", "Not Change", thread_name)
             else:
                 if score_message != _user.get('score_status', None):
                     mongod.users.update({'_id':ObjectId(_user['_id'])},
-                          {'$set':{
-                              "score_status": score_message,
-                              'last_fetch': datetime.datetime.now(),}
-                          },)
+                          {'$set':{"score_status": score_message,
+                              'last_fetch': datetime.datetime.now(),}},)
                     send_dict_email([_email],
-                        data={"Error Message":score_message})
+                        data={"Error Message": score_message})
                     user_log(_user['_id'], "Score", "ERROR_SEND", score_message, thread_name)
                 else:
                     user_log(_user['_id'], "Score", "ERROR_PASS",score_message, thread_name)
@@ -113,20 +116,24 @@ def get_sha(words):
     import hashlib
     return hashlib.sha224(str(words).encode('utf-8')).hexdigest()
 
-tasks = Queue(maxsize=10)
 
 def boss():
     """ 从mongo中获取用户创建任务，放入Queue
     Queue最大容量为10, 等于10时阻塞
     """
+    global tasks
     for t in mongod.users.find({"active": True}):
         task = {'action':'score', 'user': t}
         tasks.put(task)
+        print("Create task %s[%s]" % (t['name'], task['action']))
 
 def worker(thread_name):
+    print("I am Worker %s" % thread_name)
+    global tasks
     try:
         while True:
             task = tasks.get(timeout=1)
+            print("%s Processing %s" % (thread_name, task['user']['name']))
             if task['action'] == "score":
                 gotit = GotitAPI()
                 gotit.score_task(task, thread_name)
@@ -135,10 +142,19 @@ def worker(thread_name):
             else:
                 gevent.sleep(0)
     except Empty:
+        print("%s QUITING time" % thread_name)
         pass
 
-gevent.spawn(boss).join()
-threads = []
-for w in ('Tom', 'Jerry', 'Obama'):
-    threads.append(gevent.spawn(worker, w))
-gevent.joinall(threads)
+def control():
+    global tasks
+    tasks = Queue(maxsize=10)
+
+    gevent.spawn(boss).join()
+    threads = []
+    for w in ('Tom', 'Jerry', 'Obama'):
+        threads.append(gevent.spawn(worker, w))
+    gevent.joinall(threads)
+
+if __name__ == '__main__':
+    print("Cron Work Start")
+    control()

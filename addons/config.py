@@ -40,3 +40,5 @@ EMAIL_PORT = 25
 EMAIL_HOST_USER = 'postmaster@sandbox9302.mailgun.org'
 EMAIL_HOST_PASSWORD = '4f9tbvwp2cu2'
 DEFAULT_FROM_EMAIL = 'noreply@gotit.asia'
+
+CRON_TOKEN = "be82ee8d0ca34ebcb18c955642c8ad29"

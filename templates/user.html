@@ -10,7 +10,7 @@
             <form role="form" method="post">
                 <div class="form-group">
                     <label for="exampleInputEmail1">Real Name</label>
-                    <input type="text" name="name" value="{% if cuser %}{{ cuser.name }}{% endif %} "
+                    <input type="text" name="name" value="{% if cuser %}{{ cuser.name|e }}{% endif %} "
                            class="form-control" id="exampleInputEmail1" placeholder="Real Name">
                 </div>
                 <div class="form-group">
@@ -52,7 +52,7 @@
                     <th>Name</th>
                     <th>Number</th>
                     <th>Email</th>
-                    <th>Ali-Pay</th>
+                    <th>Status</th>
                     <th>Created Date</th>
                     <th>Action</th>
                 </tr>
@@ -60,11 +60,11 @@
                 <tbody>
                 {% for user in user_list %}
                     <tr {% if not user.active %}class="active"{% endif %} >
-                        <td><a href="/users/detail/{{ user._id }}">{{ user.name }}</a></td>
-                        <td><a href="/users/detail/{{ user._id }}">{{ user.xh }}</a></td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.alipay }}</td>
-                        <td>{{ user.created_date }}</td>
+                        <td><a href="/users/detail/{{ user._id }}">{{ user.name|e }}</a></td>
+                        <td><a href="/users/detail/{{ user._id }}">{{ user.xh|e }}</a></td>
+                        <td>{{ user.email|e }}</td>
+                        <td>{{ user.score_status|truncate(9, True) }}</td>
+                        <td>{{ user.created_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                         <td>
                             <a href="/users/log/{{ user._id }}" class="btn btn-xs btn-primary">Log</a>
                             <a href="/users/update/{{ user._id }}" class="btn btn-xs btn-info">Update</a>
@@ -85,19 +85,23 @@
                 <tbody>
                 <tr>
                     <th>Name</th>
-                    <td>{{ cuser.name }}</td>
+                    <td>{{ cuser.name|e }}</td>
                 </tr>
                 <tr>
                     <th>Email</th>
-                    <td>{{ cuser.email }}</td>
+                    <td>{{ cuser.email|e }}</td>
                 </tr>
                 <tr>
-                    <th>Ali-Pay</th>
-                    <td>{{ cuser.alipay }}</td>
+                    <th>Number</th>
+                    <td>{{ cuser.xh|e }}</td>
                 </tr>
                 <tr>
                     <th>Password</th>
                     <td>******</td>
+                </tr>
+                <tr>
+                    <th>Ali-Pay</th>
+                    <td>{{ cuser.alipay|e }}</td>
                 </tr>
                 <tr>
                     <th>Score Status</th>
@@ -154,10 +158,14 @@
         <hr/>
         <table class="table table-bordered table-responsive">
             <tr>
-                <th>{{ cuser.name }}</th>
+                <th><a href="/users/detail/{{ cuser._id }}">{{ cuser.name|e }}</a></th>
                 <td>{{ cuser.score_status }}</td>
                 <td>{{ cuser.last_fetch }}</td>
-                <td><a href="/users/detail/{{ cuser._id }}" class="btn btn-sm btn-default">返回用户</a></td>
+                <td>
+                    <a href="/users/detail/{{ cuser._id }}" class="btn btn-xs btn-default">返回</a>
+                    <a href="/users" class="btn btn-xs btn-default">List</a>
+                    <a href="/users/log/{{ cuser._id }}" class="btn btn-xs btn-default">ALL Logs</a>
+                </td>
             </tr>
         </table>
         <table class="table table-bordered table-responsive">
@@ -173,11 +181,11 @@
             <tbody>
             {% for log in log_list %}
             <tr>
-                <td>{{ log.item }}</td>
-                <td>{{ log.status }}</td>
-                <td>{{ log.message }}</td>
-                <td>{{ log.thread_name }}</td>
-                <td><span class="label label-info">{{ log.created_date }}</span></td>
+                <td><a href="/users/log/{{ cuser._id }}?key=item&value={{ log.item }}">{{ log.item }}</a></td>
+                <td><a href="/users/log/{{ cuser._id }}?key=status&value={{ log.status }}">{{ log.status }}</a></td>
+                <td><a href="/users/log/{{ cuser._id }}?key=message&value={{ log.message }}">{{ log.message }}</a></td>
+                <td><a href="/users/log/{{ cuser._id }}?key=thread_name&value={{ log.thread_name }}">{{ log.thread_name }}</a></td>
+                <td><span class="" style="font-size: 13.5px;">{{ log.created_date.strftime('%Y-%m-%d %H:%M:%S') }}</span></td>
             </tr>
             {% endfor %}
             </tbody>

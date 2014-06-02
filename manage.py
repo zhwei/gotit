@@ -353,7 +353,17 @@ class UserManage:
         if action in ("detail", "update", "delete", "log") and user_id:
             cuser = db.users.find_one({'_id':ObjectId(user_id)})
         if action == "log":
-            log_list = db.CronLog.find({"user_id": ObjectId(user_id)}).sort('created_date', -1).limit(77)
+            PAGE_LIMIT = 77
+            _k = web.input(_method="GET").get('key', None)
+            _v = web.input(_method="GET").get('value', None)
+            if _k and _v:
+                log_list = db.CronLog.find({
+                        "user_id": ObjectId(user_id),
+                        _k: _v,
+                    }).sort('created_date', -1).limit(PAGE_LIMIT)
+            else:
+                log_list = db.CronLog.find({"user_id": ObjectId(user_id)
+                    }).sort('created_date', -1).limit(PAGE_LIMIT)
         if action.endswith("active"):
             # active or deactive
             _t = True if action == "active" else False
@@ -375,6 +385,7 @@ class UserManage:
                 'xh': data['xh'],
                 'pw': data['pw'],
                 'alipay': data['alipay'],
+                'active': True,
                 'created_date': datetime.datetime.now(),
                 'updated_date': datetime.datetime.now(),
             })
