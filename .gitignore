@@ -17,6 +17,7 @@ start.sh
 .idea/*
 initial_data.py
 *.swp
+addons/config.py
 
 # C extensions
 *.so

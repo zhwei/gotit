@@ -5,6 +5,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import logging
+import datetime
 
 import web
 from web.contrib.template import render_jinja
@@ -22,7 +23,7 @@ from addons import get_former_cet, get_book
 from addons.RedisStore import RedisStore
 from addons.utils import get_score_gpa, PageAlert
 from addons.utils import incr_key
-from forms import cet_form, xh_form, login_form
+from forms import cet_form, xh_form, login_form, cron_form
 
 
 urls = (
@@ -41,6 +42,7 @@ urls = (
     '/help/gpa.html', 'help_gpa',
     '/comment.html', 'comment',
     '/donate.html', 'donate',
+    '/cron.html', 'cronwork',
 
     '/ad/(.+)', 'ad',
 )
@@ -169,7 +171,7 @@ class more:
                 return render.result(tables=__dic[t]())
             raise web.notfound()
         except (AttributeError, TypeError, KeyError):
-            raise web.seeother('/zheng')
+            raise web.seeother('/zheng/nocode')
         except errors.RequestError, e:
             return render.serv_err(err=e)
         except errors.PageError, e:
@@ -301,8 +303,8 @@ class score:
     @redis_memoize('score', 100)
     def GET(self):
         form = xh_form()
-        alert=rds.get('SINGLE_score')
-        return render.score(form=form, alert=alert)
+        # alert=rds.get('SINGLE_score')
+        return render.score(form=form)
 
     def POST(self):
         form = xh_form()
@@ -377,6 +379,38 @@ class donate:
         sponsor = mongo.donate.find().sort("much",-1)
         return render.donate(sponsor=sponsor)
 
+class cronwork:
+
+    def GET(self):
+        action = web.input(_method='get').get("action", None)
+        if action and action == "apply":
+            title = "申请推送服务"
+            form = cron_form()
+            return render.normal_form(title=title, form=form)
+        return render.cronpage()
+
+    def POST(self):
+        action = web.input(_method='get').get("action", None)
+        if action and action == "apply":
+            form = cron_form()
+            if form.validates():
+                mongo["users"].insert({
+                    'name': form.d['name'],
+                    'email' : form.d["email"],
+                    'xh': form.d['xh'],
+                    'pw': form.d['pw'],
+                    # 'lib_pw': form.d['lib_pw'],
+                    'alipay': form.d['alipay'],
+                    'created_date': datetime.datetime.now(),
+                    'updated_date': datetime.datetime.now(),
+                    'active': False,
+                })
+                return render.alert_err(
+                    error='申请完成，等待管理员检查，最长24小时内答复，谢谢支持！',
+                    url='/')
+            else:
+                title = "申请推送服务"
+                return render.normal_form(title=title, form=form)
 
 # web server
 def session_hook():

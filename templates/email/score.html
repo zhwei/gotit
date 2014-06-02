@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+　   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Gotit邮件通知</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body style="margin: 0; padding: 0;">
+<h1 style="font-size: 2em;border-bottom: #2C3E50 solid 1px;margin-bottom: 15px;color: #2C3E50;">Gotit邮件通知</h1>
+
+<table style="width: 100%; max-width: 100%;margin: 0 auto;border: 1px solid #ECF0F1;border-collapse: collapse;
+border-spacing: 0;font-family: 'Lato','Helvetica Neue',Helvetica,Arial,sans-serif;font-size: 15px;line-height: 1.42857143;
+color: #2C3E50;padding: 8px;">
+    <thead style="text-align: left; font-weight: bolder">
+    <tr style="border: 1px solid #ECF0F1;border-collapse: collapse;border-spacing: 0;">
+        <th style="border: 1px solid #ECF0F1;border-collapse: collapse;border-spacing: 0;padding: 8px;">项目</th>
+        <th style="border: 1px solid #ECF0F1;border-collapse: collapse;border-spacing: 0;padding: 8px;">内容</th>
+    </tr>
+    </thead>
+    <tbody style="box-sizing: border-box;">
+        {% for object in object_list %}
+            <tr>
+                <td style="font-size: 14px;border: 1px solid #ECF0F1;border-collapse: collapse;border-spacing: 0;padding: 8px;">{{ object }}</td>
+                <td style="font-size: 14px;border: 1px solid #ECF0F1;border-collapse: collapse;border-spacing: 0;padding: 8px;">{{ object_list[object] }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>
