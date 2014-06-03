@@ -381,7 +381,6 @@ class donate:
 
 class cronwork:
 
-    @redis_memoize('cron')
     def GET(self):
         action = web.input(_method='get').get("action", None)
         if action and action == "apply":

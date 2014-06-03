@@ -18,6 +18,7 @@ start.sh
 initial_data.py
 *.swp
 addons/config.py
+addons/backup/*
 
 # C extensions
 *.so

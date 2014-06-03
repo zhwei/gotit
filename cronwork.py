@@ -126,15 +126,15 @@ def boss():
     for t in mongod.users.find({"active": True}):
         task = {'action':'score', 'user': t}
         tasks.put(task)
-        print("Create task %s[%s]" % (t['name'], task['action']))
+        logging.error("Create task %s[%s]" % (t['xh'], task['action']))
 
 def worker(thread_name):
-    print("I am Worker %s" % thread_name)
+    logging.error("I am Worker %s" % thread_name)
     global tasks
     try:
         while True:
             task = tasks.get(timeout=1)
-            print("%s Processing %s" % (thread_name, task['user']['name']))
+            logging.error("%s Processing %s" % (thread_name, task['user']['xh']))
             if task['action'] == "score":
                 gotit = GotitAPI()
                 gotit.score_task(task, thread_name)
@@ -143,7 +143,7 @@ def worker(thread_name):
             else:
                 gevent.sleep(0)
     except Empty:
-        print("%s QUITING time" % thread_name)
+        logging.error("%s QUITING time" % thread_name)
         pass
 
 def control():
@@ -157,5 +157,9 @@ def control():
     gevent.joinall(threads)
 
 if __name__ == '__main__':
-    print("Cron Work Start")
-    control()
+    while True:
+        logging.error("Cron Work Start")
+        logging.error(datetime.datetime.now())
+        control()
+        logging.error("Sleeping ...")
+        gevent.sleep(60)
