@@ -361,13 +361,11 @@ class notice:
 class ad:
 
     def GET(self, ad_name):
-        link_dict = {
-            'zhe800': 'http://campus.tuan800.com/campus/promotion/download/zhe800/431332.apk',
-        }
-        try:
-            incr_key('ad_count_zhe800')
-            raise web.seeother(link_dict[ad_name])
-        except KeyError:
+        ads = ('zhe800',)
+        if ad_name in ads:
+            incr_key('ad_count_%s' % ad_name)
+            return getattr(render, ad_name)()
+        else:
             raise web.notfound()
 
 # 赞助页面
