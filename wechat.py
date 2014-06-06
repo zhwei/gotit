@@ -391,7 +391,7 @@ class WeChatInterface(BaseMsg, ProcessMsg):
             # 基本文本响应信息
             text_dict={
                 "help": INDEX_HELP_TEXT,
-                "000": "谢谢您的支持！\nhttps://me.alipay.com/zhweifcx",
+                "000": "谢谢您的支持！\nhttp://gotit.asia/donate.html",
                 "999": "欢迎使用Gotit！\nhttp://gotit.asia/",
                 "666": self.comment,
                 "q": self.clear_user,
