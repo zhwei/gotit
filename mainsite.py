@@ -27,23 +27,22 @@ from forms import cet_form, xh_form, login_form, cron_form
 
 
 urls = (
-    '/', 'index',
-    '/zheng', 'zheng',
-    '/zheng/nocode', 'zheng_no_code',
-    '/zheng/checkcode', 'checkcode',
-    '/more/(.+)', 'more',
-    '/years', 'years',
+    '/', 'Index',
+
+    '/zheng', 'ZhengFang',
+    '/zheng/nocode', 'ZhengFangNoCode',
+    '/zheng/checkcode', 'CheckCode',
+    '/more/(.+)', 'More',
     '/score', 'Score',
+
     '/cet', 'Cet',
     '/cet/former', 'FormerCET',
     '/libr', 'Libr',
-    '/contact.html', 'Contact',
-    '/notice.html', 'Notice',
-    '/help/gpa.html', 'HelpGpa',
-    '/comment.html', 'Comment',
-    '/donate.html', 'Donate',
+
     '/cron.html', 'Cronwork',
     '/ad/(.+)', 'Advertise',
+
+    '/(\w+).html', 'TemplatePage',
 )
 
 # main app
@@ -63,10 +62,9 @@ mongo = mongo2s.init_mongo()
 
 
 
-# 首页索引页
-class index:
+class Index:
 
-    @redis_memoize('index', 100)
+    @redis_memoize(100, "Index")
     def GET(self):
         return render.index()
 
@@ -75,10 +73,9 @@ class BaseSearch(object):
     """
 
 # 成绩查询
-class zheng:
+class ZhengFang:
 
     def GET(self):
-
         try:
             zf = ZF()
             uid = zf.pre_login()
@@ -114,7 +111,7 @@ class zheng:
         except errors.RequestError, e:
             return render.serv_err(err=e)
 
-class checkcode:
+class CheckCode:
     """验证码链接
     """
     def GET(self):
@@ -134,7 +131,7 @@ class checkcode:
         except errors.PageError, e:
             pass
 
-class more:
+class More:
     """连续查询 二次查询
     """
     def GET(self, t):
@@ -176,13 +173,13 @@ class more:
         except errors.PageError, e:
             return render.alert_err(error=e.value, url='/score')
 
-class zheng_no_code:
+class ZhengFangNoCode:
     """
     无验证码正方登录
     """
     title='正方教务系统'
 
-    @redis_memoize('nocode')
+    @redis_memoize(100, "ZhengFangNoCode")
     def GET(self):
         form=login_form
         return render.normal_form(title=self.title, form=form)
@@ -200,30 +197,11 @@ class zheng_no_code:
             except errors.PageError, e:
                 return render.alert_err(error=e.value, url='/libr')
 
-class years:
-
-    def GET(self):
-
-        try:
-            zf = Login()
-            zf.init_after_login(session['time_md5'], session['xh'])
-            years=zf.more_kebiao()
-            return render.years_result(years=years)
-        except (AttributeError, TypeError):
-            raise web.seeother('/zheng')
-
-    def POST(self):
-
-        zf = Login()
-        zf.init_after_login(session['time_md5'], session['xh'])
-        return 'ok'
-
-
-# cet
-
-class cet:
-
-    @redis_memoize('cet')
+class Cet:
+    """ 四六级成绩查询
+    当前使用 JAE 接口进行查询
+    """
+    @redis_memoize(100, 'Cet')
     def GET(self):
         form = cet_form()
         return render.cet(form=form)
@@ -241,7 +219,7 @@ class cet:
                 table = get_cet_fm_jae(zkzh, name)
                 return render.result(single_table=table)
         except UnicodeDecodeError:
-            rds.hset('error_cet_unicode_de_er', form.d.zkzh, form.d.name)
+            rds.hset('Error:Hash:CET:UnicodeDecodeError', form.d.zkzh, form.d.name)
             return render.cet(form=form)
 
 
@@ -249,7 +227,7 @@ class FormerCET:
     """
     往年cet成绩查询
     """
-    @redis_memoize('FormerCET')
+    @redis_memoize(1000, 'FormerCET')
     def GET(self):
         form=xh_form
         title='往年四六级成绩'
@@ -275,7 +253,7 @@ class Libr:
     """
     图书馆相关
     """
-    @redis_memoize('libr')
+    @redis_memoize(10000, 'Libr')
     def GET(self):
         form=login_form
         title='图书馆借书查询'
@@ -299,7 +277,7 @@ class Libr:
 # 全部成绩
 class Score:
 
-    @redis_memoize('score', 100)
+    @redis_memoize(10000, "Score")
     def GET(self):
         form = xh_form()
         # alert=rds.get('SINGLE_score')
@@ -327,47 +305,65 @@ class Score:
 # 平均学分绩点计算说明页面
 
 
-class HelpGpa:
-
-    @redis_memoize('help_gpa')
-    def GET(self):
-        return render.help_gpa()
+# class HelpGpa:
+#
+#     @redis_memoize('help_gpa')
+#     def GET(self):
+#         return render.help_gpa()
 
 # 评论页面, 使用多说评论
-
-class Comment:
-
-    @redis_memoize('comment')
-    def GET(self):
-        return render.comment()
-
-
-class Contact:
-
-    """contact us page"""
-    @redis_memoize('contanct')
-    def GET(self):
-        return render.contact()
+#
+# class Comment:
+#
+#     @redis_memoize('comment')
+#     def GET(self):
+#         return render.comment()
+#
+#
+# class Contact:
+#
+#     """contact us page"""
+#     @redis_memoize('contanct')
+#     def GET(self):
+#         return render.contact()
 
 # notice
 
-class Notice:
-    @redis_memoize('notice')
-    def GET(self):
-        news = mongo.notice.find().sort("datetime",-1)
-        return render.notice(news=news)
+# class Notice:
+#     @redis_memoize('notice')
+#     def GET(self):
+#         news = mongo.notice.find().sort("datetime",-1)
+#         return render.notice(news=news)
 
 class Advertise:
     """"""
     def GET(self, ad_name):
         ads = ('zhe800',)
         if ad_name in ads:
-            incr_key('ad_count_%s' % ad_name)
+            incr_key('AD:Count:%s' % ad_name)
             return getattr(render, ad_name)()
         else:
             raise web.notfound()
 
-# 赞助页面
+class TemplatePage:
+    """Simple Template File"""
+
+    def GET(self, templ):
+        templates = ('comment', 'contact', 'donate',
+                     'HelpGPA', 'notice')
+        if templ not in templates:
+            raise web.notfound()
+        @redis_memoize(1000, templ)
+        def dispose(templ):
+            kwargs = dict()
+            if templ == "notice":
+                kwargs['news'] = mongo.notice.find().sort("datetime",-1)
+            elif templ == "donate":
+                kwargs['sponsor'] = mongo.donate.find().sort("much",-1)
+            return getattr(render, templ)(**kwargs)
+
+        return dispose(templ)
+
 
 class Donate:
 
@@ -424,12 +420,12 @@ def internalerror():
     """500
     """
     web.setcookie('webpy_session_id','',-1)
-    incr_key('internalerror')
+    incr_key('Error:InternalError')
     return web.internalerror(render.internalerror())
 
 app.notfound = notfound
 app.internalerror = internalerror
 app.add_processor(web.loadhook(session_hook))
 
-# for gunicorn
+# for Gunicorn
 application = app.wsgifunc()

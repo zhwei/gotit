@@ -3,7 +3,6 @@
 
 '''装饰器版的python自动缓存系统'''
 
-import time
 import hashlib
 try:
     import cPickle as pickle
@@ -12,72 +11,45 @@ except ImportError:
 from functools import wraps
 
 from redis2s import rds
-from config import debug_mode
-
-# _cache = {}
-
-
-def redis_memoize(cache_name, ttl=-1):
-    """
-    """
-
-    cache_name = "cache_" + cache_name
-
-    def _decorator(function):
-        def __memoize(*args, **kwargs):
-            if not debug_mode and rds.get('SINGLE_cache') == 'yes':
-                key = 'value'
-                if rds.hexists(cache_name, key):
-                    return pickle.loads(rds.hget(cache_name, key))
-                else:
-                    value = function(*args, **kwargs)
-                    rds.hset(cache_name, key, pickle.dumps(value))
-                    if ttl != -1:
-                        rds.expire(cache_name, ttl)
-                    return value
-            else:
-                return function(*args, **kwargs)
-        return __memoize
-    return _decorator
-
-def expire_redis_cache(cache_name):
-
-    rds.delete("cache_" + cache_name)
-
-    return True
-
-
-def _is_obsolete(entry, duration):
-    '''是否过期'''
-    if duration == -1: #永不过期
-        return False
-    return time.time() - entry['time'] > duration
+from config import DEBUG
 
 def _compute_key(function, args,kw):
     '''序列化并求其哈希值'''
     key = pickle.dumps((function.func_name,args,kw))
-    return hashlib.sha1(key).hexdigest()
+    return hashlib.sha1(key).hexdigest() 
 
-# def memorize(duration = -1):
-#     '''自动缓存'''
-#     def _memoize(function):
-#         @wraps(function) # 自动复制函数信息
-#         def __memoize(*args, **kw):
-#             key = _compute_key(function, args, kw)
-#             #是否已缓存？
-#             if key in _cache:
-#                 #是否过期？
-#                 if _is_obsolete(_cache[key], duration) is False:
-#                     return _cache[key]['value']
-#             # 运行函数
-#             result = function(*args, **kw)
-#             #保存结果
-#             _cache[key] = {
-#                 'value' : result,
-#                 'time'  : time.time()
-#             }
-#             return result
-#         return __memoize
-#     return _memoize
+def _key_name(key):
+    """返回Redis中实际key name"""
+    return "Cache:%s" % key
 
+def redis_memoize(ttl=-1, key=False):
+    '''Auto cache, default never expire
+    Modify From: https://github.com/ma6174/pycache
+    '''
+    def _memoize(function):
+        @wraps(function) # 自动复制函数信息
+        def __memoize(*args, **kw):
+            if DEBUG: return function(*args, **kw)
+            real_key = _key_name(key if key else _compute_key(function,
+                                                    args, kw))
+            #是否已缓存？
+            if rds.exists(real_key):
+                return rds.get(real_key)
+            else:
+                # 运行函数
+                result = function(*args, **kw)
+                #保存结果
+                rds.set(real_key, result)
+                rds.expire(real_key, ttl)
+                return result
+        return __memoize
+    return _memoize
 
+def expire_redis_cache(cache_name):
+    """ if cache equals True, Remove all cache"""
+    if cache_name == True:
+        for key in rds.keys("Cache:*"):
+            rds.delete(key)
+    else:
+        rds.delete("Cache:" + cache_name)
+    return True

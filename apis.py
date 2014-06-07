@@ -285,20 +285,20 @@ def limit_processor(handler):
             token = web.ctx.environ["HTTP_ACCESSTOKEN"]
             if token in developer_list():
                 # times limit
-                _key = "token_{}".format(token)
-                _day_key = "token_day_{}".format(token)
-                _total_key = "token_total_{}".format(token)
-                if incr_key(_key, API_TIME_LIMIT) < API_TRIES_LIMIT:
-                    incr_key(_day_key, 3600*24) # day
-                    incr_key(_total_key)    # total
-                    return handler()
-                incr_key("tries_limit")
-                return base.json_response(message="Tries Limit")
+                # _key = "Token:{}".format(token)
+                _day_key = "Token:Day:{}".format(token)
+                _total_key = "Token:Total:{}".format(token)
+                # if incr_key(_key, API_TIME_LIMIT) < API_TRIES_LIMIT:
+                incr_key(_day_key, 3600*24) # day
+                incr_key(_total_key)        # total
+                return handler()
+                # incr_key("Error:TriesLimit")
+                # return base.json_response(message="Tries Limit")
             else:
                 raise KeyError
         except KeyError:
             web.ctx.status = "401"
-            incr_key("no_access_token")
+            incr_key("Error:NoAccessToken")
             return base.json_response(message="No ACCESS_TOKEN SET")
     else:
         return handler()

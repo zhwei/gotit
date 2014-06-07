@@ -21,11 +21,11 @@ from BeautifulSoup import BeautifulSoup
 import config
 import errors
 import image
-import redis2s
+from redis2s import rds
 from utils import not_error_page, get_unique_key
 import mongo2s
 
-rds= redis2s.init_redis()
+USER_RDS_PREFIX = "User:Zf:"
 
 def prepare_request(base_url, just_header=False):
     # process links
@@ -65,7 +65,7 @@ def get_viewstate(page):
         vs = com.findall(page)[0]
     except IndexError:
         import time
-        rds.hset('error_get_vs_indexerror', time.time(), page)
+        rds.hset('Error:Hash:zfr:GetVsIndexError', time.time(), page)
         raise errors.PageError("请求错误, 请重新查询")
     return vs
 
@@ -94,7 +94,7 @@ class ZF:
         #self.VIEWSTATE = com.findall(_content)[0]
 
         # create uid
-        uid = get_unique_key(prefix="user")
+        uid = get_unique_key(prefix=USER_RDS_PREFIX)
 
         # get checkcode
         #checkcode=self.get_checkcode(uid)
@@ -220,7 +220,7 @@ class Login:
             cookies = _req1.cookies,
             headers=self.headers
         )
-        uid = get_unique_key('user')
+        uid = get_unique_key(USER_RDS_PREFIX)
         pickled_cookies = pickle.dumps(self.cookies)
         rds.hmset(uid, {
                 "base_url"  : self.base_url,

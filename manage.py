@@ -16,53 +16,45 @@ from web.contrib.template import render_jinja
 from bson import ObjectId
 from weibo import APIClient, APIError
 
-from addons import mongo2s
-from addons import redis2s
-from addons.redis2s import rds
-from addons.utils import zipf2strio, get_unique_key
-from addons.autocache import expire_redis_cache
 from addons.RedisStore import RedisStore
+from addons.autocache import expire_redis_cache
+from addons.utils import zipf2strio, get_unique_key
+from addons.config import (domains, ADMIN_WEIBO_ID,
+                           WEIBO_APP_SECRET, WEIBO_APP_KEY,
+                            LOG_FILE_PATH, MONGO_DUMP_PATH)
+from addons.redis2s import (rds,
+                            get_count as rds_get_count)
+from addons.mongo2s import (mongod as db,
+                            set_zero as mongo_set_zero)
 
-from addons.config import domains
 render = render_jinja('templates', encoding='utf-8',
                       globals={"domains": domains})
 
 
-# APP_KEY = rds.get('weibo_app_key') # app key
-APP_KEY = '4001516920' # app key
-APP_SECRET = rds.get('weibo_app_secret') # app secret
-CALLBACK_URL = 'http://{}/callback'.format(domains['manage']) # callback url
-CLIENT = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
-AUTH_URL=CLIENT.get_authorize_url()
+CALLBACK_URL = 'http://{}/callback'.format(domains['manage'])
+CLIENT = APIClient(app_key=WEIBO_APP_KEY,
+                   app_secret=WEIBO_APP_SECRET,
+                   redirect_uri=CALLBACK_URL)
+AUTH_URL = CLIENT.get_authorize_url()
 
-# 公告前缀(redis中的键前缀)
-SINGLE_HEAD = "SINGLE_"
-
-ADMIN_WEIBO_ID = int(rds.get('admin_weibo_id'))
-
-
-
-# init mongoDB
-db = mongo2s.init_mongo()
-rds = redis2s.init_redis()
 
 urls = (
-    '/', 'ologin',
-    '/callback', 'callback',
-    '/panel', 'panel',
-    # '/now', 'now',
-    '/analytics', 'analytics',
+    '/', 'OLogin',
+    '/callback', 'CallBack',
+    '/panel', 'Panel',
 
-    '/backup/(.+)', 'backup',
-    '/backup', 'backup',
+    '/analytics', 'Analytics',
 
-    '/readlog/(\w+)/(.+)', 'readlog',
+    '/backup/(.+)', 'Backup',
+    '/backup', 'Backup',
 
-    '/o/(.+)/(.+)/(.+)', 'update',
-    '/o/(.+)/(.+)', 'update',
+    '/readlog/(\w+)/(.+)', 'ReadLog',
 
-    '/single/(.+)/(.+)', 'single',
-    '/single/(.+)', 'single',
+    '/o/(.+)/(.+)/(.+)', 'Update',
+    '/o/(.+)/(.+)', 'Update',
+
+    '/single/(.+)/(.+)', 'Single',
+    '/single/(.+)', 'Single',
 
     '/de/(.+)/(.+)/(.+)', 'DetailError',
     '/de/(.+)/(.+)', 'DetailError',
@@ -77,11 +69,10 @@ urls = (
 )
 
 app = web.application(urls, locals())
+session = web.session.Session(app, RedisStore(markup='Session:Manage:'),
+                              {'count': 0,})
 
-# session
-session = web.session.Session(app, RedisStore(markup='MANAGE_'), {'count': 0,})
-
-class ologin:
+class OLogin:
 
     def GET(self):
         try:
@@ -92,7 +83,7 @@ class ologin:
         return render.ologin(auth_url=AUTH_URL)
 
 
-class callback:
+class CallBack:
 
     def GET(self):
 
@@ -102,7 +93,6 @@ class callback:
             raise web.seeother(AUTH_URL)
         if len(code)!=32:
             raise web.seeother(AUTH_URL)
-
         try:
             _r = CLIENT.request_access_token(code)
             access_token = _r.access_token
@@ -119,21 +109,7 @@ class callback:
 
         raise web.seeother('/panel')
 
-
-def pre_request():
-    ''' 访问限制
-    '''
-
-    if web.ctx.path not in ['/', '/callback']:
-        try:
-            if session.uid != ADMIN_WEIBO_ID:
-                raise web.seeother('/')
-            web.header("Cache-Control", "no-cache")
-        except AttributeError:
-            raise web.seeother('/')
-
-
-class panel:
+class Panel:
     """ 后台面板首页
     """
 
@@ -141,7 +117,7 @@ class panel:
 
         return render.panel(item=False)
 
-class analytics:
+class Analytics:
     """ 数据统计
     """
 
@@ -150,28 +126,28 @@ class analytics:
             data = web.input(_method='GET')
             li = ('internalerror', 'checkcode')
             if data.zero in li:
-                mongo2s.set_zero(data.zero)
+                mongo_set_zero(data.zero)
             elif data.zero == "cache":
-                for key in rds.keys("cache_*"): rds.delete(key)
+                expire_redis_cache(True)
             raise web.seeother('analytics')
         except AttributeError:
             pass
         data = {
-                'Session': redis2s.get_count('SESSION*'),
-                '用户': redis2s.get_count('user*'),
-                "Cache": redis2s.get_count("cache_*"),
-                'InternalError': rds.get('internalerror'),
-                "zhe800": rds.get('ad_count_zhe800'),
+                'Session': rds_get_count('Session:*'),
+                "Cache": rds_get_count("Cache:*"),
+                '用户': rds_get_count('User:*'),
+                "zhe800": rds.get('AD:Count:zhe800'),
+                'InternalError': rds.get('Error:InternalError'),
             }
         return render.panel(item=None, opera='analytics',
                             data=data)
 
-class readlog:
+class ReadLog:
     """ 查看网站日志
     """
 
     def readfile(self, fi, line):
-        log_pwd = rds.hget('log_file_path', fi)
+        log_pwd = LOG_FILE_PATH.get(fi, "stderr")
         with open(log_pwd) as fi:
             all_lines = fi.readlines()
             counts = len(all_lines)
@@ -187,19 +163,17 @@ class readlog:
             return render.panel(alert="没有找到日志文件, pwd=[{}]".format(rds.get('log_file_path')))
 
 
-class backup:
+class Backup:
     """ mongodb数据库的备份与恢复
     """
 
     def GET(self, label=None):
 
         if label=='download':
-
-            mongodump_path = rds.get('mongodump_path')
             # 备份mongodb数据库，打包成zip文件并返回下载
             dt=datetime.datetime.now()
             filename = '/tmp/gotit-backup-{}'.format(dt.strftime('%Y%m%d%H%M%S'))
-            os.system('{} -d gotit -o {}'.format(mongodump_path, filename))
+            os.system('{} -d gotit -o {}'.format(MONGO_DUMP_PATH, filename))
             ret = zipf2strio(filename) # 打包写入StringIO对象
             try:
                 import shutil
@@ -219,7 +193,7 @@ class backup:
     #    return ret
 
 
-class update:
+class Update:
     """ 内容管理 """
     item_list = ['donate', 'notice', 'wxcomment', 'developer']
     opera_list = ['cr', 'del', 'ls']
@@ -227,8 +201,8 @@ class update:
     def add_counts(self, ls):
         for _i in ls:
             _token = _i['token']
-            _day_key = "token_day_{}".format(_token)
-            _total_key = "token_total_{}".format(_token)
+            _day_key = "Token:Day:{}".format(_token)
+            _total_key = "Token:Total:{}".format(_token)
             _i['day'] = rds.get(_day_key)
             _i['total'] = rds.get(_total_key)
             yield _i
@@ -257,7 +231,6 @@ class update:
                         'much':float(data['much']),
                         'datetime': datetime.datetime.now(),
                         })
-                    expire_redis_cache('donate')
                 elif item == 'developer':
                     _token = get_unique_key()
                     db[item].insert({
@@ -265,32 +238,32 @@ class update:
                         'description':data['content'],
                         'datetime': datetime.datetime.now(),
                         })
-                    expire_redis_cache('developer')
                 else:
                     db[item].insert({
                         'content':data['content'],
                         'datetime': datetime.datetime.now(),
                         })
-                    expire_redis_cache('notice')
             elif opera == 'del':
                 db[item].remove({'_id':ObjectId(data['oid'])})
 
+            expire_redis_cache(item)
         raise web.seeother('/o/ls/'+item)
 
 
-class single:
+class Single:
     """ 用于处理网站首页等位置的警告或提示信息
     存储在redis中, 简单键值对
     """
 
     opera_list = ['cr', 'del', 'info']
+    SINGLE_HEAD = "Single:"
 
     def GET(self, opera, item=None):
         if opera in self.opera_list:
             if opera == 'info':
 
                 def get_kv():
-                    for key in rds.keys(SINGLE_HEAD+"*"):
+                    for key in rds.keys(self.SINGLE_HEAD+"*"):
                         yield (key[7:], rds.get(key))
 
                 return render.panel2(single_list=get_kv(), opera=opera)
@@ -304,15 +277,13 @@ class single:
         if opera in self.opera_list:
 
             if opera == 'cr' :
-
-                key = SINGLE_HEAD + data['key']
+                key = self.SINGLE_HEAD + data['key']
                 rds.set(key, data['content'])
 
-                expire_redis_cache(data['key'])
-
             elif opera == 'del':
-                rds.delete(SINGLE_HEAD + item)
+                rds.delete(self.SINGLE_HEAD + item)
 
+            expire_redis_cache(True)
         raise web.seeother('/single/info')
 
 class DetailError:
@@ -335,7 +306,7 @@ class DetailError:
         elif key:
             key_list = rds.hkeys(key)
         else:
-            key_list = rds.keys("error_*")
+            key_list = rds.keys("Error:Hash:*")
 
         return render.panel(item=False, opera='detail_error',
             key=key, hkey=hkey, key_list=key_list, content=content)
@@ -403,5 +374,18 @@ class UserManage:
             db.CronLog.remove({"user_id": ObjectId(data['user_id'])})
 
         raise web.redirect("/users")
+
+
+
+def pre_request():
+    ''' 访问限制
+    '''
+    if web.ctx.path not in ['/', '/callback']:
+        try:
+            if session.uid != ADMIN_WEIBO_ID:
+                raise web.seeother('/')
+            web.header("Cache-Control", "no-cache")
+        except AttributeError:
+            raise web.seeother('/')
 
 app.add_processor(web.loadhook(pre_request))

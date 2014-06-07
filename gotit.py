@@ -13,9 +13,9 @@ import manage
 import wechat
 
 # debug mode
-from addons.config import debug_mode, domains
+from addons.config import DEBUG, domains
 
-web.config.debug = debug_mode
+web.config.debug = DEBUG
 
 mapping = (
     domains['main'], mainsite.app,

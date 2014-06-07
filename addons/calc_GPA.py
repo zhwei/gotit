@@ -61,7 +61,7 @@ class GPA:
             GPA.__ret["foreign"] = GPA.__table[11]  #外语
             return 0
         except:
-            rds.hset('error_score_cant_get_info', self.__num, self.page)
+            rds.hset('Error:Hash:GPA:CantGetInfo', self.__num, self.page)
             raise errors.PageError('找不到您的成绩单!')
 
 
@@ -130,7 +130,7 @@ class GPA:
                 num = float(text)
                 return num
             except:
-                rds.hset('error_score_page', "{}+{}".format(self.__num, text), self.page)
+                rds.hset('Error:Hash:ScorePageKeyword', "{}+{}".format(self.__num, text), self.page)
                 return -1
 
     def __calc_score(self):

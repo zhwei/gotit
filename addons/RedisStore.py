@@ -18,7 +18,7 @@ from web.session import Store
 
 import redis
 
-SESSION_MARKUP='SESSION_'
+SESSION_MARKUP='Session:'
 
 
 class RedisStore(Store):
@@ -30,7 +30,7 @@ class RedisStore(Store):
 
         self.db = redis.StrictRedis(host=ip, port=port, db=db)
         # self.timeout = web.webapi.config.session_parameters.timeout
-        self.markup = markup or 'SESSION_'
+        self.markup = markup or SESSION_MARKUP
         self.timeout = timeout or 600
 
     def __contains__(self, key):
@@ -78,5 +78,5 @@ class RedisStore(Store):
             return pickle.loads(pickled)
         except pickle.UnpicklingError:
             from time import time
-            self.db.hset('error_UnpicklingError', time(),pickled)
+            self.db.hset('Error:Hash:UnpicklingError', time(), pickled)
             return pickle.loads(pickled)
