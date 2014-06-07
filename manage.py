@@ -156,13 +156,11 @@ class analytics:
             raise web.seeother('analytics')
         except AttributeError:
             pass
-        coll = db.analytics
         data = {
-                'internalerror': coll.find_one({'item':'internalerror'})['times'],
-                'CheckCodes': db.checkcodes.count(),
-                'session': redis2s.get_count('SESSION*'),
+                'Session': redis2s.get_count('SESSION*'),
                 '用户': redis2s.get_count('user*'),
-                "cache": redis2s.get_count("cache_*"),
+                "Cache": redis2s.get_count("cache_*"),
+                'InternalError': rds.get('internalerror'),
                 "zhe800": rds.get('ad_count_zhe800'),
             }
         return render.panel(item=None, opera='analytics',

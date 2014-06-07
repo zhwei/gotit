@@ -33,18 +33,17 @@ urls = (
     '/zheng/checkcode', 'checkcode',
     '/more/(.+)', 'more',
     '/years', 'years',
-    '/score', 'score',
-    '/cet', 'cet',
+    '/score', 'Score',
+    '/cet', 'Cet',
     '/cet/former', 'FormerCET',
-    '/libr', 'libr',
-    '/contact.html', 'contact',
-    '/notice.html', 'notice',
-    '/help/gpa.html', 'help_gpa',
-    '/comment.html', 'comment',
-    '/donate.html', 'donate',
-    '/cron.html', 'cronwork',
-
-    '/ad/(.+)', 'ad',
+    '/libr', 'Libr',
+    '/contact.html', 'Contact',
+    '/notice.html', 'Notice',
+    '/help/gpa.html', 'HelpGpa',
+    '/comment.html', 'Comment',
+    '/donate.html', 'Donate',
+    '/cron.html', 'Cronwork',
+    '/ad/(.+)', 'Advertise',
 )
 
 # main app
@@ -272,7 +271,7 @@ class FormerCET:
             return render.serv_err(err=e)
 
 
-class libr:
+class Libr:
     """
     图书馆相关
     """
@@ -298,7 +297,7 @@ class libr:
 
 
 # 全部成绩
-class score:
+class Score:
 
     @redis_memoize('score', 100)
     def GET(self):
@@ -328,7 +327,7 @@ class score:
 # 平均学分绩点计算说明页面
 
 
-class help_gpa:
+class HelpGpa:
 
     @redis_memoize('help_gpa')
     def GET(self):
@@ -336,14 +335,14 @@ class help_gpa:
 
 # 评论页面, 使用多说评论
 
-class comment:
+class Comment:
 
     @redis_memoize('comment')
     def GET(self):
         return render.comment()
 
 
-class contact:
+class Contact:
 
     """contact us page"""
     @redis_memoize('contanct')
@@ -352,14 +351,14 @@ class contact:
 
 # notice
 
-class notice:
+class Notice:
     @redis_memoize('notice')
     def GET(self):
         news = mongo.notice.find().sort("datetime",-1)
         return render.notice(news=news)
 
-class ad:
-
+class Advertise:
+    """"""
     def GET(self, ad_name):
         ads = ('zhe800',)
         if ad_name in ads:
@@ -370,14 +369,14 @@ class ad:
 
 # 赞助页面
 
-class donate:
+class Donate:
 
     @redis_memoize('donate')
     def GET(self):
         sponsor = mongo.donate.find().sort("much",-1)
         return render.donate(sponsor=sponsor)
 
-class cronwork:
+class Cronwork:
 
     def GET(self):
         action = web.input(_method='get').get("action", None)
@@ -425,7 +424,7 @@ def internalerror():
     """500
     """
     web.setcookie('webpy_session_id','',-1)
-    mongo2s.mcount('internalerror')
+    incr_key('internalerror')
     return web.internalerror(render.internalerror())
 
 app.notfound = notfound
