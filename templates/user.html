@@ -1,0 +1,196 @@
+{% extends "base-panel.html" %}
+
+{% block content %}
+
+    {% if action == "create" or action == "update" %}
+        <h2>添加用户</h2>
+        <a href="/users" class="btn btn-primary btn-sm">列表</a>
+        <hr/>
+        <div class="col-md-4 center">
+            <form role="form" method="post">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Real Name</label>
+                    <input type="text" name="name" value="{% if cuser %}{{ cuser.name|e }}{% endif %} "
+                           class="form-control" id="exampleInputEmail1" placeholder="Real Name">
+                </div>
+                <div class="form-group">
+                    <label>Email address</label>
+                    <input type="email" name="email" value="{% if cuser %}{{ cuser.email }}{% endif %} "
+                           class="form-control" id="id_email" placeholder="Enter email">
+
+                    <p class="help-block">Receive Email Messages!</p>
+                </div>
+                <div class="form-group">
+                    <label>Number</label>
+                    <input type="text" class="form-control" value="{% if cuser %}{{ cuser.xh }}{% endif %} " name="xh"
+                           id="id_xh" placeholder="Number">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" name="pw" id="id_pw"
+                           placeholder="Password" value="{% if cuser %}{{ cuser.pw }}{% endif %}">
+                </div>
+                <div class="form-group">
+                    <label>Ali-Pay ID</label>
+                    <input type="text" class="form-control" name="alipay" id="id_alipay"
+                           placeholder="Ali-Pay ID" value="{% if cuser %}{{ cuser.alipay }}{% endif %} ">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                {% if action == "update" %}
+                    <a href="/users/detail/{{ cuser._id }}" class="btn btn-default">Back</a>
+                {% endif %}
+            </form>
+        </div>
+    {% elif action == "list" and user_list %}
+        <h2>全部用户&nbsp;&nbsp;<a href="/users/create" class="btn btn-primary btn-sm">添加</a>
+        </h2>
+        <hr/>
+        <div class="col-md-12 center">
+            <table class="table table-bordered table-responsive">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Number</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in user_list %}
+                    <tr {% if not user.active %}class="active"{% endif %} >
+                        <td><a href="/users/detail/{{ user._id }}">{{ user.name|e }}</a></td>
+                        <td><a href="/users/detail/{{ user._id }}">{{ user.xh|e }}</a></td>
+                        <td>{{ user.email|e }}</td>
+                        <td>{{ user.score_status|truncate(9, True) }}</td>
+                        <td>{{ user.created_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>
+                            <a href="/users/log/{{ user._id }}" class="btn btn-xs btn-primary">Log</a>
+                            <a href="/users/update/{{ user._id }}" class="btn btn-xs btn-info">Update</a>
+                            <a href="/users/delete/{{ user._id }}" class="btn btn-xs btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+    {% elif action == "detail" and cuser %}
+        <h2>用户&nbsp;&nbsp;<a href="/users" class="btn btn-primary btn-sm">列表</a></h2>
+        <hr/>
+        <div class="col-md-12 center">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <th>Name</th>
+                    <td>{{ cuser.name|e }}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>{{ cuser.email|e }}</td>
+                </tr>
+                <tr>
+                    <th>Number</th>
+                    <td>{{ cuser.xh|e }}</td>
+                </tr>
+                <tr>
+                    <th>Password</th>
+                    <td>******</td>
+                </tr>
+                <tr>
+                    <th>Ali-Pay</th>
+                    <td>{{ cuser.alipay|e }}</td>
+                </tr>
+                <tr>
+                    <th>Score Status</th>
+                    <td>{{ cuser.score_status }}</td>
+                </tr>
+                <tr>
+                    <th>Last Fetch</th>
+                    <td>{{ cuser.last_fetch }}</td>
+                </tr>
+                <tr>
+                    <th>Created Date</th>
+                    <td>{{ cuser.created_date }}</td>
+                </tr>
+                <tr>
+                    <th>Updated Date</th>
+                    <td>{{ cuser.updated_date }}</td>
+                </tr>
+                <tr>
+                    <th>Action</th>
+                    <td>
+                        <a href="/users/log/{{ cuser._id }}" class="btn btn-xs btn-primary">Log</a>
+                        <a href="/users/update/{{ cuser._id }}" class="btn btn-xs btn-info">Update</a>
+                        <a href="/users/delete/{{ cuser._id }}" class="btn btn-xs btn-danger">Delete</a>
+                        {% if cuser.active %}
+                            <a href="/users/deactive/{{ cuser._id }}" class="btn btn-xs btn-warning">Deactive</a>
+                        {% else %}
+                            <a href="/users/active/{{ cuser._id }}" class="btn btn-xs btn-default">Active</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    {% elif action == "delete" %}
+        <h2>删除用户</h2>
+        <hr/>
+        <div class="col-md-4 center">
+            <form method="post">
+                <p class='lead'>ARE YOU SURE？</p>
+                <input type="hidden" name="user_id" value="{{ cuser._id }}"/>
+                <div class="clearfix"></div>
+                <div class="btn-group">
+                    <a onclick="location.href=document.referrer;" class="btn btn-default"><i
+                            class="glyphicon glyphicon-arrow-left"></i>&nbsp;返回</a>
+                </div>
+                <div class="btn-group">
+                    <input type="submit" value="确认" class="btn btn-danger"/>
+                </div>
+            </form>
+        </div>
+    {% elif action == "log" and log_list %}
+        <h2>用户日志</h2>
+        <hr/>
+        <table class="table table-bordered table-responsive">
+            <tr>
+                <th><a href="/users/detail/{{ cuser._id }}">{{ cuser.name|e }}</a></th>
+                <td>{{ cuser.score_status }}</td>
+                <td>{{ cuser.last_fetch }}</td>
+                <td>
+                    <a href="/users/detail/{{ cuser._id }}" class="btn btn-xs btn-default">返回</a>
+                    <a href="/users" class="btn btn-xs btn-default">List</a>
+                    <a href="/users/log/{{ cuser._id }}" class="btn btn-xs btn-default">ALL Logs</a>
+                </td>
+            </tr>
+        </table>
+        <table class="table table-bordered table-responsive">
+            <thead>
+            <tr>
+                <th>项目</th>
+                <th>状态</th>
+                <th>信息</th>
+                <th>worker</th>
+                <th>日期</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for log in log_list %}
+            <tr>
+                <td><a href="/users/log/{{ cuser._id }}?key=item&value={{ log.item }}">{{ log.item }}</a></td>
+                <td><a href="/users/log/{{ cuser._id }}?key=status&value={{ log.status }}">{{ log.status }}</a></td>
+                <td><a href="/users/log/{{ cuser._id }}?key=message&value={{ log.message }}">{{ log.message }}</a></td>
+                <td><a href="/users/log/{{ cuser._id }}?key=thread_name&value={{ log.thread_name }}">{{ log.thread_name }}</a></td>
+                <td><span class="" style="font-size: 13.5px;">{{ log.created_date.strftime('%Y-%m-%d %H:%M:%S') }}</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+
+{% endblock %}

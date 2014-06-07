@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>我们为你Got it&middot; Got it</title>
+    <title>我们为你Got it &middot; Got it</title>
     {% include "includes/head.html" %}
 </head>
 
 <body>
 
-<div class="index-jumbotron jumbotron">
+<div class="index-jumbotron jumbotron hidden-xs">
     <div class="container">
         <h1>Got it</h1>
+
         <div class="words">
-            <p>While the truncheon may be used in lieu of conversation , Words will always retain their power.</p>
+            <p>{{ alert.head }}</p>
         </div>
     </div>
 </div>
@@ -21,21 +22,17 @@
 </div>
 
 <div class="container index-body">
-    {% if alert %}
-    <div class="alert alert-dismissable alert-info">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        {{ alert }}
-    </div>
-    {% endif %}
+
     <div>
         <div class="col-lg-4">
-            <div class="panel panel-info">
+            <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">正方教务系统</h3>
                 </div>
                 <div class="panel-body">
                     <p>查询本学期最新成绩, 最新课表, 考试时间</p>
-                    {% if zheng_alert %}{{ zheng_alert }}{% endif %}
+                    <p>无验证码登录</p>
+                    {% if alert.nocode %}{{ alert.nocode }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/zheng/nocode" class="btn btn-default btn-block">Gooo</a>
@@ -47,9 +44,22 @@
                 </div>
                 <div class="panel-body">
                     <p>四六级最新成绩查询</p>
+                    {% if alert.cet %}{{ alert.cet }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/cet" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">正方教务系统(验证码)</h3>
+                </div>
+                <div class="panel-body">
+                    <p>查询本学期最新成绩, 最新课表, 考试时间</p>
+                    {% if alert.zheng %}{{ alert.zheng }}{% endif %}
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/zheng" class="btn btn-default btn-block">Go</a>
                 </div>
             </div>
             <div class="panel panel-primary">
@@ -58,6 +68,7 @@
                 </div>
                 <div class="panel-body">
                     <p>往年四六级成绩, 痛定思痛!</p>
+                    {% if alert.former_cet %}{{ alert.former_cet }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/cet/former" class="btn btn-default btn-block">Go</a>
@@ -67,13 +78,15 @@
         <div class="col-lg-4">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title">正方教务系统</h3>
+                    <h3 class="panel-title">购物神器 &middot;折800</h3>
                 </div>
                 <div class="panel-body">
-                    <p>查询本学期最新成绩, 最新课表, 考试时间</p>
+                    <a href="http://{{ domains.main }}/ad/zhe800" target="_blank">
+                        <img src="http://gotit.qiniudn.com/img/zhe800-01.jpg" style="width: 100%;" alt="折800"/>
+                    </a>
                 </div>
                 <div class="panel-footer">
-                    <a href="http://{{ domains.main }}/zheng" class="btn btn-default btn-block">Go</a>
+                    <a href="http://{{ domains.main }}/ad/zhe800" class="btn btn-default btn-block">查看详情</a>
                 </div>
             </div>
             <div class="panel panel-primary">
@@ -82,6 +95,7 @@
                 </div>
                 <div class="panel-body">
                     <p>在图书馆借了哪些书, 超期了没有?</p>
+                    {% if alert.libr %}{{ alert.libr }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/libr" class="btn btn-default btn-block">Go</a>
@@ -98,14 +112,40 @@
                     <a href="http://{{ domains.main }}/404" class="btn btn-default btn-block">Go</a>
                 </div>
             </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">网站赞助者</h3>
+                </div>
+                <div class="panel-body">
+                    <p>您的每一分钱都会让<strong>Gotit</strong>做的更好!</p>
+                    {% if alert.donate %}{{ alert.donate }}{% endif %}
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/donate.html#names" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
         </div>
         <div class="col-lg-4">
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <h3 class="panel-title">成绩推送服务</h3>
+                </div>
+                <div class="panel-body">
+                    <p>系统每十分钟查询为您查询一次成绩，如果成绩更新则发送邮件到设定的邮箱！</p>
+                    <p>感谢大家的支持！</p>
+                    {% if alert.cron %}{{ alert.cron }}{% endif %}
+                </div>
+                <div class="panel-footer">
+                    <a href="http://{{ domains.main }}/cron.html" class="btn btn-default btn-block">Go</a>
+                </div>
+            </div>
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">微信公众帐号</h3>
                 </div>
                 <div class="panel-body">
                     <p>微信公众帐号, 成绩查询, 方便快捷, 一目了然!</p>
+                    {% if alert.wechat %}{{ alert.wechat }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.wechat }}" class="btn btn-default btn-block">Go</a>
@@ -117,22 +157,13 @@
                 </div>
                 <div class="panel-body">
                     <p>查询入学以来所有成绩,包括第二专业和补考成绩以及平均学分绩点.</p>
+                    {% if alert.score %}{{ alert.score }}{% endif %}
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/score" class="btn btn-default btn-block">Go</a>
                 </div>
             </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">网站赞助者</h3>
-                </div>
-                <div class="panel-body">
-                    <p>您的每一分钱都会让<strong>Gotit</strong>做的更好!</p>
-                </div>
-                <div class="panel-footer">
-                    <a href="http://{{ domains.main }}/donate.html#names" class="btn btn-default btn-block">Go</a>
-                </div>
-            </div>
+
         </div>
     </div>
 </div>

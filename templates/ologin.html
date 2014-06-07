@@ -1,22 +1,46 @@
-{% extends 'base-index.html' %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <title>微博登录&middot; Got it</title>
+  {% include "includes/head.html" %}
+  <style>
+  html, body {
+    background-color: #ffffff;
+  }
+  </style>
+  </head>
+<body>
 
-{% block title %}微博登录{% endblock %}
+<div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target=".navbar-responsive-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://{{ domains.main }}">Got it</a>
+        </div>
+    </div>
+<!--nav end-->
+</div>
 
-{% block head %}
-    <style>
-        html, body {
-            background-color: #ffffff;
-        }
-    </style>
 
-{% endblock %}
-
-{% block content %}
-
+<div class="container" id="site-body">
+  <div>
     <div class="jumbotron text-center">
-        <a class="btn btn-lg btn-success" href="{{ auth_url }}">微博登录</a>
+      <a class="btn btn-lg btn-success" href="{{ auth_url }}">微博登录</a>
     </div>
 
     <hr/>
+  </div>
+</div>
 
-{% endblock %}
+{% include "includes/footer.html" %}
+
+{% block foot -%}{%- endblock %}
+
+</body>
+</html>
+

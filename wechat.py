@@ -127,8 +127,8 @@ class ProcessMsg(object):
         """ 获取绩点
         """
         gpa = GPA(xh)
-        gpa.getscore_page()
         try:
+            gpa.getscore_page()
             jidi = gpa.get_gpa()
             ret = "学分绩点: {}\n".format(jidi)
         except errors.PageError, e:
@@ -138,11 +138,14 @@ class ProcessMsg(object):
     def get_former_cet(self, xh):
         """获取往年四六级成绩"""
         cet = CET()
-        _dic = cet.get_cet_dict(xh)
-        ret = ""
-        for i in range(_dic.get('total')):
-            ret += "<{}-{}>  {}\n".format(_dic['cet_time'][i][:6],
-                    _dic['cet_type'][i], _dic['cet_score'][i])
+        try:
+            _dic = cet.get_cet_dict(xh)
+            ret = ""
+            for i in range(_dic.get('total')):
+                ret += "<{}-{}>  {}\n".format(_dic['cet_time'][i][:6],
+                        _dic['cet_type'][i], _dic['cet_score'][i])
+        except errors.PageError, e:
+            ret = e
         return ret
 
     def get_zf_score(self, t):
@@ -328,7 +331,7 @@ class ProcessMsg(object):
 
 urls = (
         '/', 'WeixinIndex',
-        '/weixin', 'WeixinInterface',
+        '/weixin', 'WeChatInterface',
         )
 
 app = web.application(urls, locals())
@@ -337,12 +340,13 @@ class WeixinIndex:
 
     @redis_memoize('weixin')
     def GET(self):
-        from web.contrib.template import render_jinja
-        render = render_jinja('templates', encoding='utf-8')
-        from addons.config import domains
-        return render.weixin(domains=domains)
+        from mainsite import render
+        # from web.contrib.template import render_jinja
+        # render = render_jinja('templates', encoding='utf-8')
+        # from addons.config import domains
+        return render.weixin()
 
-class WeixinInterface(BaseMsg, ProcessMsg):
+class WeChatInterface(BaseMsg, ProcessMsg):
 
     def GET(self):
         #获取输入参数
@@ -387,7 +391,7 @@ class WeixinInterface(BaseMsg, ProcessMsg):
             # 基本文本响应信息
             text_dict={
                 "help": INDEX_HELP_TEXT,
-                "000": "谢谢您的支持！\nhttps://me.alipay.com/zhweifcx",
+                "000": "谢谢您的支持！\nhttp://gotit.asia/donate.html",
                 "999": "欢迎使用Gotit！\nhttp://gotit.asia/",
                 "666": self.comment,
                 "q": self.clear_user,

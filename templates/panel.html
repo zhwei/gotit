@@ -33,8 +33,10 @@
             <td class="hidden-xs">{{ l.datetime }}</td>
             {% elif item == 'developer' %}
             <td><span class="label label-primary">{{ l.token }}</span></td>
+            <td><span class="label label-info">{{ l.day }}</span></td>
+            <td><span class="label label-primary">{{ l.total }}</span></td>
+            <td class='text-overflow'>{{ l.description }}</td>
             <td class="hidden-xs">{{ l.datetime.strftime('%Y-%m-%d') }}</td>
-            <td class='hidden-xs text-overflow'>{{ l.description }}</td>
             {% elif item == 'wxcomment' %}
               <td class='text-overflow'>{{ l.content }}</td>
               <td class="hidden-xs">{{ l.datetime }}</td>
@@ -82,10 +84,10 @@
   {% elif opera == 'readlog' %}
   <h2 class="lead">网站日志</h2>
   <p>
-    <a href="/readlog/1" class='btn btn-default'>最后50行</a>
-    <a href="/readlog/2" class='btn btn-default'>最后100行</a>
-    <a href="/readlog/3" class='btn btn-default'>最后150行</a>
-    <a href="/readlog/4" class='btn btn-default'>最后200行</a>
+    <a href="./1" class='btn btn-default'>最后50行</a>
+    <a href="./2" class='btn btn-default'>最后100行</a>
+    <a href="./3" class='btn btn-default'>最后150行</a>
+    <a href="./4" class='btn btn-default'>最后200行</a>
   </p>
   <div>
     <pre>

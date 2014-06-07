@@ -6,6 +6,7 @@ import datetime
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
+import logging
 
 import web
 from web import ctx
@@ -55,7 +56,7 @@ urls = (
     '/backup/(.+)', 'backup',
     '/backup', 'backup',
 
-    '/readlog/(.+)', 'readlog',
+    '/readlog/(\w+)/(.+)', 'readlog',
 
     '/o/(.+)/(.+)/(.+)', 'update',
     '/o/(.+)/(.+)', 'update',
@@ -68,13 +69,17 @@ urls = (
     '/de/(.+)', 'DetailError',
     '/de', 'DetailError',
 
-    'developer/(\w+)', 'Developer',
+    '/developer/(\w+)', 'Developer',
+
+    '/users', 'UserManage',
+    '/users/(\w+)', 'UserManage',
+    '/users/(\w+)/(\w+)', 'UserManage',
 )
 
 app = web.application(urls, locals())
 
 # session
-session = web.session.Session(app, RedisStore(), {'count': 0,})
+session = web.session.Session(app, RedisStore(markup='MANAGE_'), {'count': 0,})
 
 class ologin:
 
@@ -98,13 +103,13 @@ class callback:
         if len(code)!=32:
             raise web.seeother(AUTH_URL)
 
-        _r = CLIENT.request_access_token(code)
-        access_token = _r.access_token
-        expires_in = _r.expires_in
-
-        CLIENT.set_access_token(access_token, expires_in)
-
         try:
+            _r = CLIENT.request_access_token(code)
+            access_token = _r.access_token
+            expires_in = _r.expires_in
+
+            CLIENT.set_access_token(access_token, expires_in)
+
             uid = CLIENT.account.get_uid.get()['uid']
             if uid != ADMIN_WEIBO_ID:
                 return render.ologin(auth_url=AUTH_URL, error='欢迎尝试')
@@ -123,6 +128,7 @@ def pre_request():
         try:
             if session.uid != ADMIN_WEIBO_ID:
                 raise web.seeother('/')
+            web.header("Cache-Control", "no-cache")
         except AttributeError:
             raise web.seeother('/')
 
@@ -150,13 +156,12 @@ class analytics:
             raise web.seeother('analytics')
         except AttributeError:
             pass
-        coll = db.analytics
         data = {
-                'internalerror': coll.find_one({'item':'internalerror'})['times'],
-                'CheckCodes': db.checkcodes.count(),
-                'session': redis2s.get_count('SESSION*'),
+                'Session': redis2s.get_count('SESSION*'),
                 '用户': redis2s.get_count('user*'),
-                "cache": redis2s.get_count("cache_*"),
+                "Cache": redis2s.get_count("cache_*"),
+                'InternalError': rds.get('internalerror'),
+                "zhe800": rds.get('ad_count_zhe800'),
             }
         return render.panel(item=None, opera='analytics',
                             data=data)
@@ -165,8 +170,8 @@ class readlog:
     """ 查看网站日志
     """
 
-    def readfile(self, line):
-        log_pwd = rds.get('log_file_path')
+    def readfile(self, fi, line):
+        log_pwd = rds.hget('log_file_path', fi)
         with open(log_pwd) as fi:
             all_lines = fi.readlines()
             counts = len(all_lines)
@@ -174,9 +179,9 @@ class readlog:
                 if lno >= counts-int(line)*50:
                     yield li
 
-    def GET(self, line):
+    def GET(self, fi, line=1):
         try:
-            lines = self.readfile(line)
+            lines = self.readfile(fi, line)
             return render.panel(item=None, opera='readlog', lines=lines)
         except IOError:
             return render.panel(alert="没有找到日志文件, pwd=[{}]".format(rds.get('log_file_path')))
@@ -219,12 +224,22 @@ class update:
     item_list = ['donate', 'notice', 'wxcomment', 'developer']
     opera_list = ['cr', 'del', 'ls']
 
+    def add_counts(self, ls):
+        for _i in ls:
+            _token = _i['token']
+            _day_key = "token_day_{}".format(_token)
+            _total_key = "token_total_{}".format(_token)
+            _i['day'] = rds.get(_day_key)
+            _i['total'] = rds.get(_total_key)
+            yield _i
+
     def GET(self, opera, item, oid=None):
 
         if item in self.item_list and opera in self.opera_list:
-
             if opera == 'ls':
                 ls = db[item].find().sort("datetime",-1)
+                if item == "developer":
+                    ls = self.add_counts(ls)
                 return render.panel(item=item, opera=opera, ls=ls)
 
         return render.panel(item=item, opera=opera, oid=oid)
@@ -325,5 +340,68 @@ class DetailError:
         return render.panel(item=False, opera='detail_error',
             key=key, hkey=hkey, key_list=key_list, content=content)
 
+class UserManage:
+
+
+    def GET(self, action="list", user_id=None):
+
+        user_list = log_list = cuser = None
+        if action == "list":
+            user_list = db.users.find().sort('created_date', -1)
+        if action in ("detail", "update", "delete", "log") and user_id:
+            cuser = db.users.find_one({'_id':ObjectId(user_id)})
+        if action == "log":
+            PAGE_LIMIT = 77
+            _k = web.input(_method="GET").get('key', None)
+            _v = web.input(_method="GET").get('value', None)
+            if _k and _v:
+                log_list = db.CronLog.find({
+                        "user_id": ObjectId(user_id),
+                        _k: _v,
+                    }).sort('created_date', -1).limit(PAGE_LIMIT)
+            else:
+                log_list = db.CronLog.find({"user_id": ObjectId(user_id)
+                    }).sort('created_date', -1).limit(PAGE_LIMIT)
+        if action.endswith("active"):
+            # active or deactive
+            _t = True if action == "active" else False
+            logging.error(_t)
+            db.users.update({'_id':ObjectId(user_id)},
+                      {'$set':{'active': _t,
+                        'updated_date': datetime.datetime.now(),}},)
+            raise web.redirect("/users/detail/%s" % user_id)
+        return render.user(action=action, user_list=user_list,
+                           cuser=cuser, log_list=log_list)
+
+    def POST(self, action="create", user_id=None):
+
+        data = web.input()
+        if action == "create":
+            db["users"].insert({
+                'name': data['name'],
+                'email' : data["email"],
+                'xh': data['xh'],
+                'pw': data['pw'],
+                'alipay': data['alipay'],
+                'active': True,
+                'created_date': datetime.datetime.now(),
+                'updated_date': datetime.datetime.now(),
+            })
+        elif action == "update":
+            db.users.update({'_id':ObjectId(user_id)},
+                      {'$set':{
+                        'name': data['name'],
+                        'email' : data["email"],
+                        'xh': data['xh'],
+                        'pw': data['pw'],
+                        'alipay': data['alipay'],
+                        'updated_date': datetime.datetime.now(),}
+                      },)
+            raise web.redirect("/users/detail/%s" % user_id)
+        elif action == "delete":
+            db.users.remove({"_id":ObjectId(data['user_id'])})
+            db.CronLog.remove({"user_id": ObjectId(data['user_id'])})
+
+        raise web.redirect("/users")
 
 app.add_processor(web.loadhook(pre_request))

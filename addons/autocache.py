@@ -12,6 +12,7 @@ except ImportError:
 from functools import wraps
 
 from redis2s import rds
+from config import debug_mode
 
 # _cache = {}
 
@@ -24,7 +25,7 @@ def redis_memoize(cache_name, ttl=-1):
 
     def _decorator(function):
         def __memoize(*args, **kwargs):
-            if rds.get('SINGLE_cache') == 'yes':
+            if not debug_mode and rds.get('SINGLE_cache') == 'yes':
                 key = 'value'
                 if rds.hexists(cache_name, key):
                     return pickle.loads(rds.hget(cache_name, key))

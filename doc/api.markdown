@@ -1,23 +1,25 @@
 # Gotit 开放接口文档
 
-+ _更新时间: 2014-04-17_
++ _更新时间: 2014-05-05_
 + _数据格式均为`JSON`_
 + 接口使用说明:  
     1. 由于中文验证码的存在, 接口或许有点另类, 希望见谅.  
     2. 验证类接口需要登录后才能使用, 如果仅查询单项信息推荐使用下面的成绩类或课表类接口  
-    3. 开发者在使用接口前先通过<a href="mailto:zhwei@gotit.asia">邮件</a>联系作者 索要`ACCESS_TOKEN`, 将其放入请求`header`中.
+    3. 开发者在使用接口前先通过<a href="mailto:zhwei@gotit.asia">邮件</a>联系作者 索要`accesstoken`, 将其放入请求`header`中.
     4. 次数限制 `1000次/小时`, 防止端口被恶意使用, 如果配额不够请联系作者.
 
 ## 索引
 
 + [验证类](#验证类)
   - [登录](#登录)
-    + 功能
-    + 请求方式
-      - 使用说明
-      - GET结果示例
-      - POST示例
-    + 返回值示例
+    + [无验证码登录](#无验证码登录)
+    + [有验证码登录](#有验证码登录)
+        - 功能
+        - 请求方式
+        - 使用说明
+            - GET结果示例
+            - POST示例
+        - 返回值示例
   - [查询接口列表(需登录)](#查询接口列表需登录)
 + [成绩类](#成绩类)
   - [当前学期成绩](#当前学期成绩)
@@ -40,7 +42,7 @@ _以后正方系统可能屏蔽此登录方式_
 + 功能  
 登录后可以直接获取下面所有接口的结果, 仅需要提供用户识别码(UID)
 + 接口地址  
-[/user/login.json?nocode=true](http://api.gotit.asia/user/nocode/login.json?nocode=true)
+[/user/login.json?nocode=true](http://api.gotit.asia/user/login.json?nocode=true)
 + 请求方式  
 `POST`
 + POST示例
@@ -67,7 +69,6 @@ _长期支持_
     + GET 结果示例
 
     ```json
-
         {
             "status": {
                 "code": 200,
@@ -80,10 +81,7 @@ _长期支持_
     ```
     + POST 示例
 
-    参数: `data`
-
     ```json
-
         {
             "uid": "user_067e11ac790844c08e068c96fb5b023b",
             "xh": "1111123456",
@@ -114,9 +112,8 @@ _下面表格中接口请求方式与请求数据相同_
 + 请求方式  
 `POST`
 + 请求数据  
-参数: data
-```json
 
+```json
     {
         "uid": "user_067e11ac790844c08e068c96fb5b023b"
     }
@@ -179,14 +176,35 @@ _例如: 无验证码登录 http://api.gotit.asia/user/login.json?nocode=true, �
 + 支持格式  
 JSON  
 + 请求方式  
-<i>同<a href="#登录">登录</a></i>  
+`GET` + `POST`  
     + 使用说明  
-    <i>同<a href="#登录">登录</a></i>
-    + GET 结果示例  
-    <i>同<a href="#登录">登录</a></i>
-    + POST 示例  
-    <i>同<a href="#登录">登录</a></i>
+        1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
+        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/checkcode.gif?uid=[UID]`(无括号).
+        3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
 
+    + GET 结果示例
+
+    ```json
+        {
+            "status": {
+                "code": 200,
+                "message": "Success",
+            },
+            "data": {
+                "uid": "user_067e11ac790844c08e068c96fb5b023b"
+            }
+        }
+    ```
+    + POST 示例
+
+    ```json
+        {
+            "uid": "user_067e11ac790844c08e068c96fb5b023b",
+            "xh": "1111123456",
+            "pw": "password",
+            "verify": "疫讨"
+        }
+    ```
 
 
 + 返回值示例
@@ -217,7 +235,6 @@ JSON
 + 请求方式  
 `POST`
     - 请求数据示例  
-    参数: data
 
     ```json
 
@@ -257,7 +274,6 @@ JSON
 + 请求方式  
 `POST`
     - 请求数据示例  
-    参数: data
 
     ```json
 
@@ -289,7 +305,6 @@ JSON
 + 请求方式  
 `POST`
     - 请求数据示例  
-    参数: data
 
     ```json
 
@@ -325,13 +340,36 @@ _接口可以直接使用， 单次使用_
 + 接口地址  
 [/timetable/current_semester.json](http://api.gotit.asia/timetable/current_semester.json)
 + 请求方式  
-<i>同<a href="#登录">登录</a></i>  
+`GET` + `POST`  
     + 使用说明  
-    <i>同<a href="#登录">登录</a></i>
-    + GET 结果示例  
-    <i>同<a href="#登录">登录</a></i>
-    + POST 示例  
-    <i>同<a href="#登录">登录</a></i>
+        1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
+        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/checkcode.gif?uid=[UID]`(无括号).
+        3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
+
+    + GET 结果示例
+
+    ```json
+        {
+            "status": {
+                "code": 200,
+                "message": "Success",
+            },
+            "data": {
+                "uid": "user_067e11ac790844c08e068c96fb5b023b"
+            }
+        }
+    ```
+    + POST 示例
+
+    ```json
+        {
+            "uid": "user_067e11ac790844c08e068c96fb5b023b",
+            "xh": "1111123456",
+            "pw": "password",
+            "verify": "疫讨"
+        }
+    ```
+
 
 + 返回值示例
 
@@ -367,13 +405,35 @@ _接口可以直接使用， 单次使用_
 + 接口地址  
 [/timetable/raw/current_semester.json](http://api.gotit.asia/timetable/current_semester/raw.json)
 + 请求方式  
-<i>同<a href="#登录">登录</a></i>
+`GET` + `POST`  
     + 使用说明  
-    <i>同<a href="#登录">登录</a></i>
-    + GET 结果示例  
-    <i>同<a href="#登录">登录</a></i>
-    + POST 示例  
-    <i>同<a href="#登录">登录</a></i>
+        1. **GET**:  先进行一次GET获取 `UID` 值(用户识别码), 用户的唯一标识. 
+        2. 通过`UID`获取验证码, 验证码链接为`http://api.gotit.asia/checkcode.gif?uid=[UID]`(无括号).
+        3.  **POST**: POST的数据有: 学号, 密码, 中文验证码(utf-8), 用户识别码`UID`
+
+    + GET 结果示例
+
+    ```json
+        {
+            "status": {
+                "code": 200,
+                "message": "Success",
+            },
+            "data": {
+                "uid": "user_067e11ac790844c08e068c96fb5b023b"
+            }
+        }
+    ```
+    + POST 示例
+
+    ```json
+        {
+            "uid": "user_067e11ac790844c08e068c96fb5b023b",
+            "xh": "1111123456",
+            "pw": "password",
+            "verify": "疫讨"
+        }
+    ```
 
 + 返回值示例
 

@@ -1,0 +1,42 @@
+{% extends 'base-index.html' %}
+
+{% block title %}申请{% endblock %}
+
+{% block head %}
+    <style>
+        html, body {
+            background-color: #ffffff;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="center col-md-9">
+        <h2>内容推送服务</h2>
+        <h3>介绍</h3>
+        <p>新功能， 系统每十分钟检索一次特定内容，如果内容更新则发送邮件到用户预先设定的邮箱。</p>
+
+        <p>暂时只允许&nbsp;<strong style="color: #b92c28;">赞助过的用户</strong>&nbsp;可以申请此服务，谢谢大家的支持！</p>
+        <h3>支持推送的内容</h3>
+        <ul>
+            <li>当前学期成绩</li>
+        </ul>
+        <h3>注意</h3>
+        <ul>
+            <li>申请服务需要提供相应密码</li>
+            <li>申请成绩推送前要保证能正常查询成绩，避免以下情况</li>
+            <ul>
+              <li>未完成当前学期的教学质量评价</li>
+              <li>没有更改过默认密码</li>
+            </ul>
+            <li>发件人为 <span>no-reply@gotit.asia</span>，如果被放入垃圾邮件请将其加入白名单</li>
+            <li>如有异常欢迎在留言页面提供相关信息</li>
+        </ul>
+        <p style="margin:50px 0 50px;" class="col-md-6 center">
+            <a href="/cron.html?action=apply" class="btn btn-info btn-block">申请</a>
+        </p>
+    </div>
+
+{% endblock %}
+

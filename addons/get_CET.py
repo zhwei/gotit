@@ -10,7 +10,7 @@ from time import ctime
 import requests
 
 import errors
-import config
+from redis2s import rds
 DIR = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -20,6 +20,17 @@ def get_proxy():
     second = int(str(ctime())[-7:-5])
     proxy = line[second].strip()
     return proxy
+
+def get_cet_fm_jae(number, name):
+    """ 从jae抓取数据 """
+    import json
+    header = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
+    url = "http://gotitasia.jd-app.com/cet"
+    data = {'number': number, 'name':name}
+    json_object = requests.post(url, data, headers=header).text
+    js = json.loads(json_object)
+    return js.get('raw', None)
+
 
 
 class CET:
@@ -61,9 +72,14 @@ class CET:
                 ).text
         except requests.Timeout:
             raise errors.RequestError('无法连接成绩查询系统！')
-        patten = re.compile("</caption>(.*?)</table>",re.M|re.S)
-        #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为
-        return patten.findall(page)[1]
+        try:
+            patten = re.compile("</caption>(.*?)</table>",re.M|re.S)
+            #re.M表示多行匹配，re.S表示点任意匹配模式，改变'.'的行为
+            ret = patten.findall(page)[1]
+        except IndexError:
+            rds.hset('error_score_cant_get_info', num, page)
+            raise errors.PageError('找不到您的成绩单!')
+        return ret
 
     def get_cet_dict(self,num):
         '''获取四六级成绩（返回一个字典）'''
@@ -85,8 +101,8 @@ class CET:
             ret['class']=res[6]     #班级
             ret['foreign']=res[11]  #外语类型
         except:
-            logging.error("cannot get info")
-            return -1
+            rds.hset('error_score_cant_get_info', num, page)
+            raise errors.PageError('找不到您的成绩单!')
         total = (len(res)-13)/7
         cet_num=[]      #四六级考号
         cet_time=[]     #四六级考试时间

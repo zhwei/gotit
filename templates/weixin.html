@@ -15,7 +15,12 @@
     <div class="center col-md-9">
 
         <h2>微信公众账号, 欢迎使用！</h2>
-
+        {% if alert.wechat %}
+        <div class="alert alert-dismissable alert-info">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            {{ alert.wechat }}
+        </div>
+        {% endif %}
         <div class="jumbotron text-center">
             <p><img class="img-thumbnail img-responsive" src="http://gotit.qiniudn.com/gotit_weixin_258.jpg" alt="微信二维码图片"></p>
         </div>

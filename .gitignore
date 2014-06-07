@@ -16,6 +16,9 @@ restart.sh
 start.sh
 .idea/*
 initial_data.py
+*.swp
+addons/config.py
+addons/backup/*
 
 # C extensions
 *.so

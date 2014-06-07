@@ -14,15 +14,24 @@ except ImportError:
 
 import config
 import errors
-from addons.calc_GPA import GPA
+from calc_GPA import GPA
+from redis2s import rds
+
+class PageAlert(object):
+    """ 处理页面警告
+    从redis中获取页面警告
+    """
+
+    def __getattr__(self, item):
+        """从redis中获取警告内容"""
+        alert = rds.get('SINGLE_{}'.format(item))
+        return alert
 
 def get_unique_key(prefix=None):
 
-    import time
-    import md5
-    if prefix:
-        key = "{}_{}".format(prefix, md5.md5(str(time.time())).hexdigest())
-    key = md5.md5(str(time.time())).hexdigest()
+    import uuid
+    key = uuid.uuid4().hex
+    if prefix: key = "{}_{}".format(prefix, key)
     return key
 
 LEVELS = {
@@ -76,7 +85,7 @@ def not_error_page(page):
         raise errors.PageError(_m.group(1))
         #return _m.group(1)
     if page.find('ERROR - 出错啦！') != -1:
-        raise errors.ZfError('正方教务系统不可用')
+        raise errors.RequestError('正方教务系统不可用')
     return True
 
 def get_score_gpa(xh):
@@ -106,3 +115,30 @@ def zipf2strio(foldername, includeEmptyDIr=True):
         empty_dirs = []
     zip.close()
     return fi
+
+
+def incr_key(key, expire=False):
+    """ 如果存在则++，不存在则设为0 """
+    if rds.exists(key): rds.incr(key)
+    else:
+        rds.set(key, 0)
+        if expire: rds.expire(key, expire)
+    return int(rds.get(key) or 0)
+
+def send_mail(to_list, subject, content):
+    import smtplib
+    from email.mime.text import MIMEText
+    msg = MIMEText(content,_subtype='html',_charset='gb2312')    #创建一个实例，这里设置为html格式邮件
+    msg['Subject'] = subject    #设置主题
+    msg['From'] = config.DEFAULT_FROM_EMAIL
+    msg['To'] = ";".join(to_list)
+    try:
+        s = smtplib.SMTP()
+        s.connect(config.EMAIL_HOST)  #连接smtp服务器
+        s.login(config.EMAIL_HOST_USER,config.EMAIL_HOST_PASSWORD)  #登陆服务器
+        s.sendmail(config.DEFAULT_FROM_EMAIL, to_list, msg.as_string())  #发送邮件
+        s.close()
+        return True
+    except Exception, e:
+        logging.error(e)
+        return False

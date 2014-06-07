@@ -26,34 +26,36 @@ class RedisStore(Store):
     Store for saving a session in redis
     """
 
-    def __init__(self, ip="127.0.0.1", port=6379, db=0):
+    def __init__(self, ip="127.0.0.1", port=6379, db=0, markup=None, timeout=None):
 
         self.db = redis.StrictRedis(host=ip, port=port, db=db)
-        self.timeout = web.webapi.config.session_parameters.timeout
+        # self.timeout = web.webapi.config.session_parameters.timeout
+        self.markup = markup or 'SESSION_'
+        self.timeout = timeout or 600
 
     def __contains__(self, key):
         #"判定是否存在key"
         try:
-            return bool(self.db.exists(SESSION_MARKUP+key))
+            return bool(self.db.exists(self.markup+key))
         except redis.ConnectionError:
             sys.stderr.write('Error: Can not Connect Redis')
             sys.exit()
 
     def __getitem__(self, key):
 
-        v = self.db.get(SESSION_MARKUP+key)
+        v = self.db.get(self.markup+key)
         if v:
-            self.db.expire(SESSION_MARKUP+key, 600)
+            self.db.expire(self.markup+key, self.timeout)
             return self.decode(v)
         else:
             raise KeyError
 
     def __setitem__(self, key, value):
 
-        self.db.setex(SESSION_MARKUP+key, 600, self.encode(value))
+        self.db.setex(self.markup+key, self.timeout, self.encode(value))
 
     def __delitem__(self, key):
-        self.db.delete(SESSION_MARKUP+key)
+        self.db.delete(self.markup+key)
 
     def cleanup(self, timeout):
         pass
@@ -75,5 +77,6 @@ class RedisStore(Store):
         try:
             return pickle.loads(pickled)
         except pickle.UnpicklingError:
-            logging.error('UnpicklingError: '+pickled)
+            from time import time
+            self.db.hset('error_UnpicklingError', time(),pickled)
             return pickle.loads(pickled)

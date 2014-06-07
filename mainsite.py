@@ -5,6 +5,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import logging
+import datetime
 
 import web
 from web.contrib.template import render_jinja
@@ -20,8 +21,9 @@ from addons.zfr import ZF, Login
 from addons.autocache import redis_memoize
 from addons import get_former_cet, get_book
 from addons.RedisStore import RedisStore
-from addons.utils import get_score_gpa
-from forms import cet_form, xh_form, login_form
+from addons.utils import get_score_gpa, PageAlert
+from addons.utils import incr_key
+from forms import cet_form, xh_form, login_form, cron_form
 
 
 urls = (
@@ -31,15 +33,17 @@ urls = (
     '/zheng/checkcode', 'checkcode',
     '/more/(.+)', 'more',
     '/years', 'years',
-    '/score', 'score',
-    '/cet', 'cet',
+    '/score', 'Score',
+    '/cet', 'Cet',
     '/cet/former', 'FormerCET',
-    '/libr', 'libr',
-    '/contact.html', 'contact',
-    '/notice.html', 'notice',
-    '/help/gpa.html', 'help_gpa',
-    '/comment.html', 'comment',
-    '/donate.html', 'donate',
+    '/libr', 'Libr',
+    '/contact.html', 'Contact',
+    '/notice.html', 'Notice',
+    '/help/gpa.html', 'HelpGpa',
+    '/comment.html', 'Comment',
+    '/donate.html', 'Donate',
+    '/cron.html', 'Cronwork',
+    '/ad/(.+)', 'Advertise',
 )
 
 # main app
@@ -51,26 +55,20 @@ session = web.session.Session(app, RedisStore(), {'count': 0, 'xh':False})
 # render templates
 from addons.config import domains
 render = render_jinja('templates', encoding='utf-8',
-                      globals={
-                          'context':session,
-                          "domains":domains
-                      })
-
+                      globals=dict(context=session,domains=domains,
+                            alert=PageAlert(),))
 
 # init mongoDB
 mongo = mongo2s.init_mongo()
+
+
 
 # 首页索引页
 class index:
 
     @redis_memoize('index', 100)
     def GET(self):
-        zheng_alert = rds.get('SINGLE_zheng')
-        score_alert = rds.get('SINGLE_score')
-        index_show = rds.get('SINGLE_index')
-
-        return render.index(zheng_alert=zheng_alert, index_show=index_show,
-                            score_alert=score_alert)
+        return render.index()
 
 class BaseSearch(object):
     """ 各个查询功能的基类
@@ -84,13 +82,11 @@ class zheng:
         try:
             zf = ZF()
             uid = zf.pre_login()
-        except errors.ZfError, e:
+        except errors.RequestError, e:
             return render.serv_err(err=e.value)
         session['uid'] = uid
-        # get alert
-        _alert=rds.get('SINGLE_zheng')
         import time
-        return render.zheng(alert=_alert, ctime=str(time.time()))
+        return render.zheng(ctime=str(time.time()))
 
     def POST(self):
         content = web.input()
@@ -100,7 +96,6 @@ class zheng:
             uid = session['uid']
         except (AttributeError, KeyError), e:
             return render.alert_err(error='请检查您是否禁用cookie', url='/zheng')
-
         try:
             zf = Login()
             zf.login(uid, content)
@@ -116,6 +111,8 @@ class zheng:
             return render.result(tables=__dic[t]())
         except errors.PageError, e:
             return render.alert_err(error=e.value, url='/zheng')
+        except errors.RequestError, e:
+            return render.serv_err(err=e)
 
 class checkcode:
     """验证码链接
@@ -125,19 +122,26 @@ class checkcode:
             uid = web.input(_method='get').uid
         except AttributeError:
             try:
-                uid=session['uid']
+                uid = session['uid']
+                if not uid: raise KeyError
             except KeyError:
                 return render.serv_err(err='该页面无法直接访问或者您的登录已超时，请重新登录')
         web.header('Content-Type','image/gif')
         zf = ZF()
-        image_content = zf.get_checkcode(uid)
-        return image_content
+        try:
+            image_content = zf.get_checkcode(uid)
+            return image_content
+        except errors.PageError, e:
+            pass
 
 class more:
     """连续查询 二次查询
     """
     def GET(self, t):
-        if session['xh'] is False:
+        try:
+            if session['xh'] is False:
+                raise KeyError
+        except KeyError:
             raise web.seeother('/zheng')
         try:
             __dic1 = { # need xh
@@ -166,7 +170,7 @@ class more:
                 return render.result(tables=__dic[t]())
             raise web.notfound()
         except (AttributeError, TypeError, KeyError):
-            raise web.seeother('/zheng')
+            raise web.seeother('/zheng/nocode')
         except errors.RequestError, e:
             return render.serv_err(err=e)
         except errors.PageError, e:
@@ -178,7 +182,7 @@ class zheng_no_code:
     """
     title='正方教务系统'
 
-    @redis_memoize('zheng_no_code')
+    @redis_memoize('nocode')
     def GET(self):
         form=login_form
         return render.normal_form(title=self.title, form=form)
@@ -222,22 +226,23 @@ class cet:
     @redis_memoize('cet')
     def GET(self):
         form = cet_form()
-        return render.cet_bae(form=form)
+        return render.cet(form=form)
 
     def POST(self):
         form = cet_form()
-        if not form.validates():
+        try:
+            if not form.validates():
+                return render.cet(form=form)
+            else:
+                zkzh = form.d.zkzh
+                name = form.d.name
+                name = name.encode('utf-8')
+                from addons.get_CET import get_cet_fm_jae
+                table = get_cet_fm_jae(zkzh, name)
+                return render.result(single_table=table)
+        except UnicodeDecodeError:
+            rds.hset('error_cet_unicode_de_er', form.d.zkzh, form.d.name)
             return render.cet(form=form)
-        else:
-            zkzh = form.d.zkzh
-            name = form.d.name
-            name = name.encode('utf-8')
-            items = ["学校","姓名","阅读", "写作", "综合",
-                    "准考证号", "考试时间", "总分", "考试类别",
-                    "听力"]
-            cet = CET()
-            res = cet.get_last_cet_score(zkzh, name)
-            return render.result_dic(items=items, res=res)
 
 
 class FormerCET:
@@ -260,11 +265,13 @@ class FormerCET:
         try:
             table=get_former_cet(xh)
             return render.result(table=table)
+        except errors.PageError, e:
+            return render.alert_err(error=e.value, url='/cet/former')
         except errors.RequestError, e:
             return render.serv_err(err=e)
 
 
-class libr:
+class Libr:
     """
     图书馆相关
     """
@@ -290,13 +297,13 @@ class libr:
 
 
 # 全部成绩
-class score:
+class Score:
 
     @redis_memoize('score', 100)
     def GET(self):
         form = xh_form()
-        alert=rds.get('SINGLE_score')
-        return render.score(form=form, alert=alert)
+        # alert=rds.get('SINGLE_score')
+        return render.score(form=form)
 
     def POST(self):
         form = xh_form()
@@ -320,7 +327,7 @@ class score:
 # 平均学分绩点计算说明页面
 
 
-class help_gpa:
+class HelpGpa:
 
     @redis_memoize('help_gpa')
     def GET(self):
@@ -328,14 +335,14 @@ class help_gpa:
 
 # 评论页面, 使用多说评论
 
-class comment:
+class Comment:
 
     @redis_memoize('comment')
     def GET(self):
         return render.comment()
 
 
-class contact:
+class Contact:
 
     """contact us page"""
     @redis_memoize('contanct')
@@ -344,22 +351,63 @@ class contact:
 
 # notice
 
-class notice:
+class Notice:
     @redis_memoize('notice')
     def GET(self):
         news = mongo.notice.find().sort("datetime",-1)
         return render.notice(news=news)
 
+class Advertise:
+    """"""
+    def GET(self, ad_name):
+        ads = ('zhe800',)
+        if ad_name in ads:
+            incr_key('ad_count_%s' % ad_name)
+            return getattr(render, ad_name)()
+        else:
+            raise web.notfound()
 
 # 赞助页面
 
-class donate:
+class Donate:
 
     @redis_memoize('donate')
     def GET(self):
         sponsor = mongo.donate.find().sort("much",-1)
         return render.donate(sponsor=sponsor)
 
+class Cronwork:
+
+    def GET(self):
+        action = web.input(_method='get').get("action", None)
+        if action and action == "apply":
+            title = "申请推送服务"
+            form = cron_form()
+            return render.normal_form(title=title, form=form)
+        return render.cronpage()
+
+    def POST(self):
+        action = web.input(_method='get').get("action", None)
+        if action and action == "apply":
+            form = cron_form()
+            if form.validates():
+                mongo["users"].insert({
+                    'name': form.d['name'],
+                    'email' : form.d["email"],
+                    'xh': form.d['xh'],
+                    'pw': form.d['pw'],
+                    # 'lib_pw': form.d['lib_pw'],
+                    'alipay': form.d['alipay'],
+                    'created_date': datetime.datetime.now(),
+                    'updated_date': datetime.datetime.now(),
+                    'active': False,
+                })
+                return render.alert_err(
+                    error='申请完成，等待管理员检查，最长24小时内答复，谢谢支持！',
+                    url='/')
+            else:
+                title = "申请推送服务"
+                return render.normal_form(title=title, form=form)
 
 # web server
 def session_hook():
@@ -376,7 +424,7 @@ def internalerror():
     """500
     """
     web.setcookie('webpy_session_id','',-1)
-    mongo2s.mcount('internalerror')
+    incr_key('internalerror')
     return web.internalerror(render.internalerror())
 
 app.notfound = notfound
