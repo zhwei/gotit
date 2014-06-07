@@ -118,6 +118,9 @@ class UserLogin(BaseApiMixin, BaseGet):
                 uid = content["uid"]
                 zf.login(uid, content)
             return self.json_response(data={"uid": uid})
+        except KeyError:
+            web.ctx.status = "400"
+            return self.json_response(message="data format wrong")
         except errors.PageError, e:
             return self.json_response({}, message=e.value)
 

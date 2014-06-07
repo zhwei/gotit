@@ -103,13 +103,13 @@ class callback:
         if len(code)!=32:
             raise web.seeother(AUTH_URL)
 
-        _r = CLIENT.request_access_token(code)
-        access_token = _r.access_token
-        expires_in = _r.expires_in
-
-        CLIENT.set_access_token(access_token, expires_in)
-
         try:
+            _r = CLIENT.request_access_token(code)
+            access_token = _r.access_token
+            expires_in = _r.expires_in
+
+            CLIENT.set_access_token(access_token, expires_in)
+
             uid = CLIENT.account.get_uid.get()['uid']
             if uid != ADMIN_WEIBO_ID:
                 return render.ologin(auth_url=AUTH_URL, error='欢迎尝试')
