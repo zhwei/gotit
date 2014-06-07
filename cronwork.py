@@ -162,4 +162,4 @@ if __name__ == '__main__':
         logging.error(datetime.datetime.now())
         control()
         logging.error("Sleeping ...")
-        gevent.sleep(60)
+        gevent.sleep(600)
