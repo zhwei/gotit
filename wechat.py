@@ -18,22 +18,20 @@ from web import ctx
 
 from addons import mongo2s
 from addons.zfr import ZF, Login
-from addons import redis2s
+from addons.redis2s import rds
 from addons import errors
 from addons.calc_GPA import GPA
 from addons.get_CET import CET
 from addons.data_factory import get_score_dict
 from addons.autocache import redis_memoize
+from addons.config import WECHAT_TOKEN
 
-# init redis
-rds = redis2s.init_redis()
 # init mongoDB
 db = mongo2s.init_mongo()
 
 # 账户过期时间(s) 十分钟
 EXPIRE_SECONDS = 600
 # 微信Token
-WEIXIN_TOKEN = "gotitzhangwei"
 
 INDEX_HELP_TEXT = \
 """欢迎使用！
@@ -72,6 +70,10 @@ FAST_ZF_HELP = \
 q.删除用户信息
 - - -
 000.赞助我们"""
+
+def redis_key(user_key):
+
+    return "WeChat:User:%s" % user_key
 
 class BaseMsg(object):
     """基本信息操作"""
@@ -122,6 +124,9 @@ class BaseMsg(object):
 
 class ProcessMsg(object):
     """处理查询操作"""
+
+    fromUser = None
+    content = None
 
     def get_gpa(self, xh):
         """ 获取绩点
@@ -181,7 +186,7 @@ class ProcessMsg(object):
                 'verify':'验证码',
                 }
         if init:
-            """引导输入学号等信息"""
+            # 引导输入学号等信息
             st = rds.hget(self.fromUser, 'status')
             if st not in ('xh','pw','verify') or self.content == '11':
                 rds.hset(self.fromUser, 'status', 'xh')
@@ -224,7 +229,7 @@ class ProcessMsg(object):
             else:
                 return self.replay_text(self.text_help())
         else:
-            """登录成功后的操作"""
+            # 登录成功后的操作
             if self.content == "00":
                 # 内容列表
                 return self.replay_text(self.text_success())
@@ -287,7 +292,7 @@ class ProcessMsg(object):
             ret += "- - - \n {}".format(FAST_ZF_HELP)
             return self.replay_text(ret)
 
-    def cet_jidi(self, xh=False):
+    def cet_gpa(self, xh=False):
         """获取绩点或者往年cet成绩"""
         if xh is False:
             # self.content must be 3 or 4
@@ -328,7 +333,6 @@ class ProcessMsg(object):
         rds.delete(self.fromUser)
         return self.replay_text('已清空用户信息,退出查询过程.\n{}'.format(self.text_help()))
 
-
 urls = (
         '/', 'WeixinIndex',
         '/weixin', 'WeChatInterface',
@@ -341,12 +345,12 @@ class WeixinIndex:
     @redis_memoize('weixin')
     def GET(self):
         from mainsite import render
-        # from web.contrib.template import render_jinja
-        # render = render_jinja('templates', encoding='utf-8')
-        # from addons.config import domains
         return render.weixin()
 
 class WeChatInterface(BaseMsg, ProcessMsg):
+
+    def __init__(self):
+        self.comment = None
 
     def GET(self):
         #获取输入参数
@@ -356,7 +360,7 @@ class WeChatInterface(BaseMsg, ProcessMsg):
             nonce, echostr = data.nonce,data.echostr
         except AttributeError:
             return 't'
-        token= WEIXIN_TOKEN
+        token= WECHAT_TOKEN
         #字典序排序
         li=[token, timestamp, nonce]
         li.sort()
@@ -419,9 +423,9 @@ class WeChatInterface(BaseMsg, ProcessMsg):
                 return self.fast_zf(init=False)
             # gpa and old cet
             elif self.content in ('3', '4'):
-                return self.cet_jidi()
+                return self.cet_gpa()
             elif _s in ('3', '4'):
-                return self.cet_jidi(self.content)
+                return self.cet_gpa(self.content)
             # comment
             elif _s == 'comment':
                 return self.comment(False)
