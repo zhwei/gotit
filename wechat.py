@@ -338,7 +338,7 @@ app = web.application(urls, locals())
 
 class WeixinIndex:
 
-    @redis_memoize('weixin')
+    @redis_memoize(10000, 'weixin')
     def GET(self):
         from mainsite import render
         # from web.contrib.template import render_jinja

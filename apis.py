@@ -274,7 +274,7 @@ def internalerror():
 
 def limit_processor(handler):
 
-    @redis_memoize("developer")
+    @redis_memoize(10000, "developer")
     def developer_list():
         db = init_mongo()
         return [d['token'] for d in db['developer'].find()]
