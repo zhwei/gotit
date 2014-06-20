@@ -50,10 +50,10 @@
                 <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Number</th>
-                    <th>Email</th>
+                    <th class="hidden-xs">Number</th>
+                    <th class="hidden-xs">Email</th>
                     <th>Status</th>
-                    <th>Created Date</th>
+                    <th class="hidden-xs">Created Date</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -61,10 +61,10 @@
                 {% for user in user_list %}
                     <tr {% if not user.active %}class="active"{% endif %} >
                         <td><a href="/users/detail/{{ user._id }}">{{ user.name|e }}</a></td>
-                        <td><a href="/users/detail/{{ user._id }}">{{ user.xh|e }}</a></td>
-                        <td>{{ user.email|e }}</td>
+                        <td class="hidden-xs"><a href="/users/detail/{{ user._id }}">{{ user.xh|e }}</a></td>
+                        <td class="hidden-xs">{{ user.email|e }}</td>
                         <td>{{ user.score_status|truncate(9, True) }}</td>
-                        <td>{{ user.created_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td class="hidden-xs">{{ user.created_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                         <td>
                             <a href="/users/log/{{ user._id }}" class="btn btn-xs btn-primary">Log</a>
                             <a href="/users/update/{{ user._id }}" class="btn btn-xs btn-info">Update</a>
