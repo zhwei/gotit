@@ -61,11 +61,11 @@ LOGGED_HELP_TEXT = \
 q.  取消登录状态"""
 
 FAST_ZF_HELP = \
-"""按需求输入下面序号:
+"""按需求输入下面格式的内容:
 查询当前学期成绩:
-1&学号&密码&验证码
+    1&学号&密码
 查询上学期成绩:
-2&学号&密码&验证码
+    2&学号&密码
 - - -
 0.显示此帮助菜单
 q.删除用户信息
@@ -200,33 +200,13 @@ class ProcessMsg(object):
                 if self.content == '1112051112': __egg+="\n love you, my x!"
                 return self.replay_text(__egg)
             elif st == 'pw':
-                rds.hset(redis_key(self.fromUser), 'pw', self.content)
-                rds.hset(redis_key(self.fromUser), 'status', 'verify')
-                # before login
-                zf = ZF()
-                uid = zf.pre_login()
-                rds.expire(redis_key(self.fromUser), EXPIRE_SECONDS)
-                rds.hset(redis_key(self.fromUser), 'uid', uid)
-                rds.hset(redis_key(self.fromUser), 'status', 'verify')
-                return self.replay_code(uid) # return checkcode msg
-            elif self.content == 'r':
-                # 再次获取验证码
-                rds.hset(redis_key(self.fromUser), 'status', 'verify')
-                uid=rds.hget(redis_key(self.fromUser), 'uid')
-                _ret = self.replay_code(uid)
-                logging.error(("uid", uid))
-                logging.error(("replay_code", _ret))
-                return _ret # return checkcode msg
-            elif st == 'verify':
                 zf = Login()
                 data = {
                         "xh": rds.hget(redis_key(self.fromUser), 'xh'),
-                        "pw": rds.hget(redis_key(self.fromUser), 'pw'),
-                        "verify": self.content,
-                        }
-                uid=rds.hget(redis_key(self.fromUser), "uid")
+                        "pw": self.content, }
                 try:
-                    zf.login(uid, data)
+                    uid = zf.no_code_login(data)
+                    rds.hset(redis_key(self.fromUser), 'uid', uid)
                     rds.hset(redis_key(self.fromUser), 'status', 'logged')
                     return self.replay_text('登录成功！十分钟内无操作删除用户信息。\n{}'.format(self.text_success()))
                 except errors.PageError, e:
@@ -264,29 +244,25 @@ class ProcessMsg(object):
         if self.content == '00':
             return self.replay_text(FAST_ZF_HELP)
         if init==True:
-            z = ZF()
-            uid = z.pre_login()
             rds.expire(redis_key(self.fromUser), EXPIRE_SECONDS)
-            rds.hset(redis_key(self.fromUser), 'uid', uid)
             rds.hset(redis_key(self.fromUser), 'status', 'fast1')
-            return self.replay_code(uid, content=FAST_ZF_HELP) # return checkcode msg
+            return self.replay_text(content=FAST_ZF_HELP) # return checkcode msg
         else:
             try:
                 tu = self.content.split("&")
-                _xh, pw_l, _verify   = tu[1], tu[2:-1], tu[-1]
+                _xh, pw_l = tu[1], tu[2:]
             except IndexError:
                 return self.replay_text(FAST_ZF_HELP)
-            if len(pw_l) == 1: _pw = pw_l[0]
-            else: _pw = "&".join(pw_l)
+            if isinstance(pw_l, (list, tuple)):
+                _pw = "&".join(pw_l)
+            else: _pw = pw_l
             _data = {
                     "xh": _xh,
-                    "pw": _pw,
-                    "verify": _verify,
-                    }
-            uid=rds.hget(redis_key(self.fromUser), "uid")
+                    "pw": _pw, }
             zf = Login()
             try:
-                zf.login(uid, _data)
+                uid = zf.no_code_login(_data)
+                rds.hset(redis_key(self.fromUser), "uid", uid)
                 rds.hset(redis_key(self.fromUser), 'xh', _xh)
                 ret = self.get_zf_score(tu[0])
             except KeyError:
