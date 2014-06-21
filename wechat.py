@@ -10,6 +10,7 @@ import datetime
 import hashlib
 import time
 import json
+import logging
 from lxml import etree
 
 import requests
@@ -101,7 +102,8 @@ class BaseMsg(object):
         return text
 
     def replay_code(self, uid, content=""):
-        if rds.hget(self.fromUser, 'status').startswith('fast'):
+        if rds.hget(redis_key(self.fromUser),
+                    'status').startswith('fast'):
             r = '2'
         else: r = 'r'
         text = """
@@ -165,12 +167,12 @@ class ProcessMsg(object):
                 '1': zf.get_score,
                 '2': zf.get_last_score,
                 }
-        _uid = rds.hget(self.fromUser, 'uid')
-        _xh = rds.hget(self.fromUser, 'xh')
+        _uid = rds.hget(redis_key(self.fromUser), 'uid')
+        _xh = rds.hget(redis_key(self.fromUser), 'xh')
         zf.init_after_login(_uid, _xh)
         try:
             score = _zf_dic[t]()[0] # 条件选择
-            rds.expire(self.fromUser, EXPIRE_SECONDS) # 延长过期时间
+            rds.expire(redis_key(self.fromUser), EXPIRE_SECONDS) # 延长过期时间
         except KeyError:
             return self.text_success()
         _dic = get_score_dict(score)
@@ -187,42 +189,45 @@ class ProcessMsg(object):
                 }
         if init:
             # 引导输入学号等信息
-            st = rds.hget(self.fromUser, 'status')
+            st = rds.hget(redis_key(self.fromUser), 'status')
             if st not in ('xh','pw','verify') or self.content == '11':
-                rds.hset(self.fromUser, 'status', 'xh')
+                rds.hset(redis_key(self.fromUser), 'status', 'xh')
                 return self.replay_text('请输入学号:\n(q.退出查询状态)')
             if st == 'xh':
-                rds.hset(self.fromUser, 'xh', self.content)
-                rds.hset(self.fromUser, 'status', 'pw')
+                rds.hset(redis_key(self.fromUser), 'xh', self.content)
+                rds.hset(redis_key(self.fromUser), 'status', 'pw')
                 __egg = '请输入密码:\n(q.退出查询状态)'
                 if self.content == '1112051112': __egg+="\n love you, my x!"
                 return self.replay_text(__egg)
             elif st == 'pw':
-                rds.hset(self.fromUser, 'pw', self.content)
-                rds.hset(self.fromUser, 'status', 'verify')
+                rds.hset(redis_key(self.fromUser), 'pw', self.content)
+                rds.hset(redis_key(self.fromUser), 'status', 'verify')
                 # before login
                 zf = ZF()
                 uid = zf.pre_login()
-                rds.expire(self.fromUser, EXPIRE_SECONDS)
-                rds.hset(self.fromUser, 'uid', uid)
-                rds.hset(self.fromUser, 'status', 'verify')
+                rds.expire(redis_key(self.fromUser), EXPIRE_SECONDS)
+                rds.hset(redis_key(self.fromUser), 'uid', uid)
+                rds.hset(redis_key(self.fromUser), 'status', 'verify')
                 return self.replay_code(uid) # return checkcode msg
             elif self.content == 'r':
                 # 再次获取验证码
-                rds.hset(self.fromUser, 'status', 'verify')
-                uid=rds.hget(self.fromUser, 'uid')
-                return self.replay_code(uid) # return checkcode msg
+                rds.hset(redis_key(self.fromUser), 'status', 'verify')
+                uid=rds.hget(redis_key(self.fromUser), 'uid')
+                _ret = self.replay_code(uid)
+                logging.error(("uid", uid))
+                logging.error(("replay_code", _ret))
+                return _ret # return checkcode msg
             elif st == 'verify':
                 zf = Login()
                 data = {
-                        "xh": rds.hget(self.fromUser, 'xh'),
-                        "pw": rds.hget(self.fromUser, 'pw'),
+                        "xh": rds.hget(redis_key(self.fromUser), 'xh'),
+                        "pw": rds.hget(redis_key(self.fromUser), 'pw'),
                         "verify": self.content,
                         }
-                uid=rds.hget(self.fromUser, "uid")
+                uid=rds.hget(redis_key(self.fromUser), "uid")
                 try:
                     zf.login(uid, data)
-                    rds.hset(self.fromUser, 'status', 'logged')
+                    rds.hset(redis_key(self.fromUser), 'status', 'logged')
                     return self.replay_text('登录成功！十分钟内无操作删除用户信息。\n{}'.format(self.text_success()))
                 except errors.PageError, e:
                     return self.replay_text("错误:{0}\n- - - \nr.  重新获取验证码\n11.重新查询\nq. 退出查询过程".format(e.value))
@@ -245,8 +250,8 @@ class ProcessMsg(object):
                         '3': self.get_gpa,
                         '4': self.get_former_cet,
                         }
-                _xh = rds.hget(self.fromUser, 'xh')
-                rds.expire(self.fromUser, EXPIRE_SECONDS)
+                _xh = rds.hget(redis_key(self.fromUser), 'xh')
+                rds.expire(redis_key(self.fromUser), EXPIRE_SECONDS)
                 ret = _dic[self.content](_xh)
             else:
                 ret = ""
@@ -261,9 +266,9 @@ class ProcessMsg(object):
         if init==True:
             z = ZF()
             uid = z.pre_login()
-            rds.expire(self.fromUser, EXPIRE_SECONDS)
-            rds.hset(self.fromUser, 'uid', uid)
-            rds.hset(self.fromUser, 'status', 'fast1')
+            rds.expire(redis_key(self.fromUser), EXPIRE_SECONDS)
+            rds.hset(redis_key(self.fromUser), 'uid', uid)
+            rds.hset(redis_key(self.fromUser), 'status', 'fast1')
             return self.replay_code(uid, content=FAST_ZF_HELP) # return checkcode msg
         else:
             try:
@@ -278,17 +283,17 @@ class ProcessMsg(object):
                     "pw": _pw,
                     "verify": _verify,
                     }
-            uid=rds.hget(self.fromUser, "uid")
+            uid=rds.hget(redis_key(self.fromUser), "uid")
             zf = Login()
             try:
                 zf.login(uid, _data)
-                rds.hset(self.fromUser, 'xh', _xh)
+                rds.hset(redis_key(self.fromUser), 'xh', _xh)
                 ret = self.get_zf_score(tu[0])
             except KeyError:
                 ret = "前缀错误\n{}".format(FAST_ZF_HELP)
             except errors.PageError, e:
                 ret = e.value
-            rds.hset(self.fromUser, 'status', None)
+            rds.hset(redis_key(self.fromUser), 'status', None)
             ret += "- - - \n {}".format(FAST_ZF_HELP)
             return self.replay_text(ret)
 
@@ -296,16 +301,16 @@ class ProcessMsg(object):
         """获取绩点或者往年cet成绩"""
         if xh is False:
             # self.content must be 3 or 4
-            rds.hset(self.fromUser, 'status', self.content)
+            rds.hset(redis_key(self.fromUser), 'status', self.content)
             return self.replay_text('请输入学号:\nq.退出查询过程')
         _dic = {
                 '3': self.get_gpa,
                 '4': self.get_former_cet,
                 }
-        _t = rds.hget(self.fromUser, 'status')
+        _t = rds.hget(redis_key(self.fromUser), 'status')
         try:
             ret = _dic[_t](xh)
-            rds.hset(self.fromUser, 'status', None)
+            rds.hset(redis_key(self.fromUser), 'status', None)
         except errors.RequestError, e:
             ret = e.value
         return self.replay_text(ret)
@@ -313,11 +318,11 @@ class ProcessMsg(object):
     def comment(self, init=True):
         """留言"""
         if init:
-            rds.hset(self.fromUser, 'status', 'comment')
+            rds.hset(redis_key(self.fromUser), 'status', 'comment')
             text = "格式: ly#内容\n谢谢支持！"
             return self.replay_text(text)
         if self.content.startswith('ly#') is False:
-            rds.hset(self.fromUser, 'status', None)
+            rds.hset(redis_key(self.fromUser), 'status', None)
             return self.replay_text("格式错误, 留言结束,谢谢支持。")
         _data = {
                 'user': self.fromUser,
@@ -325,12 +330,12 @@ class ProcessMsg(object):
                 'datetime': datetime.datetime.now(),
                 }
         db.wxcomment.insert(_data)
-        rds.hset(self.fromUser, 'status', None)
+        rds.hset(redis_key(self.fromUser), 'status', None)
         return self.replay_text("提交成功，谢谢您的支持！")
 
     def clear_user(self):
         # 清空用户状态
-        rds.delete(self.fromUser)
+        rds.delete(redis_key(self.fromUser))
         return self.replay_text('已清空用户信息,退出查询过程.\n{}'.format(self.text_help()))
 
 urls = (
@@ -410,7 +415,7 @@ class WeChatInterface(BaseMsg, ProcessMsg):
             except KeyError:
                 pass
             # 获取用户状态
-            _s = rds.hget(self.fromUser, 'status')
+            _s = rds.hget(redis_key(self.fromUser), 'status')
             # 引导查询操作
             if _s in ('logged',) and self.content != '11':
                 return self.zf_process(init=False)
