@@ -42,7 +42,11 @@
             </form>
         </div>
     {% elif action == "list" and user_list %}
-        <h2>全部用户&nbsp;&nbsp;<a href="/users/create" class="btn btn-primary btn-sm">添加</a>
+    <h2>全部用户
+	    &nbsp;&nbsp;<a href="/users/create" class="btn btn-primary btn-sm">添加</a>
+	    <a href="/users?active=all" class="btn btn-info btn-sm">全部</a>
+	    <a href="/users?active=true" class="btn btn-info btn-sm">用户</a>
+	    <a href="/users?active=false" class="btn btn-info btn-sm">待通过</a>
         </h2>
         <hr/>
         <div class="col-md-12 center">

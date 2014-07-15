@@ -149,10 +149,9 @@ def worker(thread_name):
 def control():
     global tasks
     tasks = Queue(maxsize=10)
-
-    gevent.spawn(boss).join()
-    threads = []
-    for w in ('Tom', 'Jerry', 'Obama'):
+    #gevent.spawn(boss).join()
+    threads = [gevent.spawn(boss),]
+    for w in ('Tom', 'Jerry', 'Obama', 'hello'):
         threads.append(gevent.spawn(worker, w))
     gevent.joinall(threads)
 

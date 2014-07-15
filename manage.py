@@ -124,10 +124,9 @@ class Analytics:
     def GET(self):
         try:
             data = web.input(_method='GET')
-            li = ('internalerror', 'checkcode')
-            if data.zero in li:
-                mongo_set_zero(data.zero)
-            elif data.zero == "cache":
+            if data.zero == "InternalError":
+                rds.delete('Error:InternalError')
+            elif data.zero == "Cache":
                 expire_redis_cache(True)
             raise web.seeother('analytics')
         except AttributeError:
@@ -318,7 +317,13 @@ class UserManage:
 
         user_list = log_list = cuser = None
         if action == "list":
-            user_list = db.users.find().sort('created_date', -1)
+            _k = web.input(_method="GET").get('active', None)
+            if _k == "all" or _k == None:
+                _pre_user_list = db.users.find()
+            else:
+                _t = True if _k == "true" else False
+                _pre_user_list = db.users.find({"active": _t})
+            user_list = _pre_user_list.sort('created_date', -1)
         if action in ("detail", "update", "delete", "log") and user_id:
             cuser = db.users.find_one({'_id':ObjectId(user_id)})
         if action == "log":
