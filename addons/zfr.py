@@ -155,7 +155,10 @@ class Login:
         # init datas
         self.base_url = rds.hget(self.uid, 'base_url')
         self.viewstate = rds.hget(self.uid, 'viewstate')
-        pickled = base64.decodestring(rds.hget(self.uid, 'cookies'))
+        _uid = rds.hget(self.uid, 'cookies')
+        if _uid is None:
+            raise errors.PageError('请重新登录！')
+        pickled = base64.decodestring(_uid)
         self.cookies = pickle.loads(pickled)
         rds.pexpire(self.uid, config.COOKIES_TIME_OUT) # 延时
 
