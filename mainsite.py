@@ -336,9 +336,12 @@ class Score:
 #         return render.notice(news=news)
 
 class Advertise:
-    """"""
+    """广告处理
+    - 递增PV
+    - 渲染模板
+    """
     def GET(self, ad_name):
-        ads = ('zhe800',)
+        ads = ('',)
         if ad_name in ads:
             incr_key('AD:Count:%s' % ad_name)
             return getattr(render, ad_name)()

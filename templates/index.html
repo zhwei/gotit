@@ -78,17 +78,17 @@
         <div class="col-lg-4">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title">购物神器 &middot;折800</h3>
+                    <h3 class="panel-title">绩点 总成绩 </h3>
                 </div>
                 <div class="panel-body">
-                    <a href="http://{{ domains.main }}/ad/zhe800" target="_blank">
-                        <img src="http://gotit.qiniudn.com/img/zhe800-01.jpg" style="width: 100%;" alt="折800"/>
-                    </a>
+                    <p>查询入学以来所有成绩,包括第二专业和补考成绩以及平均学分绩点.</p>
+                    {% if alert.score %}{{ alert.score }}{% endif %}
                 </div>
                 <div class="panel-footer">
-                    <a href="http://{{ domains.main }}/ad/zhe800" class="btn btn-default btn-block">查看详情</a>
+                    <a href="http://{{ domains.main }}/score" class="btn btn-default btn-block">Go</a>
                 </div>
             </div>
+
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">图书馆</h3>
@@ -110,18 +110,6 @@
                 </div>
                 <div class="panel-footer">
                     <a href="http://{{ domains.main }}/404" class="btn btn-default btn-block">Go</a>
-                </div>
-            </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">网站赞助者</h3>
-                </div>
-                <div class="panel-body">
-                    <p>您的每一分钱都会让<strong>Gotit</strong>做的更好!</p>
-                    {% if alert.donate %}{{ alert.donate }}{% endif %}
-                </div>
-                <div class="panel-footer">
-                    <a href="http://{{ domains.main }}/donate.html#names" class="btn btn-default btn-block">Go</a>
                 </div>
             </div>
         </div>
@@ -153,17 +141,16 @@
             </div>
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title">绩点 总成绩 </h3>
+                    <h3 class="panel-title">网站赞助者</h3>
                 </div>
                 <div class="panel-body">
-                    <p>查询入学以来所有成绩,包括第二专业和补考成绩以及平均学分绩点.</p>
-                    {% if alert.score %}{{ alert.score }}{% endif %}
+                    <p>您的每一分钱都会让<strong>Gotit</strong>做的更好!</p>
+                    {% if alert.donate %}{{ alert.donate }}{% endif %}
                 </div>
                 <div class="panel-footer">
-                    <a href="http://{{ domains.main }}/score" class="btn btn-default btn-block">Go</a>
+                    <a href="http://{{ domains.main }}/donate.html#names" class="btn btn-default btn-block">Go</a>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

@@ -12,10 +12,10 @@ import apis
 import manage
 import wechat
 
-from addons.config import debug_mode
+from addons.config import DEBUG
 
 # debug mode
-web.config.debug = debug_mode
+web.config.debug = DEBUG
 
 mapping = (
     "(www\.)?gotit.local", mainsite.app,
