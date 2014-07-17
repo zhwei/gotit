@@ -224,6 +224,8 @@ class ProcessMsg(object):
                     ret = self.get_zf_score(t=self.content)
                 except KeyError:
                     return self.replay_text(self.text_success())
+                except errors.PageError, e:
+                    return self.replay_text("错误:{0}\n- - - \nr.  重新获取验证码\n11.重新查询\nq. 退出查询过程".format(e.value))
             elif self.content in ('3', '4'):
                 # 绩点 & 往年四六级成绩
                 _dic = {
