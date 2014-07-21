@@ -319,7 +319,7 @@ class Login:
                 "__EVENTARGUMENT":"",
                 "__VIEWSTATE":viewstate,
                 "xnd":'2013-2014',
-                "xqd":"1",
+                "xqd":"2",
                 }
         url = self.base_url + 'xskbcx' + ".aspx?xh=" + self.xh
         _ret = requests.post(url=url, data=data,cookies=self.cookies, headers=self.headers)
