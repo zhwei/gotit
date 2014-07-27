@@ -222,7 +222,7 @@ class CurrentSemester(BaseApiMixin, BaseGet):
                 score = zf.get_score()
                 data = get_score_dict(score)
             elif category == "timetable":
-                timetable = zf.get_timetable()
+                timetable = zf.get_last_timetable()
                 if raw:
                     data = {"raw": timetable}
                 else:
