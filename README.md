@@ -30,4 +30,4 @@ Got it
 ## 需要的其他服务
 
   + redis
-  + mongodb
+  + mongodb 
