@@ -47,8 +47,9 @@ urls = (
 class APIDoc:
     """ API 文档 首页"""
     def GET(self):
-        url = "https://github.com/zhwei/gotit/blob/2.0-stable/doc/api.markdown"
-        raise web.seeother(url)
+
+        return ('<script src="https://gist.github.com'
+                '/zhwei/2c01aa053cc5ee3e45dc.js"></script>')
 
 
 
