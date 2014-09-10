@@ -23,7 +23,7 @@ def get_proxy():
 
 def get_cet_fm_jae(number, name):
     """ 从jae抓取数据 """
-    import json
+    import simplejson as json
     header = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     url = "http://gotitasia.jd-app.com/cet"
     data = {'number': number, 'name':name}

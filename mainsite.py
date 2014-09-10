@@ -193,7 +193,7 @@ class ZhengFangNoCode:
                 zf = Login()
                 session['uid'] = zf.no_code_login(form.d)
                 session['xh'] = form.d.xh
-                return render.result(tables=zf.get_last_timetable())
+                return render.result(tables=zf.get_timetable())
             except errors.PageError, e:
                 return render.alert_err(error=e.value, url='/libr')
 

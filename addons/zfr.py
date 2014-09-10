@@ -14,6 +14,7 @@ try:
     import cPickle as pickle
 except ImportError:
     import pickle
+from urlparse import urlparse
 
 import requests
 from BeautifulSoup import BeautifulSoup
@@ -29,13 +30,15 @@ USER_RDS_PREFIX = "User:Zf:"
 
 def prepare_request(base_url, just_header=False):
     # process links
+    _parse = urlparse(base_url)
     headers = {
             'Referer':base_url,
-            'Host':base_url[7:21],
+            'Host':_parse.netloc,
             'User-Agent':"Mozilla/5.0 (X11; Ubuntu; Linux i686;\
-                    rv:18.0) Gecko/20100101 Firefox/18.0",
+                    rv:18.0) Gecko/20100101 Firefox/30.0",
             'Connection':'Keep-Alive'
             }
+
     if just_header: return headers
     login_url = base_url + "Default2.aspx"
     code_url = base_url + 'CheckCode.aspx'
@@ -61,7 +64,8 @@ def get_viewstate(page):
     """get __VIEWSTATE
     """
     try:
-        com = re.compile(r'name="__VIEWSTATE" value="(.*?)"')
+        com = re.compile('name="__VIEWSTATE" value="(.*?)"')
+        # logging.error(com.findall(page))
         vs = com.findall(page)[0]
     except IndexError:
         import time
@@ -200,7 +204,7 @@ class Login:
 
         self.xh = post_content.get('xh')
         self.pw = post_content.get('pw')
-        self.login_url = self.base_url + "default6.aspx"
+        self.login_url = self.base_url + "Default6.aspx"
         self.headers = prepare_request(self.base_url, just_header=True)
         _req1 = safe_get(self.login_url, headers=self.headers)
         _viewstate = get_viewstate(_req1.content)
@@ -213,6 +217,7 @@ class Login:
             'tbtnsXm':'',
             'rblJs':"学生",
             "txtYhm":self.xh,
+            'txtXm':"",
             'txtMm':self.pw,
             '__VIEWSTATE': _viewstate,
             'btnDl': '登 录',
