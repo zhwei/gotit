@@ -5,7 +5,7 @@ addons/*.pyc
 tools.py
 dong.py
 test/*
-.idea/*
+.idea/
 static/pic/*
 static/cdn/*
 static/css/*
@@ -19,56 +19,4 @@ initial_data.py
 *.swp
 addons/config.py
 addons/backup/*
-
-# C extensions
-*.so
-
-# Packages
-*.egg
-*.egg-info
-dist
-build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
-.installed.cfg
-lib
-lib64
-
-# Installer logs
-pip-log.txt
-
-# Unit test / coverage reports
-.coverage
-.tox
-nosetests.xml
-
-# Translations
-*.mo
-
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
-
-### PyCharm ###
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
-
-## Directory-based project format
-.idea/
-# if you remove the above rule, at least ignore user-specific stuff:
-# .idea/workspace.xml
-# .idea/tasks.xml
-# and these sensitive or high-churn files:
-# .idea/dataSources.ids
-# .idea/dataSources.xml
-# .idea/sqlDataSources.xml
-# .idea/dynamic.xml
-
-## File-based project format
-*.ipr
-*.iws
-*.iml
+env
