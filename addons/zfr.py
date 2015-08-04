@@ -64,7 +64,7 @@ def get_viewstate(page):
     """get __VIEWSTATE
     """
     try:
-        com = re.compile('name="__VIEWSTATE" value="(.*?)"')
+        com = re.compile('name="__VIEWSTATE".*?value="(.*?)"')
         # logging.error(com.findall(page))
         vs = com.findall(page)[0]
     except IndexError:

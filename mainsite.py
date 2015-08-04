@@ -195,7 +195,7 @@ class ZhengFangNoCode:
                 session['xh'] = form.d.xh
                 return render.result(tables=zf.get_timetable())
             except errors.PageError, e:
-                return render.alert_err(error=e.value, url='/libr')
+                return render.alert_err(error=e.value, url='/zheng/nocode')
 
 class Cet:
     """ 四六级成绩查询
